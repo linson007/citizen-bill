@@ -18,38 +18,73 @@ The first focus is Kerala, where MLAs can introduce private member bills, but pu
 
 ## Getting Started
 
-Install dependencies:
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-Create local environment variables:
+### 2. Create local environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-For Google login, create OAuth credentials in Google Cloud Console and set:
+Edit `.env` and set the values needed for your environment.
+
+Required for the app and database:
+
+- `DATABASE_URL` - PostgreSQL connection string used by Prisma.
+- `NEXTAUTH_SECRET` - random secret for NextAuth/Auth.js. Generate one with `openssl rand -base64 32`.
+- `NEXTAUTH_URL` - local URL, usually `http://localhost:3000`.
+
+Required for Google login:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL`
 
-Generate the Prisma client:
+Optional:
+
+- `OPENAI_API_KEY` - enables real OpenAI responses. Without it, development fallback AI drafts are returned.
+- `AI_DAILY_LIMIT` - per-user daily AI request limit. Defaults to `20`.
+- `BLOB_READ_WRITE_TOKEN` - enables Vercel Blob uploads for bill attachments.
+- `EMAIL_FROM` - marks notification emails as queued. Without it, email events are logged in development.
+
+### 3. Prepare PostgreSQL
+
+Create a PostgreSQL database that matches `DATABASE_URL`, then run migrations:
+
+```bash
+npm run db:migrate
+```
+
+If the database schema is already up to date and you only need generated Prisma types/client, run:
 
 ```bash
 npm run db:generate
 ```
 
-Run the development server:
+Important: `src/generated/prisma` is generated code and is intentionally ignored by git. Run `npm run db:generate` after cloning and before typechecking, testing, or building.
+
+### 4. Run the development server
 
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Verification
+
+Before committing, run:
+
+```bash
+npm run db:generate
+npm run lint
+npm run test
+npx tsc --noEmit
+npm run build
+```
 
 ## Scripts
 
@@ -68,10 +103,10 @@ npm run db:studio    # Open Prisma Studio
 
 ## Testing
 
-The project uses Vitest for fast unit tests. Add tests next to the code they
-cover using `*.test.ts` or `*.test.tsx`.
+The project uses Vitest for fast unit tests. Add tests next to the code they cover using `*.test.ts` or `*.test.tsx`.
 
 ```bash
+npm run db:generate
 npm run test
 ```
 
@@ -81,18 +116,15 @@ See [product.md](./product.md) for the product scope, MVP phases, data model, da
 
 ## Upload Limits
 
-Bill attachments support PDF and DOCX files up to 10 MB. Configure
-`BLOB_READ_WRITE_TOKEN` to enable Vercel Blob uploads.
+Bill attachments support PDF and DOCX files up to 10 MB. Configure `BLOB_READ_WRITE_TOKEN` to enable Vercel Blob uploads.
 
 ## Legal Pages
 
-The app includes public terms and privacy pages at `/terms` and `/privacy`.
-AI-generated text is drafting assistance only and is not legal advice.
+The app includes public terms and privacy pages at `/terms` and `/privacy`. AI-generated text is drafting assistance only and is not legal advice.
 
 ## AI Usage Limits
 
-AI drafting endpoints require login and track per-user usage in the database.
-The default limit is 20 AI requests per user per day. Override it with:
+AI drafting endpoints require login and track per-user usage in the database. The default limit is 20 AI requests per user per day. Override it with:
 
 ```bash
 AI_DAILY_LIMIT=20
