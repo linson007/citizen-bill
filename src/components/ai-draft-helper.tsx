@@ -1,0 +1,354 @@
+"use client";
+
+import { useState } from "react";
+import { Bot, Loader2, Save, Send, Wand2 } from "lucide-react";
+
+import {
+  parseAiDraftFieldsFromText,
+  type AiDraftFields,
+} from "@/lib/ai-draft-fields";
+
+export type { AiDraftFields };
+
+const aiModes = [
+  {
+    value: "draft",
+    label: "Draft bill",
+  },
+  {
+    value: "legal",
+    label: "Legal structure",
+  },
+  {
+    value: "simplify",
+    label: "Simplify",
+  },
+  {
+    value: "malayalam",
+    label: "Malayalam",
+  },
+  {
+    value: "summary",
+    label: "Summarize",
+  },
+  {
+    value: "arguments",
+    label: "Arguments",
+  },
+] as const;
+
+type AiMode = (typeof aiModes)[number]["value"];
+
+export function AiDraftHelper({
+  title,
+  problem,
+  onInsert,
+  billId,
+}: {
+  title: string;
+  problem: string;
+  onInsert?: (fields: AiDraftFields) => void;
+  billId?: string;
+}) {
+  const [prompt, setPrompt] = useState(problem);
+  const [mode, setMode] = useState<AiMode>("draft");
+  const [result, setResult] = useState("");
+  const [fields, setFields] = useState<AiDraftFields | null>(null);
+  const [messages, setMessages] = useState<
+    { role: "user" | "assistant"; content: string }[]
+  >([]);
+  const [saveHistory, setSaveHistory] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  function getDefaultErrorMessage(status: number) {
+    if (status === 401) {
+      return "Please log in to use the AI assistant.";
+    }
+
+    if (status === 429) {
+      return "Daily AI limit reached. Try again after the limit resets.";
+    }
+
+    return "Unable to generate a draft right now.";
+  }
+
+  async function readErrorMessage(response: Response) {
+    try {
+      const data = (await response.json()) as { error?: string };
+      return data.error || getDefaultErrorMessage(response.status);
+    } catch {
+      return getDefaultErrorMessage(response.status);
+    }
+  }
+
+  async function runAssistant() {
+    const userMessage = prompt.trim();
+    if (!userMessage) {
+      return;
+    }
+
+    setLoading(true);
+    setResult("");
+    setFields(null);
+
+    const nextMessages = [
+      ...messages,
+      {
+        role: "user" as const,
+        content: userMessage,
+      },
+    ];
+    setMessages(nextMessages);
+
+    const response = await fetch("/api/ai/draft", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, prompt, mode }),
+    });
+
+    if (!response.ok) {
+      const message = await readErrorMessage(response);
+      setResult(message);
+      setMessages([
+        ...nextMessages,
+        {
+          role: "assistant",
+          content: message,
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
+    const data = (await response.json()) as {
+      text?: string;
+      fields?: AiDraftFields | null;
+    };
+    setResult(data.text ?? "Unable to generate a draft right now.");
+    setFields(data.fields ?? null);
+    setMessages([
+      ...nextMessages,
+      {
+        role: "assistant",
+        content: data.text ?? "Unable to generate a draft right now.",
+      },
+    ]);
+    setPrompt("");
+    setLoading(false);
+  }
+
+  async function sendChatMessage() {
+    const userMessage = prompt.trim();
+    if (!userMessage) {
+      return;
+    }
+
+    setLoading(true);
+    setResult("");
+    setFields(null);
+
+    const nextMessages = [
+      ...messages,
+      {
+        role: "user" as const,
+        content: userMessage,
+      },
+    ];
+    setMessages([
+      ...nextMessages,
+      {
+        role: "assistant",
+        content: "",
+      },
+    ]);
+    setPrompt("");
+
+    const response = await fetch("/api/ai/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        billId,
+        messages: nextMessages,
+        mode,
+        saveHistory,
+        title,
+      }),
+    });
+
+    if (!response.ok) {
+      const message = await readErrorMessage(response);
+      setMessages([
+        ...nextMessages,
+        {
+          role: "assistant",
+          content: message,
+        },
+      ]);
+      setResult(message);
+      setLoading(false);
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let assistantText = "";
+
+    if (!reader) {
+      setLoading(false);
+      return;
+    }
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      assistantText += decoder.decode(value, { stream: true });
+      setMessages([
+        ...nextMessages,
+        {
+          role: "assistant",
+          content: assistantText,
+        },
+      ]);
+    }
+
+    setResult(assistantText);
+    if (mode === "draft" || mode === "legal") {
+      setFields(parseAiDraftFieldsFromText(assistantText));
+    }
+    setLoading(false);
+  }
+
+  return (
+    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+          <Bot size={20} aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="font-semibold">AI drafting assistant</h2>
+          <p className="text-sm text-[#6d6658]">
+            Draft, revise, translate, summarize, or stress-test a bill idea.
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {aiModes.map((item) => (
+          <button
+            key={item.value}
+            type="button"
+            onClick={() => setMode(item.value)}
+            className={`h-9 rounded-md border px-2 text-xs font-semibold ${
+              mode === item.value
+                ? "border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                : "border-[#c8c0ae] bg-white text-[#2f2a22]"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {messages.length > 0 ? (
+        <div className="mb-3 max-h-80 space-y-3 overflow-y-auto rounded-md border border-[#e7e1d3] bg-[#fbfaf7] p-3">
+          {messages.map((message, index) => (
+            <div
+              key={`${message.role}-${index}`}
+              className={`rounded-md px-3 py-2 text-sm leading-6 ${
+                message.role === "user"
+                  ? "bg-white text-[#2f2a22]"
+                  : "bg-[#e4eef6] text-[#123c69]"
+              }`}
+            >
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">
+                {message.role === "user" ? "You" : "Assistant"}
+              </p>
+              <p className="whitespace-pre-wrap">
+                {message.content || "Writing..."}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <textarea
+        value={prompt}
+        onChange={(event) => setPrompt(event.target.value)}
+        rows={5}
+        placeholder="Ask the assistant to draft, improve, summarize, translate, or review your bill idea."
+        className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+      />
+      <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-[#6d6658]">
+        <input
+          type="checkbox"
+          checked={saveHistory}
+          onChange={(event) => setSaveHistory(event.target.checked)}
+          className="mt-1"
+        />
+        Save this AI conversation to my drafting history.
+      </label>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={sendChatMessage}
+          disabled={loading || prompt.trim().length < 5}
+          className="flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {loading ? (
+            <Loader2 className="animate-spin" size={16} aria-hidden="true" />
+          ) : (
+            <Send size={16} aria-hidden="true" />
+          )}
+          {loading ? "Writing" : "Send chat"}
+        </button>
+        <button
+          type="button"
+          onClick={runAssistant}
+          disabled={loading || prompt.trim().length < 5}
+          className="flex h-10 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {loading ? (
+            <Loader2 className="animate-spin" size={16} aria-hidden="true" />
+          ) : (
+            <Bot size={16} aria-hidden="true" />
+          )}
+          Structured draft
+        </button>
+      </div>
+
+      {result ? (
+        <div className="mt-4 rounded-md bg-[#fbfaf7] p-4">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-[#3f3a32]">
+              Suggested draft
+            </p>
+            {fields && onInsert ? (
+              <button
+                type="button"
+                onClick={() => onInsert(fields)}
+                className="flex h-8 items-center gap-1.5 rounded-md bg-[#123c69] px-2.5 text-xs font-semibold text-white"
+              >
+                {fields.proposedSolution || fields.expectedImpact ? (
+                  <Wand2 size={14} aria-hidden="true" />
+                ) : (
+                  <Save size={14} aria-hidden="true" />
+                )}
+                Insert into form
+              </button>
+            ) : null}
+          </div>
+          <pre className="whitespace-pre-wrap text-sm leading-6 text-[#3f3a32]">
+            {result}
+          </pre>
+        </div>
+      ) : null}
+    </section>
+  );
+}

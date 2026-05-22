@@ -1,0 +1,368 @@
+"use client";
+
+import { useActionState } from "react";
+import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { FileText, Send, Save } from "lucide-react";
+
+import { createBillAction, type BillFormState } from "@/app/bills/new/actions";
+import {
+  AiDraftHelper,
+  type AiDraftFields,
+} from "@/components/ai-draft-helper";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
+import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
+
+const initialState: BillFormState = {};
+
+export function BillForm() {
+  const [state, formAction] = useActionState(createBillAction, initialState);
+  const [fields, setFields] = useState({
+    title: state.fields?.title ?? "",
+    description: state.fields?.description ?? "",
+    category: state.fields?.category ?? "",
+    categoryOther: state.fields?.categoryOther ?? "",
+    tags: state.fields?.tags ?? "",
+    problem: state.fields?.problem ?? "",
+    proposedSolution: state.fields?.proposedSolution ?? "",
+    expectedImpact: state.fields?.expectedImpact ?? "",
+    body: state.fields?.body ?? "",
+    references: state.fields?.references ?? "",
+  });
+
+  function updateField(name: keyof typeof fields, value: string) {
+    setFields((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  function insertAiDraft(draft: AiDraftFields) {
+    setFields((current) => ({
+      ...current,
+      description: draft.description || current.description,
+      proposedSolution: draft.proposedSolution || current.proposedSolution,
+      expectedImpact: draft.expectedImpact || current.expectedImpact,
+      body: draft.body || current.body,
+    }));
+  }
+
+  return (
+    <form action={formAction} className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="space-y-5">
+        <FormSection title="Bill details">
+          <Field
+            label="Title"
+            name="title"
+            placeholder="Kerala Public Health Data Transparency Bill"
+            value={fields.title}
+            onChange={(value) => updateField("title", value)}
+            error={state.errors?.title?.[0]}
+          />
+          <TextArea
+            label="Short description"
+            name="description"
+            rows={3}
+            placeholder="A short public summary of what this bill should do."
+            value={fields.description}
+            onChange={(value) => updateField("description", value)}
+            error={state.errors?.description?.[0]}
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <CategorySelect
+              label="Category"
+              name="category"
+              value={fields.category}
+              onChange={(value) => updateField("category", value)}
+              error={state.errors?.category?.[0]}
+            />
+            <Field
+              label="Tags"
+              name="tags"
+              placeholder="health, data, hospitals"
+              value={fields.tags}
+              onChange={(value) => updateField("tags", value)}
+              error={state.errors?.tags?.[0]}
+            />
+          </div>
+          {fields.category === OTHER_BILL_CATEGORY ? (
+            <Field
+              label="Other category"
+              name="categoryOther"
+              placeholder="Enter the department or topic"
+              value={fields.categoryOther}
+              onChange={(value) => updateField("categoryOther", value)}
+              error={state.errors?.categoryOther?.[0]}
+            />
+          ) : null}
+        </FormSection>
+
+        <FormSection title="Policy content">
+          <TextArea
+            label="Problem statement"
+            name="problem"
+            rows={5}
+            placeholder="Describe the public problem, who is affected, and why this needs legislative attention."
+            value={fields.problem}
+            onChange={(value) => updateField("problem", value)}
+            error={state.errors?.problem?.[0]}
+          />
+          <TextArea
+            label="Proposed solution"
+            name="proposedSolution"
+            rows={5}
+            placeholder="Describe the intervention, obligations, rights, duties, standards, or reporting requirements."
+            value={fields.proposedSolution}
+            onChange={(value) => updateField("proposedSolution", value)}
+            error={state.errors?.proposedSolution?.[0]}
+          />
+          <TextArea
+            label="Expected public impact"
+            name="expectedImpact"
+            rows={4}
+            placeholder="Explain how people, institutions, or local bodies should benefit."
+            value={fields.expectedImpact}
+            onChange={(value) => updateField("expectedImpact", value)}
+            error={state.errors?.expectedImpact?.[0]}
+          />
+          <TextArea
+            label="Draft bill text"
+            name="body"
+            rows={10}
+            placeholder="Paste or draft clauses here. The AI assistant will later help structure this section."
+            value={fields.body}
+            onChange={(value) => updateField("body", value)}
+            error={state.errors?.body?.[0]}
+          />
+          <TextArea
+            label="References and supporting links"
+            name="references"
+            rows={4}
+            placeholder="Add source links, reports, news articles, government pages, or notes that support this bill."
+            value={fields.references}
+            onChange={(value) => updateField("references", value)}
+            error={state.errors?.references?.[0]}
+          />
+        </FormSection>
+      </div>
+
+      <aside className="space-y-4">
+        <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+              <FileText size={20} aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="font-semibold">Save bill</h2>
+              <p className="text-sm text-[#6d6658]">
+                Keep it private or publish immediately.
+              </p>
+            </div>
+          </div>
+          {state.message ? (
+            <p className="mb-4 rounded-md bg-[#fff3d7] px-3 py-2 text-sm font-medium text-[#6b4e16]">
+              {state.message}
+            </p>
+          ) : null}
+          <div className="space-y-2">
+            <SubmitButton intent="draft" />
+            <SubmitButton intent="publish" />
+          </div>
+          <p className="mt-3 text-xs leading-5 text-[#6d6658]">
+            Publishing requires a description, problem statement, proposed
+            solution, and draft bill text.
+          </p>
+        </div>
+
+        <AiDraftHelper
+          title={fields.title || "New public bill"}
+          problem={fields.problem}
+          onInsert={insertAiDraft}
+        />
+        <LegalDisclaimer compact />
+      </aside>
+    </form>
+  );
+}
+
+function SubmitButton({ intent }: { intent: "draft" | "publish" }) {
+  const { pending } = useFormStatus();
+  const isPublish = intent === "publish";
+
+  return (
+    <button
+      type="submit"
+      name="intent"
+      value={intent}
+      className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-70 ${
+        isPublish
+          ? "bg-[#123c69] text-white"
+          : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+      }`}
+      disabled={pending}
+    >
+      {isPublish ? (
+        <Send size={17} aria-hidden="true" />
+      ) : (
+        <Save size={17} aria-hidden="true" />
+      )}
+      {pending
+        ? isPublish
+          ? "Publishing"
+          : "Saving draft"
+        : isPublish
+          ? "Save and publish"
+          : "Save draft"}
+    </button>
+  );
+}
+
+function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+      <h2 className="mb-5 text-lg font-semibold">{title}</h2>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function CategorySelect({
+  label,
+  name,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <select
+        name={name}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+      >
+        <option value="">Select category</option>
+        {billCategories.map((category) => (
+          <option key={category} value={category}>
+            {category === OTHER_BILL_CATEGORY ? "Other" : category}
+          </option>
+        ))}
+      </select>
+      {error ? <ErrorText>{error}</ErrorText> : null}
+    </label>
+  );
+}
+
+function Field({
+  label,
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  name: string;
+  placeholder: string;
+  value: string;
+  onChange?: (value: string) => void;
+  error?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <input
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange?.(event.target.value)}
+        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+      />
+      {error ? <ErrorText>{error}</ErrorText> : null}
+    </label>
+  );
+}
+
+function TextArea({
+  label,
+  name,
+  rows,
+  placeholder,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  name: string;
+  rows: number;
+  placeholder: string;
+  value: string;
+  onChange?: (value: string) => void;
+  error?: string;
+}) {
+  const snippets =
+    name === "body"
+      ? [
+          {
+            label: "Section",
+            value: "\n\n## Section title\n\nDraft the section text here.",
+          },
+          {
+            label: "Clause",
+            value: "\n\n1. Clause heading\n   Clause text here.",
+          },
+          {
+            label: "Note",
+            value: "\n\nNote: Add drafting note or reference here.",
+          },
+        ]
+      : [];
+
+  return (
+    <label className="block">
+      <span className="flex items-center justify-between gap-3">
+        <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+        {snippets.length > 0 ? (
+          <span className="flex gap-1">
+            {snippets.map((snippet) => (
+              <button
+                key={snippet.label}
+                type="button"
+                onClick={() => onChange?.(`${value}${snippet.value}`)}
+                className="rounded-md border border-[#c8c0ae] bg-white px-2 py-1 text-xs font-semibold text-[#2f2a22]"
+              >
+                {snippet.label}
+              </button>
+            ))}
+          </span>
+        ) : null}
+      </span>
+      <textarea
+        name={name}
+        rows={rows}
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange?.(event.target.value)}
+        className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+      />
+      {error ? <ErrorText>{error}</ErrorText> : null}
+    </label>
+  );
+}
+
+function ErrorText({ children }: { children: React.ReactNode }) {
+  return <p className="mt-2 text-sm font-medium text-[#a33a2a]">{children}</p>;
+}

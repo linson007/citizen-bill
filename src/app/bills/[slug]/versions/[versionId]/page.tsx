@@ -1,0 +1,65 @@
+import { getServerSession } from "next-auth";
+import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
+import { SiteHeader } from "@/components/site-header";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export default async function BillVersionPage({
+  params,
+}: {
+  params: Promise<{ slug: string; versionId: string }>;
+}) {
+  const session = await getServerSession(authOptions);
+  const { slug, versionId } = await params;
+
+  const bill = await prisma.bill.findUnique({
+    where: { slug },
+    select: { id: true, authorId: true, status: true, title: true },
+  });
+
+  if (!bill) {
+    notFound();
+  }
+
+  if (bill.status === "DRAFT" && session?.user?.id !== bill.authorId) {
+    redirect("/login");
+  }
+
+  const version = await prisma.billVersion.findUnique({
+    where: { id: versionId },
+  });
+
+  if (!version || version.billId !== bill.id) {
+    notFound();
+  }
+
+  return (
+    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+      <SiteHeader />
+      <section className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+        <Link
+          href={`/bills/${slug}`}
+          className="mb-5 flex w-fit items-center gap-2 text-sm font-semibold text-[#123c69]"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          Back to bill
+        </Link>
+        <article className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <p className="text-sm text-[#6d6658]">
+            Snapshot from {version.createdAt.toLocaleString("en-IN")}
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold">{version.title}</h1>
+          {version.summary ? (
+            <p className="mt-4 text-[#4f4a40]">{version.summary}</p>
+          ) : null}
+          <pre className="mt-5 whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+            {version.body || "No body was saved in this version."}
+          </pre>
+        </article>
+      </section>
+    </main>
+  );
+}

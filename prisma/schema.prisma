@@ -1,0 +1,329 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum BillStatus {
+  DRAFT
+  READY_FOR_REVIEW
+  PUBLISHED
+  UNDER_DISCUSSION
+  ARCHIVED
+  REPORTED
+  REMOVED
+  SUBMITTED_TO_MLA
+  INTRODUCED_AS_PRIVATE_BILL
+  REJECTED
+  PASSED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum SuggestionStatus {
+  OPEN
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id             String                @id @default(cuid())
+  name           String?
+  email          String                @unique
+  emailVerified  DateTime?
+  image          String?
+  displayName    String?
+  role           UserRole              @default(USER)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  bills          Bill[]
+  votes          Vote[]
+  comments       Comment[]
+  aiSessions     AiConversation[]
+  aiSafetyEvents AiSafetyEvent[]
+  aiUsageEvents  AiUsageEvent[]
+  reports        Report[]              @relation("Reporter")
+  suggestions    AmendmentSuggestion[]
+  notifications  Notification[]
+  accounts       Account[]
+  sessions       Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Bill {
+  id               String                @id @default(cuid())
+  title            String
+  slug             String                @unique
+  description      String
+  problem          String?
+  proposedSolution String?
+  expectedImpact   String?
+  body             String?
+  references       String?
+  summary          String?
+  region           String?
+  status           BillStatus            @default(DRAFT)
+  authorId         String
+  author           User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  category         Category?             @relation(fields: [categoryId], references: [id])
+  tags             BillTag[]
+  files            UploadedFile[]
+  versions         BillVersion[]
+  votes            Vote[]
+  comments         Comment[]
+  shares           BillShare[]
+  aiSessions       AiConversation[]
+  reports          Report[]
+  suggestions      AmendmentSuggestion[]
+  notifications    Notification[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  publishedAt      DateTime?
+
+  @@index([authorId])
+  @@index([status])
+  @@index([categoryId])
+}
+
+model BillVersion {
+  id        String   @id @default(cuid())
+  billId    String
+  bill      Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  summary   String?
+  createdAt DateTime @default(now())
+
+  @@index([billId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  billId    String
+  bill      Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([billId, userId])
+  @@index([userId])
+}
+
+model BillShare {
+  id        String   @id @default(cuid())
+  billId    String
+  bill      Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  platform  String
+  createdAt DateTime @default(now())
+
+  @@index([billId])
+  @@index([platform])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  billId    String
+  bill      Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  reports   Report[]
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([billId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  bills     Bill[]
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  bills     BillTag[]
+  createdAt DateTime  @default(now())
+}
+
+model BillTag {
+  billId String
+  bill   Bill   @relation(fields: [billId], references: [id], onDelete: Cascade)
+  tagId  String
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([billId, tagId])
+}
+
+model UploadedFile {
+  id        String   @id @default(cuid())
+  billId    String
+  bill      Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  url       String
+  fileName  String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  @@index([billId])
+}
+
+model AiConversation {
+  id        String   @id @default(cuid())
+  billId    String?
+  bill      Bill?    @relation(fields: [billId], references: [id], onDelete: SetNull)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  messages  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([billId])
+  @@index([userId])
+}
+
+model AiSafetyEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  billId    String?
+  reason    String
+  prompt    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([billId])
+  @@index([reason])
+}
+
+model AiUsageEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route     String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  billId     String?
+  bill       Bill?        @relation(fields: [billId], references: [id], onDelete: Cascade)
+  commentId  String?
+  comment    Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User         @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     String
+  details    String?
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([billId])
+  @@index([commentId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+model AmendmentSuggestion {
+  id        String           @id @default(cuid())
+  billId    String
+  bill      Bill             @relation(fields: [billId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  section   String?
+  body      String
+  status    SuggestionStatus @default(OPEN)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([billId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billId    String?
+  bill      Bill?     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([billId])
+  @@index([readAt])
+}
