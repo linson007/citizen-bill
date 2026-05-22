@@ -1,5 +1,3 @@
-import { prisma } from "@/lib/prisma";
-
 export const DEFAULT_DAILY_AI_LIMIT = 20;
 
 export type AiUsageLimitResult = {
@@ -24,6 +22,14 @@ type AiUsageStore = {
     create(args: { data: { userId: string; route: string } }): Promise<unknown>;
   };
 };
+
+let defaultStore: AiUsageStore | undefined;
+
+async function getDefaultStore() {
+  defaultStore ??= (await import("@/lib/prisma")).prisma;
+
+  return defaultStore;
+}
 
 export function getDailyAiLimit() {
   const configuredLimit = Number(process.env.AI_DAILY_LIMIT);
@@ -55,7 +61,7 @@ export async function checkAiUsageLimit(
 ): Promise<AiUsageLimitResult> {
   const limit = options.limit ?? getDailyAiLimit();
   const { start, resetAt } = getAiUsageWindow(options.now);
-  const store = options.store ?? prisma;
+  const store = options.store ?? (await getDefaultStore());
   const used = await store.aiUsageEvent.count({
     where: {
       userId,
@@ -79,9 +85,11 @@ export async function checkAiUsageLimit(
 export async function recordAiUsage(
   userId: string,
   route: string,
-  store: AiUsageStore = prisma,
+  store?: AiUsageStore,
 ) {
-  await store.aiUsageEvent.create({
+  const usageStore = store ?? (await getDefaultStore());
+
+  await usageStore.aiUsageEvent.create({
     data: {
       userId,
       route,

@@ -46,6 +46,7 @@ Required for Google login:
 Optional:
 
 - `OPENAI_API_KEY` - enables real OpenAI responses. Without it, development fallback AI drafts are returned.
+- `OPENAI_MODEL` - OpenAI chat/completions model. Defaults to `gpt-4.1-mini`.
 - `AI_DAILY_LIMIT` - per-user daily AI request limit. Defaults to `20`.
 - `BLOB_READ_WRITE_TOKEN` - enables Vercel Blob uploads for bill attachments.
 - `EMAIL_FROM` - marks notification emails as queued. Without it, email events are logged in development.

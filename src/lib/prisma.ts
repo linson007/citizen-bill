@@ -1,18 +1,12 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "@/generated/prisma/client";
+import { getDatabaseUrl } from "@/lib/database-url";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
   prismaConnectionString?: string;
 };
-
-const fallbackConnectionString =
-  "postgresql://citizen_bill:citizen_bill@localhost:5432/citizen_bill?schema=public";
-
-function getConnectionString() {
-  return process.env.DATABASE_URL ?? fallbackConnectionString;
-}
 
 function createPrismaClient(connectionString: string) {
   return new PrismaClient({
@@ -20,7 +14,7 @@ function createPrismaClient(connectionString: string) {
   });
 }
 
-const connectionString = getConnectionString();
+const connectionString = getDatabaseUrl();
 
 export const prisma =
   globalForPrisma.prismaConnectionString === connectionString &&

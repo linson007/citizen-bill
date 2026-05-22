@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+import { getOpenAiModel } from "@/lib/ai-config";
 import { authOptions } from "@/lib/auth";
 import {
   checkAiGuardrails,
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
         } else {
           const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
           const completion = await client.chat.completions.create({
-            model: "gpt-4.1-mini",
+            model: getOpenAiModel(),
             stream: true,
             messages: [
               {

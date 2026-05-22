@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { authOptions } from "@/lib/auth";
+import { getOpenAiModel } from "@/lib/ai-config";
 import {
   checkAiGuardrails,
   guardedSystemInstruction,
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const completion = await client.chat.completions.create({
-    model: "gpt-4.1-mini",
+    model: getOpenAiModel(),
     messages: [
       {
         role: "system",
