@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Bookmark,
+  Bell,
   Calendar,
   ChartNoAxesColumn,
   Flag,
@@ -26,6 +27,7 @@ import {
   reportBillAction,
   reportCommentAction,
   reviewSuggestionAction,
+  toggleFollowBillAction,
   toggleSavedBillAction,
   toggleVoteAction,
   uploadBillFileAction,
@@ -34,6 +36,7 @@ import { SharePanel } from "@/components/share-panel";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
+import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
@@ -118,6 +121,7 @@ export default async function BillDetailPage({
           comments: true,
           shares: true,
           savedBy: true,
+          followers: true,
           suggestions: true,
         },
       },
@@ -144,6 +148,19 @@ export default async function BillDetailPage({
     : null;
   const userSavedBill = session?.user?.id
     ? await prisma.savedBill.findUnique({
+        where: {
+          billId_userId: {
+            billId: bill.id,
+            userId: session.user.id,
+          },
+        },
+        select: {
+          id: true,
+        },
+      })
+    : null;
+  const userFollow = session?.user?.id
+    ? await prisma.billFollow.findUnique({
         where: {
           billId_userId: {
             billId: bill.id,
@@ -523,6 +540,7 @@ export default async function BillDetailPage({
             comments={bill._count.comments}
             shares={bill._count.shares}
             saves={bill._count.savedBy}
+            followers={bill._count.followers}
             suggestions={bill._count.suggestions}
             categoryName={bill.category?.name}
             categoryRank={categoryRank >= 0 ? categoryRank + 1 : null}
@@ -562,6 +580,30 @@ export default async function BillDetailPage({
               </a>
             </div>
           </div>
+
+          {isPublicBill ? (
+            <form
+              action={toggleFollowBillAction}
+              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+            >
+              <input type="hidden" name="slug" value={bill.slug} />
+              <h2 className="font-semibold">Follow activity</h2>
+              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+                {bill._count.followers} people follow updates on this bill.
+              </p>
+              <button
+                type="submit"
+                className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm ${
+                  userFollow
+                    ? "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                    : "bg-[#123c69] text-white"
+                }`}
+              >
+                <Bell size={17} aria-hidden="true" />
+                {getBillFollowButtonLabel(Boolean(userFollow))}
+              </button>
+            </form>
+          ) : null}
 
           {isPublicBill ? (
             <form
@@ -889,6 +931,7 @@ function BillAnalytics({
   comments,
   shares,
   saves,
+  followers,
   suggestions,
   categoryName,
   categoryRank,
@@ -899,6 +942,7 @@ function BillAnalytics({
   comments: number;
   shares: number;
   saves: number;
+  followers: number;
   suggestions: number;
   categoryName?: string;
   categoryRank: number | null;
@@ -916,6 +960,7 @@ function BillAnalytics({
         <StatLabel label="Comments" value={comments} />
         <StatLabel label="Shares" value={shares} />
         <StatLabel label="Saves" value={saves} />
+        <StatLabel label="Followers" value={followers} />
         <StatLabel label="Suggestions" value={suggestions} />
       </div>
       {categoryName && categoryRank ? (

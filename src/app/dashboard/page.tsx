@@ -5,6 +5,7 @@ import {
   FileCheck2,
   FileText,
   Bookmark,
+  Bell,
   MessageSquare,
   Plus,
   Search,
@@ -15,6 +16,7 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { getSavedBillEmptyMessage } from "@/lib/bill-engagement";
+import { getBillFollowEmptyMessage } from "@/lib/bill-follow";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -31,8 +33,10 @@ export default async function DashboardPage() {
     voteCount,
     commentCount,
     savedBillCount,
+    followedBillCount,
     recentBills,
     savedBills,
+    followedBills,
     recentCommentsOnMyBills,
     trendingBills,
     mostSupportedBills,
@@ -73,6 +77,11 @@ export default async function DashboardPage() {
         userId: session.user.id,
       },
     }),
+    prisma.billFollow.count({
+      where: {
+        userId: session.user.id,
+      },
+    }),
     prisma.bill.findMany({
       where: {
         authorId: session.user.id,
@@ -86,6 +95,22 @@ export default async function DashboardPage() {
       },
     }),
     prisma.savedBill.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+      include: {
+        bill: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    }),
+    prisma.billFollow.findMany({
       where: {
         userId: session.user.id,
       },
@@ -248,6 +273,12 @@ export default async function DashboardPage() {
       detail: "Public bills you saved for reading or follow-up.",
       icon: Bookmark,
     },
+    {
+      title: "Followed bills",
+      value: followedBillCount.toString(),
+      detail: "Bills where you receive new activity notifications.",
+      icon: Bell,
+    },
   ];
 
   return (
@@ -280,7 +311,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-7">
           {dashboardCards.map((card) => (
             <article
               key={card.title}
@@ -418,6 +449,52 @@ export default async function DashboardPage() {
               ) : (
                 <p className="p-5 text-sm leading-6 text-[#6d6658]">
                   {getSavedBillEmptyMessage()}
+                </p>
+              )}
+            </section>
+
+            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-[#e7e1d3] p-5">
+                <Bell size={18} aria-hidden="true" />
+                <div>
+                  <h2 className="text-lg font-semibold">Followed bills</h2>
+                  <p className="text-sm text-[#6d6658]">
+                    Bills where you receive comment and suggestion updates.
+                  </p>
+                </div>
+              </div>
+              {followedBills.length > 0 ? (
+                <div className="divide-y divide-[#e7e1d3]">
+                  {followedBills.map((follow) => (
+                    <Link
+                      key={follow.id}
+                      href={`/bills/${follow.bill.slug}`}
+                      className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                    >
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="font-semibold">{follow.bill.title}</h3>
+                          <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                            {follow.bill.description}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <Badge>
+                            {follow.bill.status
+                              .replaceAll("_", " ")
+                              .toLowerCase()}
+                          </Badge>
+                          {follow.bill.category ? (
+                            <Badge>{follow.bill.category.name}</Badge>
+                          ) : null}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-5 text-sm leading-6 text-[#6d6658]">
+                  {getBillFollowEmptyMessage()}
                 </p>
               )}
             </section>

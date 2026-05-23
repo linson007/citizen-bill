@@ -116,6 +116,44 @@ async function notifyUser({
   }).catch(() => undefined);
 }
 
+async function notifyBillFollowers({
+  billId,
+  actorId,
+  excludedUserIds = [],
+  type,
+  message,
+}: {
+  billId: string;
+  actorId: string;
+  excludedUserIds?: string[];
+  type: string;
+  message: string;
+}) {
+  const excluded = new Set([actorId, ...excludedUserIds]);
+  const followers = await prisma.billFollow.findMany({
+    where: {
+      billId,
+      userId: {
+        notIn: Array.from(excluded),
+      },
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  await Promise.all(
+    followers.map((follower) =>
+      notifyUser({
+        userId: follower.userId,
+        billId,
+        type,
+        message,
+      }),
+    ),
+  );
+}
+
 export async function toggleVoteAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
@@ -261,6 +299,63 @@ export async function toggleSavedBillAction(formData: FormData) {
   redirect(`/bills/${slug}`);
 }
 
+export async function toggleFollowBillAction(formData: FormData) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  const slug = formData.get("slug")?.toString();
+
+  if (!slug) {
+    redirect("/bills");
+  }
+
+  const bill = await prisma.bill.findUnique({
+    where: { slug },
+    select: {
+      id: true,
+      status: true,
+    },
+  });
+
+  if (!bill || !isPublicBillStatus(bill.status)) {
+    redirect(`/bills/${slug}`);
+  }
+
+  const existingFollow = await prisma.billFollow.findUnique({
+    where: {
+      billId_userId: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingFollow) {
+    await prisma.billFollow.delete({
+      where: {
+        id: existingFollow.id,
+      },
+    });
+  } else {
+    await prisma.billFollow.create({
+      data: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
+    });
+  }
+
+  revalidatePath(`/bills/${slug}`);
+  revalidatePath("/dashboard");
+  redirect(`/bills/${slug}`);
+}
+
 export async function createCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
@@ -323,6 +418,14 @@ export async function createCommentAction(formData: FormData) {
       message: `New comment on "${bill.title}".`,
     });
   }
+
+  await notifyBillFollowers({
+    billId: bill.id,
+    actorId: session.user.id,
+    excludedUserIds: [bill.authorId],
+    type: "followed_bill_comment",
+    message: `New comment on a bill you follow: "${bill.title}".`,
+  });
 
   revalidatePath("/bills");
   revalidatePath(`/bills/${slug}`);
@@ -652,6 +755,14 @@ export async function createSuggestionAction(formData: FormData) {
       message: `New amendment suggestion on "${bill.title}".`,
     });
   }
+
+  await notifyBillFollowers({
+    billId: bill.id,
+    actorId: session.user.id,
+    excludedUserIds: [bill.authorId],
+    type: "followed_bill_suggestion",
+    message: `New amendment suggestion on a bill you follow: "${bill.title}".`,
+  });
 
   revalidatePath(`/bills/${slug}`);
   revalidatePath("/dashboard");
