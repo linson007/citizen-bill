@@ -53,7 +53,19 @@ Optional:
 
 ### 3. Prepare PostgreSQL
 
-Create a PostgreSQL database that matches `DATABASE_URL`, then run migrations:
+For local development, start PostgreSQL with Docker Compose:
+
+```bash
+npm run db:up
+```
+
+This starts a PostgreSQL 16 container using the connection string from `.env.example`:
+
+```bash
+DATABASE_URL="postgresql://citizen_bill:citizen_bill_password@localhost:5432/citizen_bill?schema=public"
+```
+
+Then run migrations:
 
 ```bash
 npm run db:migrate
@@ -95,8 +107,11 @@ npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
 npm run test         # Run unit tests
-npm run test:watch   # Run unit tests in watch mode
+npm run test:watch   # Run tests in watch mode
 npm run format       # Format the repository
+npm run db:up        # Start local PostgreSQL with Docker Compose
+npm run db:down      # Stop local PostgreSQL
+npm run db:logs      # Follow local PostgreSQL logs
 npm run db:generate  # Generate Prisma client
 npm run db:migrate   # Run local Prisma migrations
 npm run db:studio    # Open Prisma Studio

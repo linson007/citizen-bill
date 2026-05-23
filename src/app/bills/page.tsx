@@ -9,31 +9,49 @@ import {
 
 import { SiteHeader } from "@/components/site-header";
 import { Prisma } from "@/generated/prisma/client";
+import {
+  BILL_DISCOVERY_SORT_OPTIONS,
+  PUBLIC_BILL_STATUS_FILTER_OPTIONS,
+  getBillDiscoveryOrderBy,
+  getPublicBillStatusWhereValues,
+  parseBillDiscoverySort,
+  parsePublicBillStatusFilter,
+  sortBillsForDiscovery,
+  type BillDiscoverySort,
+  type PublicBillStatusFilter,
+} from "@/lib/bill-discovery";
 import { prisma } from "@/lib/prisma";
-
-const publicStatuses = [
-  "PUBLISHED",
-  "UNDER_DISCUSSION",
-  "READY_FOR_REVIEW",
-] as const;
 
 export default async function BillsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+    sort?: string;
+    status?: string;
+  }>;
 }) {
-  const { q, category } = await searchParams;
+  const { q, category, sort, status } = await searchParams;
   const query = q?.trim();
   const selectedCategory = category?.trim();
+  const selectedSort = parseBillDiscoverySort(sort);
+  const selectedStatus = parsePublicBillStatusFilter(status);
+  const statusWhereValues = getPublicBillStatusWhereValues(selectedStatus);
 
   const [bills, categories] = await Promise.all([
-    findPublicBills({ query, selectedCategory }),
+    findPublicBills({
+      query,
+      selectedCategory,
+      sort: selectedSort,
+      statusFilter: selectedStatus,
+    }),
     prisma.category.findMany({
       where: {
         bills: {
           some: {
             status: {
-              in: [...publicStatuses],
+              in: statusWhereValues,
             },
           },
         },
@@ -75,7 +93,7 @@ export default async function BillsPage({
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <form className="mb-5 grid gap-3 rounded-lg border border-[#d8d2c4] bg-white p-4 shadow-sm md:grid-cols-[1fr_240px_auto]">
+        <form className="mb-5 grid gap-3 rounded-lg border border-[#d8d2c4] bg-white p-4 shadow-sm md:grid-cols-[1fr_200px_200px_200px_auto]">
           <label className="relative block">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#6d6658]"
@@ -99,6 +117,32 @@ export default async function BillsPage({
             {categories.map((item) => (
               <option key={item.id} value={item.slug}>
                 {item.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="status"
+            defaultValue={selectedStatus}
+            aria-label="Filter by bill status"
+            className="h-11 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+          >
+            {PUBLIC_BILL_STATUS_FILTER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="sort"
+            defaultValue={selectedSort}
+            aria-label="Sort bills"
+            className="h-11 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+          >
+            {BILL_DISCOVERY_SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -179,10 +223,15 @@ export default async function BillsPage({
 async function findPublicBills({
   query,
   selectedCategory,
+  sort,
+  statusFilter,
 }: {
   query?: string;
   selectedCategory?: string;
+  sort: BillDiscoverySort;
+  statusFilter: PublicBillStatusFilter;
 }) {
+  const statusWhereValues = getPublicBillStatusWhereValues(statusFilter);
   const include = {
     author: true,
     category: true,
@@ -199,7 +248,7 @@ async function findPublicBills({
     return prisma.bill.findMany({
       where: {
         status: {
-          in: [...publicStatuses],
+          in: statusWhereValues,
         },
         ...(selectedCategory
           ? {
@@ -209,15 +258,7 @@ async function findPublicBills({
             }
           : {}),
       },
-      orderBy: [
-        {
-          votes: {
-            _count: "desc",
-          },
-        },
-        { publishedAt: "desc" },
-        { updatedAt: "desc" },
-      ],
+      orderBy: getBillDiscoveryOrderBy(sort),
       include,
     });
   }
@@ -236,7 +277,7 @@ async function findPublicBills({
         setweight(to_tsvector('english', coalesce(b.body, '')), 'D') ||
         setweight(to_tsvector('english', coalesce(b."references", '')), 'D') AS document
     ) search_document
-    WHERE b.status::text IN (${Prisma.join([...publicStatuses])})
+    WHERE b.status::text IN (${Prisma.join(statusWhereValues)})
       ${selectedCategory ? Prisma.sql`AND c.slug = ${selectedCategory}` : Prisma.empty}
       AND search_document.document @@ search_query
     ORDER BY ts_rank_cd(search_document.document, search_query) DESC,
@@ -260,9 +301,11 @@ async function findPublicBills({
   });
   const order = new Map(ids.map((id, index) => [id, index]));
 
-  return bills.sort((first, second) => {
+  const relevanceSortedBills = bills.sort((first, second) => {
     return (order.get(first.id) ?? 0) - (order.get(second.id) ?? 0);
   });
+
+  return sortBillsForDiscovery(relevanceSortedBills, sort);
 }
 
 function Badge({ children }: { children: React.ReactNode }) {
