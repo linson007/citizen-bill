@@ -204,6 +204,63 @@ export async function toggleVoteAction(formData: FormData) {
   redirect(`/bills/${slug}`);
 }
 
+export async function toggleSavedBillAction(formData: FormData) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  const slug = formData.get("slug")?.toString();
+
+  if (!slug) {
+    redirect("/bills");
+  }
+
+  const bill = await prisma.bill.findUnique({
+    where: { slug },
+    select: {
+      id: true,
+      status: true,
+    },
+  });
+
+  if (!bill || !isPublicBillStatus(bill.status)) {
+    redirect(`/bills/${slug}`);
+  }
+
+  const existingSavedBill = await prisma.savedBill.findUnique({
+    where: {
+      billId_userId: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingSavedBill) {
+    await prisma.savedBill.delete({
+      where: {
+        id: existingSavedBill.id,
+      },
+    });
+  } else {
+    await prisma.savedBill.create({
+      data: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
+    });
+  }
+
+  revalidatePath(`/bills/${slug}`);
+  revalidatePath("/dashboard");
+  redirect(`/bills/${slug}`);
+}
+
 export async function createCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 

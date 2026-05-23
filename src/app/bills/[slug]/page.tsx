@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import {
+  Bookmark,
   Calendar,
   ChartNoAxesColumn,
   Flag,
@@ -25,12 +26,14 @@ import {
   reportBillAction,
   reportCommentAction,
   reviewSuggestionAction,
+  toggleSavedBillAction,
   toggleVoteAction,
   uploadBillFileAction,
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
@@ -114,6 +117,7 @@ export default async function BillDetailPage({
           votes: true,
           comments: true,
           shares: true,
+          savedBy: true,
           suggestions: true,
         },
       },
@@ -127,6 +131,19 @@ export default async function BillDetailPage({
   const isAuthor = session?.user?.id === bill.authorId;
   const userVote = session?.user?.id
     ? await prisma.vote.findUnique({
+        where: {
+          billId_userId: {
+            billId: bill.id,
+            userId: session.user.id,
+          },
+        },
+        select: {
+          id: true,
+        },
+      })
+    : null;
+  const userSavedBill = session?.user?.id
+    ? await prisma.savedBill.findUnique({
         where: {
           billId_userId: {
             billId: bill.id,
@@ -505,6 +522,7 @@ export default async function BillDetailPage({
             votes={bill._count.votes}
             comments={bill._count.comments}
             shares={bill._count.shares}
+            saves={bill._count.savedBy}
             suggestions={bill._count.suggestions}
             categoryName={bill.category?.name}
             categoryRank={categoryRank >= 0 ? categoryRank + 1 : null}
@@ -544,6 +562,30 @@ export default async function BillDetailPage({
               </a>
             </div>
           </div>
+
+          {isPublicBill ? (
+            <form
+              action={toggleSavedBillAction}
+              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+            >
+              <input type="hidden" name="slug" value={bill.slug} />
+              <h2 className="font-semibold">Saved bill</h2>
+              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+                {bill._count.savedBy} people saved this bill for later.
+              </p>
+              <button
+                type="submit"
+                className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm ${
+                  userSavedBill
+                    ? "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                    : "bg-[#123c69] text-white"
+                }`}
+              >
+                <Bookmark size={17} aria-hidden="true" />
+                {getSavedBillButtonLabel(Boolean(userSavedBill))}
+              </button>
+            </form>
+          ) : null}
 
           {isPublicBill ? (
             <form
@@ -846,6 +888,7 @@ function BillAnalytics({
   votes,
   comments,
   shares,
+  saves,
   suggestions,
   categoryName,
   categoryRank,
@@ -855,6 +898,7 @@ function BillAnalytics({
   votes: number;
   comments: number;
   shares: number;
+  saves: number;
   suggestions: number;
   categoryName?: string;
   categoryRank: number | null;
@@ -871,6 +915,7 @@ function BillAnalytics({
         <StatLabel label="Votes" value={votes} />
         <StatLabel label="Comments" value={comments} />
         <StatLabel label="Shares" value={shares} />
+        <StatLabel label="Saves" value={saves} />
         <StatLabel label="Suggestions" value={suggestions} />
       </div>
       {categoryName && categoryRank ? (

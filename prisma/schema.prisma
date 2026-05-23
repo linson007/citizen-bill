@@ -57,6 +57,7 @@ model User {
   updatedAt      DateTime              @updatedAt
   bills          Bill[]
   votes          Vote[]
+  savedBills     SavedBill[]
   comments       Comment[]
   aiSessions     AiConversation[]
   aiSafetyEvents AiSafetyEvent[]
@@ -126,6 +127,7 @@ model Bill {
   files            UploadedFile[]
   versions         BillVersion[]
   votes            Vote[]
+  savedBy          SavedBill[]
   comments         Comment[]
   shares           BillShare[]
   aiSessions       AiConversation[]
@@ -163,6 +165,19 @@ model Vote {
 
   @@unique([billId, userId])
   @@index([userId])
+}
+
+model SavedBill {
+  id        String   @id @default(cuid())
+  billId    String
+  bill      Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([billId, userId])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model BillShare {

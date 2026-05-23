@@ -33,8 +33,8 @@ Citizen Bill will become a public participation layer for legislative drafting:
 4. The user may attach supporting PDF or DOCX files after the bill record exists.
 5. The AI assistant helps improve structure, language, legal clarity, and public readability.
 6. The bill is published to the public feed after validation and moderation checks.
-7. Other users can read, vote, comment, suggest improvements, and share the bill.
-8. The dashboard highlights trending bills, most supported bills, recent activity, and draft status.
+7. Other users can read, save/bookmark, vote, comment, suggest improvements, and share the bill.
+8. The dashboard highlights trending bills, most supported bills, saved bills, recent activity, and draft status.
 
 ## 5. MVP Features
 
@@ -94,6 +94,13 @@ Citizen Bill will become a public participation layer for legislative drafting:
 - Vote count visible publicly.
 - Future support for reactions or priority scoring can be added later.
 
+### Saved Bills
+
+- Authenticated users can save or unsave public bills from the bill page.
+- Each user can save a bill only once.
+- Bill pages show how many people saved the proposal.
+- The dashboard includes saved-bill counts and a personal saved bills list for later reading and follow-up.
+
 ### Comments
 
 - Authenticated users can comment on bills.
@@ -116,6 +123,7 @@ MVP dashboard sections:
 - My drafts
 - My published bills
 - Bills I voted on
+- Saved bills
 - Recent comments on my bills
 - Trending bills
 - Most supported bills
@@ -197,6 +205,7 @@ Core entities:
 - BillDraft
 - BillVersion
 - Vote
+- SavedBill
 - Comment
 - Tag
 - Category
@@ -210,6 +219,7 @@ Important relationships:
 - A bill can have many versions.
 - A bill can have many votes and comments.
 - A user can vote once per bill.
+- A user can save each public bill once for later reading.
 - A bill can have multiple uploaded files.
 - A bill can have AI conversation history attached to drafting sessions.
 

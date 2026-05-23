@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   FileCheck2,
   FileText,
+  Bookmark,
   MessageSquare,
   Plus,
   Search,
@@ -13,6 +14,7 @@ import {
 
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import { getSavedBillEmptyMessage } from "@/lib/bill-engagement";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -28,7 +30,9 @@ export default async function DashboardPage() {
     draftCount,
     voteCount,
     commentCount,
+    savedBillCount,
     recentBills,
+    savedBills,
     recentCommentsOnMyBills,
     trendingBills,
     mostSupportedBills,
@@ -64,6 +68,11 @@ export default async function DashboardPage() {
         userId: session.user.id,
       },
     }),
+    prisma.savedBill.count({
+      where: {
+        userId: session.user.id,
+      },
+    }),
     prisma.bill.findMany({
       where: {
         authorId: session.user.id,
@@ -74,6 +83,22 @@ export default async function DashboardPage() {
       take: 5,
       include: {
         category: true,
+      },
+    }),
+    prisma.savedBill.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+      include: {
+        bill: {
+          include: {
+            category: true,
+          },
+        },
       },
     }),
     prisma.comment.findMany({
@@ -217,6 +242,12 @@ export default async function DashboardPage() {
       detail: "Track discussion on your proposals.",
       icon: MessageSquare,
     },
+    {
+      title: "Saved bills",
+      value: savedBillCount.toString(),
+      detail: "Public bills you saved for reading or follow-up.",
+      icon: Bookmark,
+    },
   ];
 
   return (
@@ -249,7 +280,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
           {dashboardCards.map((card) => (
             <article
               key={card.title}
@@ -325,22 +356,72 @@ export default async function DashboardPage() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-            <div className="border-b border-[#e7e1d3] p-5">
-              <h2 className="text-lg font-semibold">Public discovery</h2>
-              <p className="text-sm text-[#6d6658]">
-                Trending, most supported, and newly published bills.
-              </p>
-            </div>
-            <div className="grid gap-5 p-5 xl:grid-cols-3">
-              <BillList title="Trending" bills={trendingBills} />
-              <BillList title="Most supported" bills={mostSupportedBills} />
-              <BillList
-                title="Recently published"
-                bills={recentlyPublishedBills}
-              />
-            </div>
-          </section>
+          <div className="space-y-6">
+            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+              <div className="border-b border-[#e7e1d3] p-5">
+                <h2 className="text-lg font-semibold">Public discovery</h2>
+                <p className="text-sm text-[#6d6658]">
+                  Trending, most supported, and newly published bills.
+                </p>
+              </div>
+              <div className="grid gap-5 p-5 xl:grid-cols-3">
+                <BillList title="Trending" bills={trendingBills} />
+                <BillList title="Most supported" bills={mostSupportedBills} />
+                <BillList
+                  title="Recently published"
+                  bills={recentlyPublishedBills}
+                />
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-[#e7e1d3] p-5">
+                <Bookmark size={18} aria-hidden="true" />
+                <div>
+                  <h2 className="text-lg font-semibold">Saved bills</h2>
+                  <p className="text-sm text-[#6d6658]">
+                    Public proposals you bookmarked for later.
+                  </p>
+                </div>
+              </div>
+              {savedBills.length > 0 ? (
+                <div className="divide-y divide-[#e7e1d3]">
+                  {savedBills.map((savedBill) => (
+                    <Link
+                      key={savedBill.id}
+                      href={`/bills/${savedBill.bill.slug}`}
+                      className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                    >
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="font-semibold">
+                            {savedBill.bill.title}
+                          </h3>
+                          <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                            {savedBill.bill.description}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <Badge>
+                            {savedBill.bill.status
+                              .replaceAll("_", " ")
+                              .toLowerCase()}
+                          </Badge>
+                          {savedBill.bill.category ? (
+                            <Badge>{savedBill.bill.category.name}</Badge>
+                          ) : null}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-5 text-sm leading-6 text-[#6d6658]">
+                  {getSavedBillEmptyMessage()}
+                </p>
+              )}
+            </section>
+          </div>
 
           <aside className="space-y-6">
             <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
