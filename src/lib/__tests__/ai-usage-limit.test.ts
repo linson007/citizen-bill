@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   checkAiUsageLimit,
+  consumeAiUsage,
   createAiUsageLimitMessage,
   getAiUsageWindow,
   getDailyAiLimit,
@@ -93,6 +94,68 @@ describe("recordAiUsage", () => {
         route: "ai-draft",
       },
     });
+  });
+});
+
+describe("consumeAiUsage", () => {
+  it("records usage and returns the post-consumption count", async () => {
+    const store = createStore(2);
+
+    await expect(
+      consumeAiUsage("user-1", "ai-draft", {
+        limit: 5,
+        now: new Date("2026-05-16T10:30:00.000Z"),
+        store,
+      }),
+    ).resolves.toMatchObject({
+      ok: true,
+      used: 3,
+      remaining: 2,
+      limit: 5,
+    });
+    expect(store.aiUsageEvent.create).toHaveBeenCalledWith({
+      data: {
+        userId: "user-1",
+        route: "ai-draft",
+      },
+    });
+  });
+
+  it("does not record usage when the user is already at the limit", async () => {
+    const store = createStore(5);
+
+    await expect(
+      consumeAiUsage("user-1", "ai-chat", {
+        limit: 5,
+        now: new Date("2026-05-16T10:30:00.000Z"),
+        store,
+      }),
+    ).resolves.toMatchObject({
+      ok: false,
+      used: 5,
+      remaining: 0,
+      limit: 5,
+    });
+    expect(store.aiUsageEvent.create).not.toHaveBeenCalled();
+  });
+
+  it("uses a serializable transaction when the store supports it", async () => {
+    const store = {
+      ...createStore(1),
+      $transaction: vi.fn(async (callback) => callback(store)),
+    };
+
+    await consumeAiUsage("user-1", "ai-draft", {
+      limit: 5,
+      store,
+    });
+
+    expect(store.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({
+        isolationLevel: "Serializable",
+      }),
+    );
   });
 });
 

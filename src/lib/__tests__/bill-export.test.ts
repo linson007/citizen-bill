@@ -17,6 +17,15 @@ describe("bill export helpers", () => {
     expect(pdf.length).toBeGreaterThan(100);
   });
 
+  it("paginates long PDF exports", () => {
+    const pdf = createPdf(
+      Array.from({ length: 140 }, (_, index) => `Line ${index + 1}`),
+    );
+    const text = new TextDecoder().decode(pdf);
+
+    expect(text).toContain("/Count 3");
+  });
+
   it("creates a DOCX zip byte stream", () => {
     const docx = createDocx(["Citizen Bill", "Public water access"]);
 

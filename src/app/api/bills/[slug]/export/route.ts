@@ -3,9 +3,8 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { createDocx, createPdf, safeBillExportFileName } from "@/lib/bill-export";
+import { canViewBill } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
-
-const publicStatuses = ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"];
 
 export async function GET(
   request: Request,
@@ -29,11 +28,7 @@ export async function GET(
     },
   });
 
-  if (
-    !bill ||
-    (!publicStatuses.includes(bill.status) &&
-      bill.authorId !== session?.user?.id)
-  ) {
+  if (!bill || !canViewBill(bill, session?.user?.id)) {
     return NextResponse.json({ error: "Bill not found." }, { status: 404 });
   }
 

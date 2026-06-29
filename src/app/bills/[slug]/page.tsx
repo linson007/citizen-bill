@@ -35,6 +35,7 @@ import {
 import { SharePanel } from "@/components/share-panel";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { prisma } from "@/lib/prisma";
@@ -133,6 +134,16 @@ export default async function BillDetailPage({
   }
 
   const isAuthor = session?.user?.id === bill.authorId;
+  const isPublicBill = isPublicBillStatus(bill.status);
+
+  if (!canViewBill(bill, session?.user?.id)) {
+    if (session?.user?.id) {
+      notFound();
+    }
+
+    redirect("/login");
+  }
+
   const userVote = session?.user?.id
     ? await prisma.vote.findUnique({
         where: {
@@ -226,16 +237,6 @@ export default async function BillDetailPage({
       getAuthorStats(bill.authorId),
     ],
   );
-
-  const isPublicBill = [
-    "PUBLISHED",
-    "UNDER_DISCUSSION",
-    "READY_FOR_REVIEW",
-  ].includes(bill.status);
-
-  if (!isPublicBill && !isAuthor) {
-    redirect("/login");
-  }
 
   const billUrl = `${appUrl}/bills/${bill.slug}`;
   const shareText = `Support this public bill: ${bill.title}`;

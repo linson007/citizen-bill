@@ -7,20 +7,17 @@ import { put } from "@vercel/blob";
 
 import { authOptions } from "@/lib/auth";
 import { resolveBillCategory } from "@/lib/bill-categories";
+import { isPublicBillStatus } from "@/lib/bill-visibility";
+import {
+  createBillUploadKey,
+  hasAllowedBillUploadSignature,
+  isAllowedBillUploadMetadata,
+  MAX_BILL_UPLOAD_BYTES,
+  sanitizeUploadFileName,
+} from "@/lib/bill-uploads";
 import { sendEmailNotification } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
-
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-const PUBLIC_BILL_STATUSES = [
-  "PUBLISHED",
-  "UNDER_DISCUSSION",
-  "READY_FOR_REVIEW",
-] as const;
-
-function isPublicBillStatus(status: string) {
-  return PUBLIC_BILL_STATUSES.some((item) => item === status);
-}
 
 export async function publishBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -572,32 +569,39 @@ export async function uploadBillFileAction(formData: FormData) {
     redirect("/dashboard");
   }
 
-  const allowedTypes = [
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
+  if (file.size > MAX_BILL_UPLOAD_BYTES) {
+    redirect(`/bills/${slug}?upload=size`);
+  }
 
-  if (!allowedTypes.includes(file.type)) {
+  if (!isAllowedBillUploadMetadata(file)) {
     redirect(`/bills/${slug}?upload=type`);
   }
 
-  if (file.size > MAX_UPLOAD_BYTES) {
-    redirect(`/bills/${slug}?upload=size`);
+  if (!(await hasAllowedBillUploadSignature(file))) {
+    redirect(`/bills/${slug}?upload=type`);
   }
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     redirect(`/bills/${slug}?upload=blob-missing`);
   }
 
-  const blob = await put(`bills/${bill.id}/${file.name}`, file, {
-    access: "public",
-  });
+  const safeFileName = sanitizeUploadFileName(file.name);
+  const blob = await put(
+    createBillUploadKey({
+      billId: bill.id,
+      fileName: file.name,
+    }),
+    file,
+    {
+      access: "public",
+    },
+  );
 
   await prisma.uploadedFile.create({
     data: {
       billId: bill.id,
       url: blob.url,
-      fileName: file.name,
+      fileName: safeFileName,
       mimeType: file.type,
       size: file.size,
     },
@@ -627,11 +631,12 @@ export async function reportBillAction(formData: FormData) {
     select: {
       id: true,
       authorId: true,
+      status: true,
       title: true,
     },
   });
 
-  if (!bill) {
+  if (!bill || !isPublicBillStatus(bill.status)) {
     redirect("/bills");
   }
 
@@ -679,9 +684,32 @@ export async function reportCommentAction(formData: FormData) {
     redirect("/bills");
   }
 
+  const comment = await prisma.comment.findUnique({
+    where: {
+      id: commentId,
+    },
+    select: {
+      id: true,
+      bill: {
+        select: {
+          slug: true,
+          status: true,
+        },
+      },
+    },
+  });
+
+  if (
+    !comment ||
+    comment.bill.slug !== slug ||
+    !isPublicBillStatus(comment.bill.status)
+  ) {
+    redirect("/bills");
+  }
+
   await prisma.report.create({
     data: {
-      commentId,
+      commentId: comment.id,
       reporterId: session.user.id,
       reason: "Comment reported",
     },

@@ -1,11 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { BillStatus } from "@/generated/prisma/enums";
-
-export const PUBLIC_BILL_STATUSES = [
-  BillStatus.PUBLISHED,
-  BillStatus.UNDER_DISCUSSION,
-  BillStatus.READY_FOR_REVIEW,
-] as const;
+import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 
 export const PUBLIC_BILL_STATUS_FILTER_OPTIONS = [
   {

@@ -1,3 +1,5 @@
+import { Prisma } from "@/generated/prisma/client";
+
 export const DEFAULT_DAILY_AI_LIMIT = 20;
 
 export type AiUsageLimitResult = {
@@ -21,6 +23,14 @@ type AiUsageStore = {
     }): Promise<number>;
     create(args: { data: { userId: string; route: string } }): Promise<unknown>;
   };
+  $transaction?<T>(
+    callback: (tx: AiUsageStore) => Promise<T>,
+    options?: {
+      isolationLevel?: Prisma.TransactionIsolationLevel;
+      maxWait?: number;
+      timeout?: number;
+    },
+  ): Promise<T>;
 };
 
 let defaultStore: AiUsageStore | undefined;
@@ -95,6 +105,61 @@ export async function recordAiUsage(
       route,
     },
   });
+}
+
+export async function consumeAiUsage(
+  userId: string,
+  route: string,
+  options: {
+    limit?: number;
+    now?: Date;
+    store?: AiUsageStore;
+  } = {},
+): Promise<AiUsageLimitResult> {
+  const store = options.store ?? (await getDefaultStore());
+
+  if (store.$transaction) {
+    return store.$transaction(
+      (tx) => consumeAiUsageWithoutTransaction(userId, route, {
+        ...options,
+        store: tx,
+      }),
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        maxWait: 5000,
+        timeout: 5000,
+      },
+    );
+  }
+
+  return consumeAiUsageWithoutTransaction(userId, route, {
+    ...options,
+    store,
+  });
+}
+
+async function consumeAiUsageWithoutTransaction(
+  userId: string,
+  route: string,
+  options: {
+    limit?: number;
+    now?: Date;
+    store: AiUsageStore;
+  },
+): Promise<AiUsageLimitResult> {
+  const usage = await checkAiUsageLimit(userId, options);
+
+  if (!usage.ok) {
+    return usage;
+  }
+
+  await recordAiUsage(userId, route, options.store);
+
+  return {
+    ...usage,
+    used: usage.used + 1,
+    remaining: Math.max(usage.remaining - 1, 0),
+  };
 }
 
 export function createAiUsageLimitMessage(result: AiUsageLimitResult) {

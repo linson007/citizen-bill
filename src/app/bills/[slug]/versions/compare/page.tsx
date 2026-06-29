@@ -1,8 +1,11 @@
-import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { GitCompare } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
+import { authOptions } from "@/lib/auth";
+import { canViewBill } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 
 export default async function VersionComparePage({
@@ -12,19 +15,30 @@ export default async function VersionComparePage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ from?: string; to?: string }>;
 }) {
+  const session = await getServerSession(authOptions);
   const { slug } = await params;
   const { from, to } = await searchParams;
   const bill = await prisma.bill.findUnique({
     where: { slug },
     select: {
+      authorId: true,
       id: true,
       title: true,
       slug: true,
+      status: true,
     },
   });
 
   if (!bill) {
     notFound();
+  }
+
+  if (!canViewBill(bill, session?.user?.id)) {
+    if (session?.user?.id) {
+      notFound();
+    }
+
+    redirect("/login");
   }
 
   const versions = await prisma.billVersion.findMany({

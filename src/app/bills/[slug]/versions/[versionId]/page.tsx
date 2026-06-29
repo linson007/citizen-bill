@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import { canViewBill } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 
 export default async function BillVersionPage({
@@ -24,7 +25,11 @@ export default async function BillVersionPage({
     notFound();
   }
 
-  if (bill.status === "DRAFT" && session?.user?.id !== bill.authorId) {
+  if (!canViewBill(bill, session?.user?.id)) {
+    if (session?.user?.id) {
+      notFound();
+    }
+
     redirect("/login");
   }
 

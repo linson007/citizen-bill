@@ -9,10 +9,9 @@ import {
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
 import {
-  checkAiUsageLimit,
+  consumeAiUsage,
   createAiUsageHeaders,
   createAiUsageLimitMessage,
-  recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
 
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const usage = await checkAiUsageLimit(session.user.id);
+  const usage = await consumeAiUsage(session.user.id, "ai-chat");
   if (!usage.ok) {
     return NextResponse.json(
       {
@@ -142,8 +141,6 @@ export async function POST(request: Request) {
             }
           }
         }
-
-        await recordAiUsage(session.user.id, "ai-chat");
 
         if (body.saveHistory) {
           await prisma.aiConversation.create({

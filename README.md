@@ -95,7 +95,7 @@ Before committing, run:
 npm run db:generate
 npm run lint
 npm run test
-npx tsc --noEmit
+npm run typecheck
 npm run build
 ```
 
@@ -108,6 +108,7 @@ npm run start        # Start production server
 npm run lint         # Run ESLint
 npm run test         # Run unit tests
 npm run test:watch   # Run tests in watch mode
+npm run typecheck    # Run TypeScript without emitting files
 npm run format       # Format the repository
 npm run db:up        # Start local PostgreSQL with Docker Compose
 npm run db:down      # Stop local PostgreSQL

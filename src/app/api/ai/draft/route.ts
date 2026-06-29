@@ -9,10 +9,9 @@ import {
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
 import {
-  checkAiUsageLimit,
+  consumeAiUsage,
   createAiUsageHeaders,
   createAiUsageLimitMessage,
-  recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
 
@@ -81,7 +80,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const usage = await checkAiUsageLimit(session.user.id);
+  const usage = await consumeAiUsage(session.user.id, "ai-draft");
   if (!usage.ok) {
     return NextResponse.json(
       {
@@ -99,8 +98,6 @@ export async function POST(request: Request) {
 
   if (!process.env.OPENAI_API_KEY) {
     if (mode !== "draft" && mode !== "legal") {
-      await recordAiUsage(session.user.id, "ai-draft");
-
       return NextResponse.json({
         text: createFallbackText(title, prompt, mode),
         fields: null,
@@ -108,7 +105,6 @@ export async function POST(request: Request) {
     }
 
     const fields = createFallbackFields(title, prompt, mode);
-    await recordAiUsage(session.user.id, "ai-draft");
 
     return NextResponse.json({
       text: formatDraftPreview(title, prompt, fields),
@@ -146,7 +142,6 @@ export async function POST(request: Request) {
 
   const fields =
     parseStructuredDraft(raw) ?? createFallbackFields(title, prompt, mode);
-  await recordAiUsage(session.user.id, "ai-draft");
 
   return NextResponse.json({
     text: formatDraftPreview(title, prompt, fields),

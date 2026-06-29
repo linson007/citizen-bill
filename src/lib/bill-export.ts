@@ -3,30 +3,49 @@ export function safeBillExportFileName(value: string) {
 }
 
 export function createPdf(lines: string[]) {
+  const encoder = new TextEncoder();
   const wrapped = lines.flatMap((line) => wrapLine(line, 86));
-  const text = wrapped
-    .slice(0, 90)
-    .map(
-      (line, index) =>
-        `BT /F1 10 Tf 50 ${760 - index * 14} Td (${pdfEscape(line)}) Tj ET`,
-    )
-    .join("\n");
+  const linesPerPage = 52;
+  const pages = chunk(wrapped.length > 0 ? wrapped : [""], linesPerPage);
+  const pageObjects = pages.map((pageLines, pageIndex) => {
+    const pageObjectId = 4 + pageIndex * 2;
+    const contentObjectId = pageObjectId + 1;
+    const text = pageLines
+      .map(
+        (line, index) =>
+          `BT /F1 10 Tf 50 ${760 - index * 14} Td (${pdfEscape(line)}) Tj ET`,
+      )
+      .join("\n");
+
+    return {
+      contentObjectId,
+      pageObjectId,
+      text,
+    };
+  });
+  const pageKids = pageObjects
+    .map((page) => `${page.pageObjectId} 0 R`)
+    .join(" ");
   const objects = [
     "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj",
-    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj",
-    "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj",
-    "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj",
-    `5 0 obj << /Length ${text.length} >> stream\n${text}\nendstream endobj`,
-  ];
+    `2 0 obj << /Type /Pages /Kids [${pageKids}] /Count ${pageObjects.length} >> endobj`,
+    "3 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj",
+    ...pageObjects.flatMap((page) => [
+      `${page.pageObjectId} 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents ${page.contentObjectId} 0 R >> endobj`,
+      `${page.contentObjectId} 0 obj << /Length ${
+        encoder.encode(page.text).length
+      } >> stream\n${page.text}\nendstream endobj`,
+    ]),
+  ] as const;
   let pdf = "%PDF-1.4\n";
   const offsets = [0];
 
   for (const object of objects) {
-    offsets.push(pdf.length);
+    offsets.push(encoder.encode(pdf).length);
     pdf += `${object}\n`;
   }
 
-  const xrefStart = pdf.length;
+  const xrefStart = encoder.encode(pdf).length;
   pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   pdf += offsets
     .slice(1)
@@ -34,7 +53,7 @@ export function createPdf(lines: string[]) {
     .join("");
   pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
 
-  return new TextEncoder().encode(pdf);
+  return encoder.encode(pdf);
 }
 
 function pdfEscape(value: string) {
@@ -55,7 +74,9 @@ function wrapLine(value: string, width: number) {
 
   for (const word of words) {
     if (`${current} ${word}`.trim().length > width) {
-      lines.push(current);
+      if (current) {
+        lines.push(current);
+      }
       current = word;
     } else {
       current = `${current} ${word}`.trim();
@@ -67,6 +88,16 @@ function wrapLine(value: string, width: number) {
   }
 
   return lines;
+}
+
+function chunk<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+
+  return chunks;
 }
 
 export function createDocx(lines: string[]) {
