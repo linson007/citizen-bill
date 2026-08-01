@@ -34,6 +34,7 @@ import {
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
 import { SiteHeader } from "@/components/site-header";
+import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus, PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
@@ -41,7 +42,7 @@ import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
-const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+const appUrl = getAppUrl();
 
 export async function generateMetadata({
   params,
