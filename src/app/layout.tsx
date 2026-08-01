@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getServerSession } from "next-auth";
 
 import { AuthProvider } from "@/components/auth-provider";
+import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 
 import "./globals.css";
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(getAppUrl()),
   title: "MattamUndo",
   description:
     "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",

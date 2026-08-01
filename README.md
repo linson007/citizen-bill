@@ -64,7 +64,7 @@ Required:
 | --- | --- |
 | `DATABASE_URL` | PostgreSQL connection string for Prisma |
 | `NEXTAUTH_SECRET` | Auth secret (`openssl rand -base64 32`) |
-| `NEXTAUTH_URL` | App URL, usually `http://localhost:3000` |
+| `NEXTAUTH_URL` | App URL with protocol, e.g. `http://localhost:3000` or `https://mattamundo.com` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
 
 Optional:
