@@ -3,12 +3,17 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Prefer DIRECT_URL for migrate/CLI (Supabase session/direct, port 5432).
+// Runtime Prisma Client still uses DATABASE_URL (transaction pooler, port 6543).
+const migrationUrl =
+  process.env["DIRECT_URL"]?.trim() || process.env["DATABASE_URL"];
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: migrationUrl,
   },
 });
