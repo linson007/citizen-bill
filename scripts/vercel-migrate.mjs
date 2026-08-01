@@ -1,8 +1,7 @@
 import { spawnSync } from "node:child_process";
 
 const vercelEnv = process.env.VERCEL_ENV || "development";
-const migrationUrl =
-  process.env.DIRECT_URL?.trim() || process.env.DATABASE_URL?.trim();
+const MIGRATE_TIMEOUT_MS = 20_000;
 
 // Preview/dev builds should not migrate (and often lack Build-time DB env).
 if (vercelEnv !== "production") {
@@ -12,7 +11,7 @@ if (vercelEnv !== "production") {
   process.exit(0);
 }
 
-if (!migrationUrl) {
+if (!process.env.DIRECT_URL?.trim() && !process.env.DATABASE_URL?.trim()) {
   console.error(
     "Production migrate requires DIRECT_URL or DATABASE_URL at Build time in Vercel.",
   );
@@ -23,18 +22,35 @@ function runMigrate(env) {
   return spawnSync("npx", ["prisma", "migrate", "deploy"], {
     encoding: "utf8",
     env,
+    timeout: MIGRATE_TIMEOUT_MS,
+    killSignal: "SIGKILL",
   });
+}
+
+function combinedOutput(result) {
+  return `${result.stdout ?? ""}${result.stderr ?? ""}`;
+}
+
+function isConnectivityFailure(result) {
+  const output = combinedOutput(result);
+  return (
+    result.error?.code === "ETIMEDOUT" ||
+    Boolean(result.signal) ||
+    /P1001|Can't reach database server|timed out|ETIMEDOUT/i.test(output)
+  );
+}
+
+function printResult(result) {
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
 }
 
 // Prefer DIRECT_URL when set; if that host is unreachable from Vercel (common
 // with Supabase IPv6-only direct hosts), fall back to DATABASE_URL (pooler).
-const primaryEnv = { ...process.env };
-const primary = runMigrate(primaryEnv);
-const primaryOut = `${primary.stdout ?? ""}${primary.stderr ?? ""}`;
+const primary = runMigrate({ ...process.env });
 
 if ((primary.status ?? 1) === 0) {
-  if (primary.stdout) process.stdout.write(primary.stdout);
-  if (primary.stderr) process.stderr.write(primary.stderr);
+  printResult(primary);
   process.exit(0);
 }
 
@@ -42,27 +58,33 @@ const canFallback =
   Boolean(process.env.DIRECT_URL?.trim()) &&
   Boolean(process.env.DATABASE_URL?.trim()) &&
   process.env.DIRECT_URL.trim() !== process.env.DATABASE_URL.trim() &&
-  /P1001|Can't reach database server/i.test(primaryOut);
+  isConnectivityFailure(primary);
 
 if (canFallback) {
   console.warn(
     "Direct DB URL unreachable from Vercel; retrying prisma migrate deploy with DATABASE_URL.",
   );
-  const fallbackEnv = { ...process.env, DIRECT_URL: process.env.DATABASE_URL };
-  const fallback = runMigrate(fallbackEnv);
-  if (fallback.stdout) process.stdout.write(fallback.stdout);
-  if (fallback.stderr) process.stderr.write(fallback.stderr);
+  const fallback = runMigrate({
+    ...process.env,
+    DIRECT_URL: process.env.DATABASE_URL,
+  });
+  printResult(fallback);
   if ((fallback.status ?? 1) === 0) {
     process.exit(0);
   }
+  if (isConnectivityFailure(fallback)) {
+    console.warn(
+      "Skipping failed prisma migrate deploy due to database connectivity; continuing with next build.",
+    );
+    process.exit(0);
+  }
+  process.exit(fallback.status ?? 1);
 }
 
-if (primary.stdout) process.stdout.write(primary.stdout);
-if (primary.stderr) process.stderr.write(primary.stderr);
+printResult(primary);
 
 // Do not block frontend deploys when the DB is temporarily unreachable.
-// Schema-changing PRs should still verify migrate separately.
-if (/P1001|Can't reach database server/i.test(primaryOut)) {
+if (isConnectivityFailure(primary)) {
   console.warn(
     "Skipping failed prisma migrate deploy due to database connectivity; continuing with next build.",
   );
