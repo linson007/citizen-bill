@@ -9,9 +9,10 @@ import {
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
 import {
-  consumeAiUsage,
+  checkAiUsageLimit,
   createAiUsageHeaders,
   createAiUsageLimitMessage,
+  recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const usage = await consumeAiUsage(session.user.id, "ai-chat");
+  const usage = await checkAiUsageLimit(session.user.id);
   if (!usage.ok) {
     return NextResponse.json(
       {
@@ -99,6 +100,8 @@ export async function POST(request: Request) {
       },
     );
   }
+
+  const ownedBillId = await resolveOwnedBillId(session.user.id, body.billId);
 
   const encoder = new TextEncoder();
   let assistantText = "";
@@ -142,10 +145,12 @@ export async function POST(request: Request) {
           }
         }
 
+        await recordAiUsage(session.user.id, "ai-chat");
+
         if (body.saveHistory) {
           await prisma.aiConversation.create({
             data: {
-              billId: body.billId || null,
+              billId: ownedBillId,
               userId: session.user.id,
               title: body.title?.trim() || "AI drafting session",
               messages: [
@@ -176,6 +181,24 @@ export async function POST(request: Request) {
       "Content-Type": "text/plain; charset=utf-8",
     },
   });
+}
+
+async function resolveOwnedBillId(userId: string, billId?: string) {
+  if (!billId) {
+    return null;
+  }
+
+  const bill = await prisma.bill.findFirst({
+    where: {
+      id: billId,
+      authorId: userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return bill?.id ?? null;
 }
 
 async function logAiSafetyEvent({

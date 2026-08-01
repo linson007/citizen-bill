@@ -150,7 +150,7 @@ Good first areas: docs clarity, UI accessibility, unit tests for `src/lib`, and 
 
 ## Security
 
-Please report vulnerabilities privately. See [SECURITY.md](./SECURITY.md).
+Please report vulnerabilities privately via [GitHub Security Advisories](https://github.com/linson007/citizen-bill/security/advisories/new) or email [linsonkurian007@gmail.com](mailto:linsonkurian007@gmail.com). See [SECURITY.md](./SECURITY.md).
 
 ## Support
 

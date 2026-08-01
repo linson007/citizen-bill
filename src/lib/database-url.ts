@@ -1,5 +1,5 @@
 export const DEFAULT_DATABASE_URL =
-  "postgresql://citizen_bill:citizen_bill@localhost:5432/citizen_bill?schema=public";
+  "postgresql://citizen_bill:citizen_bill_password@localhost:5432/citizen_bill?schema=public";
 
 type DatabaseEnv = {
   DATABASE_URL?: string;

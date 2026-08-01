@@ -15,8 +15,10 @@ import { prisma } from "@/lib/prisma";
 
 export default async function EditBillPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -25,6 +27,7 @@ export default async function EditBillPage({
   }
 
   const { slug } = await params;
+  const { error } = await searchParams;
   const bill = await prisma.bill.findUnique({
     where: { slug },
     include: {
@@ -54,6 +57,12 @@ export default async function EditBillPage({
       : "";
   const otherCategory =
     selectedCategory === OTHER_BILL_CATEGORY ? categoryName : "";
+  const errorMessage =
+    error === "publish"
+      ? "Complete description, problem, proposed solution, and draft text before publishing."
+      : error === "title"
+        ? "Add a bill title with at least 3 characters."
+        : null;
 
   return (
     <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
@@ -70,6 +79,11 @@ export default async function EditBillPage({
             Update the structured content and use the AI helper for drafting
             support.
           </p>
+          {errorMessage ? (
+            <p className="mt-4 rounded-md border border-[#e2b35a] bg-[#fff7e8] px-3 py-2 text-sm text-[#6a4b10]">
+              {errorMessage}
+            </p>
+          ) : null}
         </div>
       </section>
 
