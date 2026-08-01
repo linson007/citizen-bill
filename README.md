@@ -62,7 +62,8 @@ Required:
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string for Prisma |
+| `DATABASE_URL` | PostgreSQL connection string for Prisma (use Supabase transaction pooler on Vercel) |
+| `DIRECT_URL` | Optional. Direct DB URL for `prisma migrate` when `DATABASE_URL` uses pgbouncer |
 | `NEXTAUTH_SECRET` | Auth secret (`openssl rand -base64 32`) |
 | `NEXTAUTH_URL` | App URL with protocol, e.g. `http://localhost:3000` or `https://mattamundo.com` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
@@ -113,9 +114,14 @@ npm run db:up        # Start Postgres (Docker Compose)
 npm run db:down      # Stop Postgres
 npm run db:logs      # Follow Postgres logs
 npm run db:generate  # Generate Prisma client
-npm run db:migrate   # Run migrations
+npm run db:migrate   # Create/apply migrations locally (dev)
+npm run db:deploy    # Apply pending migrations (production)
 npm run db:studio    # Prisma Studio
 ```
+
+Vercel uses `vercel-build`, which runs `prisma migrate deploy` before `next build` on **production** only (preview skips migrate).
+Ensure `DATABASE_URL` (and `DIRECT_URL` if using the pooler) are enabled for **Production + Build** in Vercel.
+
 
 ## Project Layout
 
