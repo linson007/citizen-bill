@@ -121,7 +121,10 @@ npm run db:studio    # Prisma Studio
 src/app/           App Router pages, server actions, API routes
 src/components/    Shared UI
 src/lib/           Domain helpers (bills, AI, auth, uploads, export)
+src/lib/__tests__/ Vitest unit tests for lib helpers
+src/types/         Ambient TypeScript declarations
 prisma/            Schema and migrations
+docs/              Maintainer checklists and internal docs
 .github/           CI, issue and PR templates
 ```
 
