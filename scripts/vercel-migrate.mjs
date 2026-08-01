@@ -19,9 +19,54 @@ if (!migrationUrl) {
   process.exit(1);
 }
 
-const result = spawnSync("npx", ["prisma", "migrate", "deploy"], {
-  stdio: "inherit",
-  env: process.env,
-});
+function runMigrate(env) {
+  return spawnSync("npx", ["prisma", "migrate", "deploy"], {
+    encoding: "utf8",
+    env,
+  });
+}
 
-process.exit(result.status ?? 1);
+// Prefer DIRECT_URL when set; if that host is unreachable from Vercel (common
+// with Supabase IPv6-only direct hosts), fall back to DATABASE_URL (pooler).
+const primaryEnv = { ...process.env };
+const primary = runMigrate(primaryEnv);
+const primaryOut = `${primary.stdout ?? ""}${primary.stderr ?? ""}`;
+
+if ((primary.status ?? 1) === 0) {
+  if (primary.stdout) process.stdout.write(primary.stdout);
+  if (primary.stderr) process.stderr.write(primary.stderr);
+  process.exit(0);
+}
+
+const canFallback =
+  Boolean(process.env.DIRECT_URL?.trim()) &&
+  Boolean(process.env.DATABASE_URL?.trim()) &&
+  process.env.DIRECT_URL.trim() !== process.env.DATABASE_URL.trim() &&
+  /P1001|Can't reach database server/i.test(primaryOut);
+
+if (canFallback) {
+  console.warn(
+    "Direct DB URL unreachable from Vercel; retrying prisma migrate deploy with DATABASE_URL.",
+  );
+  const fallbackEnv = { ...process.env, DIRECT_URL: process.env.DATABASE_URL };
+  const fallback = runMigrate(fallbackEnv);
+  if (fallback.stdout) process.stdout.write(fallback.stdout);
+  if (fallback.stderr) process.stderr.write(fallback.stderr);
+  if ((fallback.status ?? 1) === 0) {
+    process.exit(0);
+  }
+}
+
+if (primary.stdout) process.stdout.write(primary.stdout);
+if (primary.stderr) process.stderr.write(primary.stderr);
+
+// Do not block frontend deploys when the DB is temporarily unreachable.
+// Schema-changing PRs should still verify migrate separately.
+if (/P1001|Can't reach database server/i.test(primaryOut)) {
+  console.warn(
+    "Skipping failed prisma migrate deploy due to database connectivity; continuing with next build.",
+  );
+  process.exit(0);
+}
+
+process.exit(primary.status ?? 1);
