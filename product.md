@@ -1,18 +1,21 @@
-# Citizen Bill - Product Plan
+# MattamUndo - Product Plan
+
+Public brand: **MattamUndo** (മാറ്റം ഉണ്ടോ?) · [mattamundo.com](https://mattamundo.com)  
+Repository: still hosted at `linson007/citizen-bill` until renamed.
 
 Last reviewed against the codebase: August 2026 (`v0.1.0` / unreleased open-source polish).
 
 ## 1. Product Objective
 
-Citizen Bill is an open-source civic technology platform where people can draft, attach supporting files, discuss, improve, vote on, and share proposed legislative bills with help from an AI chatbot.
+MattamUndo is an open-source civic technology platform where people can draft, attach supporting files, discuss, improve, vote on, and share proposed legislative bills with help from an AI chatbot.
 
-The platform is focused first on Kerala, where MLAs can introduce private member bills, but the success rate and public participation around such bills are low. Citizen Bill aims to give people a structured way to turn public problems into draft bills that can be reviewed, supported, and potentially taken forward by elected representatives, civic groups, policy researchers, journalists, and the public.
+The platform is focused first on Kerala, where MLAs can introduce private member bills, but the success rate and public participation around such bills are low. MattamUndo aims to give people a structured way to turn public problems into draft bills that can be reviewed, supported, and potentially taken forward by elected representatives, civic groups, policy researchers, journalists, and the public.
 
 ## 2. Background
 
 In Kerala, Members of the Legislative Assembly can introduce private member bills. However, these bills rarely succeed, and the public has limited practical channels to help shape legislative ideas into usable legal drafts.
 
-Citizen Bill is a public participation layer for legislative drafting:
+MattamUndo is a public participation layer for legislative drafting:
 
 - Anyone can draft a new bill with AI assistance or a structured editor.
 - Authors can attach supporting bill documents after creating a bill.

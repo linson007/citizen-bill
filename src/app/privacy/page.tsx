@@ -20,8 +20,8 @@ export default function PrivacyPage() {
 
       <section className="mx-auto max-w-4xl space-y-5 px-5 py-8 text-sm leading-7 text-[#3f3a32] sm:px-8">
         <PolicySection title="Information collected">
-          Citizen Bill stores account information from Google login, bill
-          drafts, uploaded file metadata, votes, comments, reports, amendment
+          MattamUndo stores account information from Google login, bill drafts,
+          uploaded file metadata, votes, comments, reports, amendment
           suggestions, notifications, and optional AI conversation history.
         </PolicySection>
 

@@ -60,14 +60,14 @@ export async function generateMetadata({
 
   if (!bill || !isPublicBillStatus(bill.status)) {
     return {
-      title: "Citizen Bill",
+      title: "MattamUndo",
     };
   }
 
   const url = `/bills/${slug}`;
 
   return {
-    title: `${bill.title} | Citizen Bill`,
+    title: `${bill.title} | MattamUndo`,
     description: bill.description,
     alternates: {
       canonical: url,
@@ -76,7 +76,7 @@ export async function generateMetadata({
       title: bill.title,
       description: bill.description,
       url,
-      siteName: "Citizen Bill",
+      siteName: "MattamUndo",
       type: "article",
     },
     twitter: {

@@ -11,7 +11,7 @@ export default function LoginPage() {
             <Scale size={23} aria-hidden="true" />
           </span>
           <div>
-            <h1 className="text-xl font-semibold">Sign in to Citizen Bill</h1>
+            <h1 className="text-xl font-semibold">Sign in to MattamUndo</h1>
             <p className="text-sm text-[#6d6658]">
               Use your Google account to create drafts, vote, and comment.
             </p>
