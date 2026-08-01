@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
+
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+
+export const metadata: Metadata = {
+  title: "Terms of use",
+  description:
+    "Terms for using MattamUndo to draft, discuss, and share public bill proposals.",
+};
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
@@ -13,16 +22,17 @@ export default function TermsPage() {
             Terms of use
           </h1>
           <p className="mt-2 text-sm text-[#6d6658]">
-            Last updated: May 12, 2026
+            Last updated: August 2, 2026
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl space-y-5 px-5 py-8 text-sm leading-7 text-[#3f3a32] sm:px-8">
+      <section className="mx-auto max-w-4xl flex-1 space-y-5 px-5 py-8 text-sm leading-7 text-[#3f3a32] sm:px-8">
         <PolicySection title="Public drafting platform">
           MattamUndo is an open-source civic platform for drafting, discussing,
           voting on, and sharing public bill proposals. Content on the platform
-          is submitted by users and is intended for public discussion.
+          is submitted by users and is intended for public discussion, not as
+          official legislation unless adopted through lawful government process.
         </PolicySection>
 
         <PolicySection title="No legal advice">
@@ -35,7 +45,7 @@ export default function TermsPage() {
           Do not post unlawful, defamatory, hateful, abusive, spam, misleading,
           or privacy-invasive content. Do not upload documents that expose
           personal data without permission. You are responsible for content you
-          submit.
+          submit and for verifying facts before relying on them.
         </PolicySection>
 
         <PolicySection title="Moderation">
@@ -44,12 +54,30 @@ export default function TermsPage() {
           terms, platform safety rules, or applicable law.
         </PolicySection>
 
+        <PolicySection title="Accounts">
+          Sign-in currently uses Google. Keep your account secure and do not
+          attempt to access another person&apos;s account. We may suspend
+          accounts that abuse the service or AI usage limits.
+        </PolicySection>
+
         <PolicySection title="Open-source project">
-          The application code is intended to be open source. Contributions must
-          follow the repository license, code of conduct, and contribution
-          guidelines.
+          The application code is open source under the MIT License.
+          Contributions must follow the repository license, code of conduct, and
+          contribution guidelines.
+        </PolicySection>
+
+        <PolicySection title="Contact">
+          Questions about these terms:{" "}
+          <a
+            className="font-semibold text-[#123c69]"
+            href="mailto:linsonkurian007@gmail.com"
+          >
+            linsonkurian007@gmail.com
+          </a>
+          .
         </PolicySection>
       </section>
+      <SiteFooter />
     </main>
   );
 }

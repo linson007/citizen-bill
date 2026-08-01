@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Bell, CheckCircle2 } from "lucide-react";
 
 import { markNotificationsReadAction } from "@/app/notifications/actions";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -23,9 +24,9 @@ export default async function NotificationsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
-      <section className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+      <section className="mx-auto max-w-4xl flex-1 px-5 py-8 sm:px-8">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
@@ -73,6 +74,7 @@ export default async function NotificationsPage() {
           )}
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }
