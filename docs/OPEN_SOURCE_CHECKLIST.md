@@ -17,11 +17,13 @@ Use this list when preparing releases or reviewing repository health.
 
 ## Maintainer follow-ups on GitHub
 
-- [ ] Enable **Private vulnerability reporting** (Settings → Code security)
-- [ ] Add Topics: `civic-tech`, `legislation`, `nextjs`, `open-source`, `kerala`
-- [ ] Confirm repository description matches README
-- [ ] Create labels: `bug`, `enhancement`, `good first issue`, `help wanted`, `docs`, `security`
-- [ ] Review branch protection for `main` (require CI, discourage force-push)
+- [x] Enable **Private vulnerability reporting** (Settings → Code security)
+- [x] Add Topics: `civic-tech`, `legislation`, `nextjs`, `open-source`, `kerala`, `public-participation`
+- [x] Confirm repository description matches README
+- [x] Create labels: `bug`, `enhancement`, `good first issue`, `help wanted`, `docs`, `security`
+- [x] Review branch protection for `main` (require CI, discourage force-push)
+- [x] Make repository public
+- [x] Enable Dependabot vulnerability alerts and automated security fixes
 - [ ] Add a maintainer contact email in CoC/Security if you prefer email over GitHub advisories
 
 ## Before each public release
