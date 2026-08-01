@@ -40,6 +40,7 @@ import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus, PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { getBillFollowButtonLabel } from "@/lib/bill-follow";
+import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
@@ -238,7 +239,7 @@ export default async function BillDetailPage({
   );
 
   const billUrl = `${appUrl}/bills/${bill.slug}`;
-  const shareText = `Support this public bill: ${bill.title}`;
+  const shareText = `Support this public bill: ${formatDisplayTitle(bill.title)}`;
   const categoryRank = categoryBills
     .sort((first, second) => second._count.votes - first._count.votes)
     .findIndex((item) => item.id === bill.id);
@@ -280,8 +281,8 @@ export default async function BillDetailPage({
             <Badge>{bill.status.replaceAll("_", " ").toLowerCase()}</Badge>
             {bill.category ? <Badge>{bill.category.name}</Badge> : null}
           </div>
-          <h1 className="max-w-4xl text-3xl font-semibold leading-tight sm:text-5xl">
-            {bill.title}
+          <h1 className="font-display max-w-4xl text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+            {formatDisplayTitle(bill.title)}
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-[#4f4a40]">
             {bill.description}

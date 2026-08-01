@@ -21,7 +21,9 @@ import {
   type BillDiscoverySort,
   type PublicBillStatusFilter,
 } from "@/lib/bill-discovery";
+import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
+import { getRequestMessages } from "@/lib/request-locale";
 
 export default async function BillsPage({
   searchParams,
@@ -34,6 +36,8 @@ export default async function BillsPage({
   }>;
 }) {
   const { q, category, sort, status } = await searchParams;
+  const { locale, t } = await getRequestMessages();
+  const copyClass = locale === "ml" ? "font-malayalam" : "";
   const query = q?.trim();
   const selectedCategory = category?.trim();
   const selectedSort = parseBillDiscoverySort(sort);
@@ -64,57 +68,56 @@ export default async function BillsPage({
   ]);
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
+    <main
+      className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}
+    >
       <SiteHeader />
 
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
-        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
-            Public bills
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
+            {t.bills.eyebrow}
           </p>
           <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold sm:text-4xl">
-                Published public bills
+              <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t.bills.heading}
               </h1>
-              <p className="mt-2 max-w-2xl text-[#4f4a40]">
-                Browse bills that authors have published for public reading,
-                discussion, voting, and sharing.
-              </p>
+              <p className="mt-2 max-w-2xl text-ink-soft">{t.bills.support}</p>
             </div>
             <Link
               href="/bills/new"
-              className="flex h-11 w-fit items-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
             >
               <FileText size={17} aria-hidden="true" />
-              Create bill
+              {t.bills.create}
             </Link>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <form className="mb-5 grid gap-3 rounded-lg border border-[#d8d2c4] bg-white p-4 shadow-sm md:grid-cols-[1fr_200px_200px_200px_auto]">
+        <form className="mb-5 grid gap-3 rounded-md border border-border bg-surface-raised p-4 md:grid-cols-[1fr_200px_200px_200px_auto]">
           <label className="relative block">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#6d6658]"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
               size={17}
               aria-hidden="true"
             />
             <input
               name="q"
               defaultValue={query}
-              placeholder="Search title, description, or problem"
-              className="h-11 w-full rounded-md border border-[#c8c0ae] bg-white pl-10 pr-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+              placeholder={t.bills.searchPlaceholder}
+              className="h-11 w-full rounded-md border border-border-strong bg-surface-raised pl-10 pr-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
             />
           </label>
 
           <select
             name="category"
             defaultValue={selectedCategory}
-            className="h-11 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+            className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
-            <option value="">All categories</option>
+            <option value="">{t.bills.allCategories}</option>
             {categories.map((item) => (
               <option key={item.id} value={item.slug}>
                 {item.name}
@@ -126,7 +129,7 @@ export default async function BillsPage({
             name="status"
             defaultValue={selectedStatus}
             aria-label="Filter by bill status"
-            className="h-11 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+            className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
             {PUBLIC_BILL_STATUS_FILTER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -139,7 +142,7 @@ export default async function BillsPage({
             name="sort"
             defaultValue={selectedSort}
             aria-label="Sort bills"
-            className="h-11 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+            className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
             {BILL_DISCOVERY_SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -150,19 +153,19 @@ export default async function BillsPage({
 
           <button
             type="submit"
-            className="h-11 rounded-md bg-[#123c69] px-5 text-sm font-semibold text-white shadow-sm"
+            className="h-11 rounded-md bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
           >
-            Search
+            {t.bills.search}
           </button>
         </form>
 
         {bills.length > 0 ? (
-          <div className="divide-y divide-[#e7e1d3] rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+          <div className="divide-y divide-border border-y border-border">
             {bills.map((bill) => (
               <Link
                 key={bill.id}
                 href={`/bills/${bill.slug}`}
-                className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                className="block py-5 transition-colors hover:bg-surface"
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
@@ -174,14 +177,14 @@ export default async function BillsPage({
                         {bill.status.replaceAll("_", " ").toLowerCase()}
                       </Badge>
                     </div>
-                    <h2 className="text-lg font-semibold leading-7">
-                      {bill.title}
+                    <h2 className="font-display text-lg font-semibold leading-7 tracking-tight">
+                      {formatDisplayTitle(bill.title)}
                     </h2>
-                    <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-muted">
                       {bill.description}
                     </p>
-                    <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-[#8a8170]">
-                      By{" "}
+                    <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
+                      {t.bills.by}{" "}
                       {bill.author.displayName ?? bill.author.name ?? "Citizen"}
                     </p>
                   </div>
@@ -208,11 +211,12 @@ export default async function BillsPage({
             ))}
           </div>
         ) : (
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-8 text-center shadow-sm">
-            <h2 className="text-lg font-semibold">No published bills yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#6d6658]">
-              Create a draft, publish it from the bill detail page, and it will
-              appear here for public review.
+          <div className="border border-border bg-surface px-6 py-10 text-center">
+            <h2 className="font-display text-lg font-semibold">
+              {t.bills.emptyHeading}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">
+              {t.bills.emptySupport}
             </p>
           </div>
         )}
@@ -312,7 +316,7 @@ async function findPublicBills({
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
       {children}
     </span>
   );
@@ -328,7 +332,7 @@ function Metric({
   label: string;
 }) {
   return (
-    <div className="flex h-10 items-center gap-1.5 rounded-md border border-[#d8d2c4] px-2.5 text-sm font-semibold text-[#3f3a32]">
+    <div className="flex h-10 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-semibold text-ink-soft">
       <Icon size={16} aria-hidden="true" />
       <span>{value.toLocaleString()}</span>
       <span className="sr-only">{label}</span>
