@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest a product or technical improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem before proposing a solution. Check product.md for roadmap context.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or contributor problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should Citizen Bill behave after this change?
+    validations:
+      required: true
+  - type: textarea
+    id: users
+    attributes:
+      label: Users affected
+      description: Citizens, authors, moderators, MLAs/staff, contributors, etc.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Bills and drafting
+        - AI assistance
+        - Auth and profiles
+        - Discovery and dashboard
+        - Moderation and safety
+        - Docs and developer experience
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes or references
+      description: Links, sketches, prior art, or related issues.
+    validations:
+      required: false

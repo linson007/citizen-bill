@@ -1,85 +1,94 @@
 # Citizen Bill
 
-Citizen Bill is an open-source civic technology platform for drafting, uploading, discussing, voting on, and sharing public bill proposals with AI assistance.
+[![CI](https://github.com/linson007/citizen-bill/actions/workflows/ci.yml/badge.svg)](https://github.com/linson007/citizen-bill/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-The first focus is Kerala, where MLAs can introduce private member bills, but public participation in the drafting process is limited. The project aims to help citizens convert public problems into structured legislative drafts that can be reviewed by the community and surfaced to representatives.
+Open-source civic technology for drafting, uploading, discussing, voting on, and sharing public bill proposals — with AI assistance.
+
+The first focus is **Kerala**, where MLAs can introduce private member bills, but public participation in drafting is limited. Citizen Bill helps people turn public problems into structured legislative drafts that the community can review and surface to representatives.
+
+> AI-generated text is drafting assistance only. It is **not legal advice**.
+
+## Features
+
+- Google sign-in and basic profiles with roles (user / moderator / admin)
+- Structured bill editor with categories, tags, and metadata
+- Optional AI drafting chat and outline helpers (OpenAI, with local fallbacks)
+- PDF / DOCX attachments via Vercel Blob
+- Public bill pages with votes, comments, saves, follows, and shares
+- Amendment suggestions with author review
+- Version history, compare, and PDF / DOCX export
+- Dashboard, notifications, and a moderation queue
+- Terms, privacy, and legal disclaimer pages
 
 ## Tech Stack
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- Prisma
-- PostgreSQL
-- Auth.js / NextAuth.js
-- OpenAI API
-- Vercel Blob
-- Vercel deployment
+| Area | Choice |
+| --- | --- |
+| App | Next.js App Router, React, TypeScript |
+| UI | Tailwind CSS, Lucide icons |
+| Auth | Auth.js / NextAuth (Google) |
+| Database | PostgreSQL + Prisma |
+| AI | OpenAI API (optional in development) |
+| Files | Vercel Blob |
+| Deploy | Vercel-friendly |
 
-## Getting Started
+## Quick Start
 
-### 1. Install dependencies
+### Requirements
+
+- Node.js 20+
+- npm 10+
+- Docker (for local PostgreSQL) or another Postgres instance
+
+### 1. Clone and install
 
 ```bash
+git clone https://github.com/linson007/citizen-bill.git
+cd citizen-bill
 npm install
 ```
 
-### 2. Create local environment variables
+### 2. Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set the values needed for your environment.
+Required:
 
-Required for the app and database:
-
-- `DATABASE_URL` - PostgreSQL connection string used by Prisma.
-- `NEXTAUTH_SECRET` - random secret for NextAuth/Auth.js. Generate one with `openssl rand -base64 32`.
-- `NEXTAUTH_URL` - local URL, usually `http://localhost:3000`.
-
-Required for Google login:
-
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string for Prisma |
+| `NEXTAUTH_SECRET` | Auth secret (`openssl rand -base64 32`) |
+| `NEXTAUTH_URL` | App URL, usually `http://localhost:3000` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
 
 Optional:
 
-- `OPENAI_API_KEY` - enables real OpenAI responses. Without it, development fallback AI drafts are returned.
-- `OPENAI_MODEL` - OpenAI chat/completions model. Defaults to `gpt-4.1-mini`.
-- `AI_DAILY_LIMIT` - per-user daily AI request limit. Defaults to `20`.
-- `BLOB_READ_WRITE_TOKEN` - enables Vercel Blob uploads for bill attachments.
-- `EMAIL_FROM` - marks notification emails as queued. Without it, email events are logged in development.
+| Variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | Real AI responses (otherwise deterministic fallbacks) |
+| `OPENAI_MODEL` | Defaults to `gpt-4.1-mini` |
+| `AI_DAILY_LIMIT` | Per-user daily AI requests (default `20`) |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob uploads |
+| `EMAIL_FROM` | Marks notification emails as queued |
 
-### 3. Prepare PostgreSQL
-
-For local development, start PostgreSQL with Docker Compose:
+### 3. Database
 
 ```bash
 npm run db:up
-```
-
-This starts a PostgreSQL 16 container using the connection string from `.env.example`:
-
-```bash
-DATABASE_URL="postgresql://citizen_bill:citizen_bill_password@localhost:5432/citizen_bill?schema=public"
-```
-
-Then run migrations:
-
-```bash
 npm run db:migrate
 ```
 
-If the database schema is already up to date and you only need generated Prisma types/client, run:
+`src/generated/prisma` is generated and gitignored. After cloning, always run:
 
 ```bash
 npm run db:generate
 ```
 
-Important: `src/generated/prisma` is generated code and is intentionally ignored by git. Run `npm run db:generate` after cloning and before typechecking, testing, or building.
-
-### 4. Run the development server
+### 4. Develop
 
 ```bash
 npm run dev
@@ -87,9 +96,38 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Scripts
+
+```bash
+npm run dev          # Development server
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint
+npm run test         # Vitest unit tests
+npm run test:watch   # Vitest watch mode
+npm run typecheck    # TypeScript check
+npm run format       # Prettier
+npm run db:up        # Start Postgres (Docker Compose)
+npm run db:down      # Stop Postgres
+npm run db:logs      # Follow Postgres logs
+npm run db:generate  # Generate Prisma client
+npm run db:migrate   # Run migrations
+npm run db:studio    # Prisma Studio
+```
+
+## Project Layout
+
+```text
+src/app/           App Router pages, server actions, API routes
+src/components/    Shared UI
+src/lib/           Domain helpers (bills, AI, auth, uploads, export)
+prisma/            Schema and migrations
+.github/           CI, issue and PR templates
+```
+
 ## Verification
 
-Before committing, run:
+Before opening a pull request:
 
 ```bash
 npm run db:generate
@@ -99,54 +137,35 @@ npm run typecheck
 npm run build
 ```
 
-## Scripts
+## Contributing
 
-```bash
-npm run dev          # Start local development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run test         # Run unit tests
-npm run test:watch   # Run tests in watch mode
-npm run typecheck    # Run TypeScript without emitting files
-npm run format       # Format the repository
-npm run db:up        # Start local PostgreSQL with Docker Compose
-npm run db:down      # Stop local PostgreSQL
-npm run db:logs      # Follow local PostgreSQL logs
-npm run db:generate  # Generate Prisma client
-npm run db:migrate   # Run local Prisma migrations
-npm run db:studio    # Open Prisma Studio
-```
+Contributions are welcome — code, docs, design, and civic product feedback.
 
-## Testing
+1. Read [CONTRIBUTING.md](./CONTRIBUTING.md)
+2. Follow the [Code of Conduct](./CODE_OF_CONDUCT.md)
+3. Browse [open issues](https://github.com/linson007/citizen-bill/issues)
+4. Prefer small, focused pull requests
 
-The project uses Vitest for fast unit tests. Add tests next to the code they cover using `*.test.ts` or `*.test.tsx`.
+Good first areas: docs clarity, UI accessibility, unit tests for `src/lib`, and bill discovery polish.
 
-```bash
-npm run db:generate
-npm run test
-```
+## Security
+
+Please report vulnerabilities privately. See [SECURITY.md](./SECURITY.md).
+
+## Support
+
+For bugs, ideas, and setup help, see [SUPPORT.md](./SUPPORT.md).
 
 ## Product Plan
 
-See [product.md](./product.md) for the product scope, MVP phases, data model, dashboard plan, and future roadmap.
+See [product.md](./product.md) for MVP scope, data model, dashboard plan, and roadmap.
 
-## Upload Limits
+Maintainer open-source checklist: [docs/OPEN_SOURCE_CHECKLIST.md](./docs/OPEN_SOURCE_CHECKLIST.md).
 
-Bill attachments support PDF and DOCX files up to 10 MB. Configure `BLOB_READ_WRITE_TOKEN` to enable Vercel Blob uploads.
+## Changelog
 
-## Legal Pages
-
-The app includes public terms and privacy pages at `/terms` and `/privacy`. AI-generated text is drafting assistance only and is not legal advice.
-
-## AI Usage Limits
-
-AI drafting endpoints require login and track per-user usage in the database. The default limit is 20 AI requests per user per day. Override it with:
-
-```bash
-AI_DAILY_LIMIT=20
-```
+See [CHANGELOG.md](./CHANGELOG.md).
 
 ## License
 
-MIT
+[MIT](./LICENSE)

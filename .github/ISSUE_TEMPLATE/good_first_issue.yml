@@ -1,0 +1,40 @@
+name: Good first issue
+description: Suggest a small, well-scoped task for new contributors
+title: "[Good first issue]: "
+labels: ["good first issue", "help wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for small, self-contained tasks with a clear definition of done.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should a new contributor implement or fix?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why this helps
+      description: Why is this a useful onboarding task?
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+      description: Checklist of acceptance criteria.
+      placeholder: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: pointers
+    attributes:
+      label: Helpful pointers
+      description: Files, docs, or related issues to start from.
+    validations:
+      required: false

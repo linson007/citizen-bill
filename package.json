@@ -2,6 +2,27 @@
   "name": "citizen-bill",
   "version": "0.1.0",
   "private": true,
+  "description": "Open-source civic platform for drafting, discussing, and supporting public bill proposals with AI assistance.",
+  "license": "MIT",
+  "homepage": "https://github.com/linson007/citizen-bill#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linson007/citizen-bill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/linson007/citizen-bill/issues"
+  },
+  "keywords": [
+    "civic-tech",
+    "legislation",
+    "open-source",
+    "nextjs",
+    "kerala",
+    "public-participation"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -24,6 +45,7 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@vercel/blob": "^2.3.3",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
     "next-auth": "^4.24.14",
