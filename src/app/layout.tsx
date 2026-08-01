@@ -18,23 +18,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteDescription =
+  "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(getAppUrl()),
-  title: "MattamUndo",
-  description:
-    "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
+  title: {
+    default: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    template: "%s | MattamUndo",
+  },
+  description: siteDescription,
+  applicationName: "MattamUndo",
+  keywords: [
+    "MattamUndo",
+    "Kerala",
+    "private member bill",
+    "civic tech",
+    "public participation",
+    "legislation",
+  ],
   openGraph: {
-    title: "MattamUndo",
-    description:
-      "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
+    title: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    description: siteDescription,
     siteName: "MattamUndo",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
-    card: "summary",
-    title: "MattamUndo",
-    description:
-      "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
+    card: "summary_large_image",
+    title: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    description: siteDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

@@ -7,6 +7,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Prisma } from "@/generated/prisma/client";
 import {
@@ -63,7 +64,7 @@ export default async function BillsPage({
   ]);
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
 
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
@@ -216,6 +217,7 @@ export default async function BillsPage({
           </div>
         )}
       </section>
+      <SiteFooter />
     </main>
   );
 }

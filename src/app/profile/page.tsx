@@ -15,6 +15,7 @@ import {
   deleteAiSessionAction,
   updateProfileAction,
 } from "@/app/profile/actions";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
@@ -114,7 +115,7 @@ export default async function ProfilePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -303,6 +304,7 @@ export default async function ProfilePage() {
           </ActivityPanel>
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

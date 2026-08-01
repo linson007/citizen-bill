@@ -9,13 +9,13 @@ import {
   Share2,
   ShieldCheck,
   ThumbsUp,
-  Upload,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { connection } from "next/server";
 
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { BillStatus } from "@/generated/prisma/enums";
@@ -77,7 +77,7 @@ export default async function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
 
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
@@ -91,8 +91,8 @@ export default async function Home() {
               Turn public problems into bills people can support.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-[#4f4a40]">
-              MattamUndo helps people in Kerala upload, create, review, vote on,
-              comment on, and share public bill proposals with AI assistance and
+              MattamUndo helps people in Kerala draft, review, vote on, comment
+              on, and share public bill proposals with AI assistance and
               community oversight.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -104,11 +104,11 @@ export default async function Home() {
                 Start with AI
               </Link>
               <Link
-                href="/bills/new"
+                href="/bills"
                 className="flex h-12 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-5 text-sm font-semibold text-[#2f2a22] shadow-sm"
               >
-                <Upload size={18} aria-hidden="true" />
-                Upload bill
+                <FileText size={18} aria-hidden="true" />
+                Browse bills
               </Link>
             </div>
           </div>
@@ -148,13 +148,13 @@ export default async function Home() {
             <div className="p-5">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold">This week</h3>
-                <a
-                  href="#bills"
+                <Link
+                  href="/bills"
                   className="flex items-center gap-1 text-sm font-semibold text-[#123c69]"
                 >
                   View bills
                   <ArrowUpRight size={16} aria-hidden="true" />
-                </a>
+                </Link>
               </div>
               <div className="space-y-3">
                 {activity.length > 0 ? (
@@ -287,7 +287,7 @@ export default async function Home() {
                         <Link
                           href={`/bills/${bill.slug}`}
                           className="grid size-10 place-items-center rounded-md border border-[#d8d2c4] text-[#4f4a40] transition-colors hover:bg-[#fbfaf7]"
-                          aria-label={`Open sharing options for ${bill.title}`}
+                          aria-label={`View ${bill.title}`}
                         >
                           <Share2 size={17} aria-hidden="true" />
                         </Link>
@@ -332,6 +332,7 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <LegalDisclaimer />
       </section>
+      <SiteFooter />
     </main>
   );
 }

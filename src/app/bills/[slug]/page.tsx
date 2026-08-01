@@ -33,6 +33,7 @@ import {
   uploadBillFileAction,
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
@@ -68,7 +69,7 @@ export async function generateMetadata({
   const url = `/bills/${slug}`;
 
   return {
-    title: `${bill.title} | MattamUndo`,
+    title: bill.title,
     description: bill.description,
     alternates: {
       canonical: url,
@@ -271,7 +272,7 @@ export default async function BillDetailPage({
   ].filter((item): item is { label: string; date: Date } => Boolean(item));
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -855,6 +856,7 @@ export default async function BillDetailPage({
           </Link>
         </aside>
       </section>
+      <SiteFooter />
     </main>
   );
 }

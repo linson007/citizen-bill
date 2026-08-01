@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { BillForm } from "@/app/bills/new/bill-form";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 
@@ -13,7 +14,7 @@ export default async function NewBillPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -31,9 +32,10 @@ export default async function NewBillPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+      <section className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8">
         <BillForm />
       </section>
+      <SiteFooter />
     </main>
   );
 }
