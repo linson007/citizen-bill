@@ -12,7 +12,7 @@ export default defineConfig({
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     coverage: {
       provider: "v8",
-      all: true,
+      // With include set, Vitest 4 reports covered + uncovered matches (all was removed).
       include: ["src/lib/**/*.ts"],
       exclude: [
         "src/lib/__tests__/**",
