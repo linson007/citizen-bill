@@ -40,7 +40,7 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers through GitHub by contacting a maintainer privately or by using [GitHub's private vulnerability reporting](https://github.com/linson007/citizen-bill/security/advisories/new) for sensitive reports.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at [linsonkurian007@gmail.com](mailto:linsonkurian007@gmail.com). For sensitive technical reports, you may also use [GitHub's private vulnerability reporting](https://github.com/linson007/citizen-bill/security/advisories/new).
 
 All complaints will be reviewed and investigated promptly and fairly. All maintainers are obligated to respect the privacy and security of the reporter of any incident.
 

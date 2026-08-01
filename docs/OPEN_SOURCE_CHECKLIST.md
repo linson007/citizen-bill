@@ -24,7 +24,7 @@ Use this list when preparing releases or reviewing repository health.
 - [x] Review branch protection for `main` (require CI, discourage force-push)
 - [x] Make repository public
 - [x] Enable Dependabot vulnerability alerts and automated security fixes
-- [ ] Add a maintainer contact email in CoC/Security if you prefer email over GitHub advisories
+- [x] Add a maintainer contact email in CoC/Security (`linsonkurian007@gmail.com`)
 
 ## Before each public release
 

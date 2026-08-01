@@ -7,7 +7,7 @@
 | Bug report | [Bug report issue](https://github.com/linson007/citizen-bill/issues/new?template=bug_report.yml) |
 | Feature idea | [Feature request issue](https://github.com/linson007/citizen-bill/issues/new?template=feature_request.yml) |
 | Setup / contribution question | [Open an issue](https://github.com/linson007/citizen-bill/issues/new/choose) |
-| Security vulnerability | [SECURITY.md](./SECURITY.md) |
+| Security vulnerability | [SECURITY.md](./SECURITY.md) or email [linsonkurian007@gmail.com](mailto:linsonkurian007@gmail.com) |
 | Product roadmap | [product.md](./product.md) |
 
 ## Before Asking

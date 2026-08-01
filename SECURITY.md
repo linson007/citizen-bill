@@ -13,9 +13,10 @@ Security fixes are applied to the latest `main` branch. If you are running a for
 
 **Do not create public GitHub issues for security vulnerabilities.**
 
-Please report security concerns privately using GitHub Security Advisories:
+Please report security concerns privately using either:
 
-[Report a vulnerability](https://github.com/linson007/citizen-bill/security/advisories/new)
+1. [GitHub Security Advisories](https://github.com/linson007/citizen-bill/security/advisories/new)
+2. Email: [linsonkurian007@gmail.com](mailto:linsonkurian007@gmail.com)
 
 Include:
 
