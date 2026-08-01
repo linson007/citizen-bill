@@ -1,10 +1,10 @@
 {
-  "name": "citizen-bill",
+  "name": "mattamundo",
   "version": "0.1.0",
   "private": true,
-  "description": "Open-source civic platform for drafting, discussing, and supporting public bill proposals with AI assistance.",
+  "description": "MattamUndo (മാറ്റം ഉണ്ടോ?) — open-source civic platform for drafting, discussing, and supporting public bill proposals with AI assistance.",
   "license": "MIT",
-  "homepage": "https://github.com/linson007/citizen-bill#readme",
+  "homepage": "https://mattamundo.com",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/linson007/citizen-bill.git"
@@ -15,9 +15,11 @@
   "keywords": [
     "civic-tech",
     "legislation",
+    "mattamundo",
     "open-source",
     "nextjs",
     "kerala",
+    "undo-universe",
     "public-participation"
   ],
   "engines": {

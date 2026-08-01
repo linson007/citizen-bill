@@ -18,9 +18,9 @@ export async function SiteHeader() {
             <Scale size={22} aria-hidden="true" />
           </span>
           <span>
-            <span className="block text-lg font-semibold">Citizen Bill</span>
-            <span className="block text-xs font-medium uppercase tracking-[0.18em] text-[#6d6658]">
-              Kerala public bills
+            <span className="block text-lg font-semibold">MattamUndo</span>
+            <span className="block text-xs font-medium tracking-[0.04em] text-[#6d6658]">
+              മാറ്റം ഉണ്ടോ?
             </span>
           </span>
         </Link>

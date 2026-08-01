@@ -20,17 +20,15 @@ export default function TermsPage() {
 
       <section className="mx-auto max-w-4xl space-y-5 px-5 py-8 text-sm leading-7 text-[#3f3a32] sm:px-8">
         <PolicySection title="Public drafting platform">
-          Citizen Bill is an open-source civic platform for drafting,
-          discussing, voting on, and sharing public bill proposals. Content on
-          the platform is submitted by users and is intended for public
-          discussion.
+          MattamUndo is an open-source civic platform for drafting, discussing,
+          voting on, and sharing public bill proposals. Content on the platform
+          is submitted by users and is intended for public discussion.
         </PolicySection>
 
         <PolicySection title="No legal advice">
-          Citizen Bill, including its AI assistant, does not provide legal
-          advice, legal representation, or official government guidance. AI
-          output may be incomplete or inaccurate and must be reviewed before
-          use.
+          MattamUndo, including its AI assistant, does not provide legal advice,
+          legal representation, or official government guidance. AI output may
+          be incomplete or inaccurate and must be reviewed before use.
         </PolicySection>
 
         <PolicySection title="User responsibilities">

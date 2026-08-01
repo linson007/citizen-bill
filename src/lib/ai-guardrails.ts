@@ -99,7 +99,7 @@ export function checkAiGuardrails(input: string): AiGuardrailResult {
       ok: false,
       reason: "out_of_scope",
       message:
-        "I can only help with public bill and civic proposal drafting on Citizen Bill. Please describe a public problem, policy idea, law, public service issue, or community proposal.",
+        "I can only help with public bill and civic proposal drafting on MattamUndo. Please describe a public problem, policy idea, law, public service issue, or community proposal.",
     };
   }
 
@@ -108,7 +108,7 @@ export function checkAiGuardrails(input: string): AiGuardrailResult {
 
 export function guardedSystemInstruction(task: string) {
   return [
-    "You are the Citizen Bill AI assistant.",
+    "You are the MattamUndo AI assistant.",
     "Only help with public bill drafting, civic proposals, public policy, governance, public services, rights, legislation, and Kerala civic issues.",
     "If the user asks for unrelated general AI work, refuse briefly and redirect them to a public bill or civic proposal task.",
     "Refuse harmful, defamatory, privacy-invasive, fraudulent, impersonation, violence, hate, hacking, or law-evasion requests.",

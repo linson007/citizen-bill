@@ -51,7 +51,7 @@ Do not run `npm audit fix --force` blindly. Prefer normal `npm update`, then rev
 
 ## AI and Civic Safety
 
-Citizen Bill may process sensitive civic and legal text. Features should:
+MattamUndo may process sensitive civic and legal text. Features should:
 
 - Minimize unnecessary storage of personal data
 - Keep AI drafting assistance clearly separated from legal advice

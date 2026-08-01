@@ -17,7 +17,7 @@ export function LegalDisclaimer({ compact = false }: { compact?: boolean }) {
       <p
         className={`mt-1 leading-6 text-[#6d6658] ${compact ? "text-xs" : "text-sm"}`}
       >
-        Citizen Bill and its AI assistant help prepare public discussion bill
+        MattamUndo and its AI assistant help prepare public discussion bill
         text. They do not provide legal advice, legal representation, or
         official government guidance. Review important proposals with qualified
         experts before relying on them.

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Rebranded the product from Citizen Bill to MattamUndo ([mattamundo.com](https://mattamundo.com))
+
 ### Added
 
 - Open-source contributor docs, GitHub issue forms, CI workflow, and support guidance
@@ -15,5 +19,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial Citizen Bill application foundation
+- Initial MattamUndo (formerly Citizen Bill) application foundation
 - Bill drafting, publishing, discussion, voting, and AI assistance flows

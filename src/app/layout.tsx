@@ -19,21 +19,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
-  title: "Citizen Bill",
+  title: "MattamUndo",
   description:
-    "Create, publish, discuss, and support public bills with AI assistance.",
+    "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
   openGraph: {
-    title: "Citizen Bill",
+    title: "MattamUndo",
     description:
-      "Create, publish, discuss, and support public bills with AI assistance.",
-    siteName: "Citizen Bill",
+      "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
+    siteName: "MattamUndo",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "Citizen Bill",
+    title: "MattamUndo",
     description:
-      "Create, publish, discuss, and support public bills with AI assistance.",
+      "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.",
   },
 };
 

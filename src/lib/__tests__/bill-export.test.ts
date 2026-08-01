@@ -10,7 +10,7 @@ describe("bill export helpers", () => {
   });
 
   it("creates a PDF byte stream", () => {
-    const pdf = createPdf(["Citizen Bill", "Public water access"]);
+    const pdf = createPdf(["MattamUndo", "Public water access"]);
     const text = new TextDecoder().decode(pdf.slice(0, 8));
 
     expect(text).toBe("%PDF-1.4");
@@ -27,7 +27,7 @@ describe("bill export helpers", () => {
   });
 
   it("creates a DOCX zip byte stream", () => {
-    const docx = createDocx(["Citizen Bill", "Public water access"]);
+    const docx = createDocx(["MattamUndo", "Public water access"]);
 
     expect(Array.from(docx.slice(0, 4))).toEqual([0x50, 0x4b, 0x03, 0x04]);
     expect(docx.length).toBeGreaterThan(100);

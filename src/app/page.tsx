@@ -85,15 +85,15 @@ export default async function Home() {
           <div className="flex flex-col justify-center">
             <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 py-2 text-sm font-medium text-[#4f4a40]">
               <Gavel size={16} aria-hidden="true" />
-              Public bill workspace
+              MattamUndo · മാറ്റം ഉണ്ടോ?
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[#141414] sm:text-5xl lg:text-6xl">
               Turn public problems into bills people can support.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-[#4f4a40]">
-              Citizen Bill helps people in Kerala upload, create, review, vote
-              on, comment on, and share public bill proposals with AI assistance
-              and community oversight.
+              MattamUndo helps people in Kerala upload, create, review, vote on,
+              comment on, and share public bill proposals with AI assistance and
+              community oversight.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link

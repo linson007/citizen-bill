@@ -1,12 +1,14 @@
-# Citizen Bill
+# MattamUndo
 
 [![CI](https://github.com/linson007/citizen-bill/actions/workflows/ci.yml/badge.svg)](https://github.com/linson007/citizen-bill/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-Open-source civic technology for drafting, uploading, discussing, voting on, and sharing public bill proposals — with AI assistance.
+**മാറ്റം ഉണ്ടോ?** Open-source civic technology for drafting, uploading, discussing, voting on, and sharing public bill proposals — with AI assistance.
 
-The first focus is **Kerala**, where MLAs can introduce private member bills, but public participation in drafting is limited. Citizen Bill helps people turn public problems into structured legislative drafts that the community can review and surface to representatives.
+Site: [mattamundo.com](https://mattamundo.com)
+
+The first focus is **Kerala**, where MLAs can introduce private member bills, but public participation in drafting is limited. MattamUndo helps people turn public problems into structured legislative drafts that the community can review and surface to representatives.
 
 > AI-generated text is drafting assistance only. It is **not legal advice**.
 

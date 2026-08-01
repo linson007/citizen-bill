@@ -119,7 +119,7 @@ async function notifyUser({
 
   await sendEmailNotification({
     to: notification.user.email,
-    subject: "Citizen Bill notification",
+    subject: "MattamUndo notification",
     text: notification.bill
       ? `${message}\n\nBill: ${notification.bill.title}`
       : message,
