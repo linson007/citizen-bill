@@ -69,6 +69,7 @@ export default async function BillsPage({
 
   return (
     <main
+      id="main-content"
       className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}
     >
       <SiteHeader />
@@ -97,8 +98,9 @@ export default async function BillsPage({
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <form className="mb-5 grid gap-3 rounded-md border border-border bg-surface-raised p-4 md:grid-cols-[1fr_200px_200px_200px_auto]">
-          <label className="relative block">
+        <form className="mb-5 grid gap-3 rounded-md border border-border bg-surface-raised p-4 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px_180px_auto]">
+          <label className="relative block sm:col-span-2 lg:col-auto">
+            <span className="sr-only">{t.bills.searchPlaceholder}</span>
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
               size={17}
@@ -115,6 +117,7 @@ export default async function BillsPage({
           <select
             name="category"
             defaultValue={selectedCategory}
+            aria-label={t.bills.allCategories}
             className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
             <option value="">{t.bills.allCategories}</option>
@@ -153,7 +156,7 @@ export default async function BillsPage({
 
           <button
             type="submit"
-            className="h-11 rounded-md bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
+            className="h-11 rounded-md bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-hero-ink sm:col-span-2 lg:col-auto"
           >
             {t.bills.search}
           </button>

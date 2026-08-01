@@ -90,12 +90,18 @@ export default async function Home() {
   ];
 
   return (
-    <main className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}>
+    <main
+      id="main-content"
+      className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}
+    >
       <SiteHeader />
 
       <section className="relative isolate min-h-[min(88vh,820px)] overflow-hidden border-b border-border">
         <HeroVisual />
         <div className="relative mx-auto flex max-w-7xl flex-col justify-end px-5 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-28 lg:min-h-[min(88vh,820px)] lg:justify-center lg:pb-24 lg:pt-24">
+          <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent backdrop-blur-sm">
+            {t.home.eyebrow}
+          </p>
           <p className="animate-fade-up font-display text-5xl font-semibold tracking-tight text-hero-ink sm:text-6xl lg:text-7xl">
             {t.home.brand}
           </p>
@@ -107,6 +113,10 @@ export default async function Home() {
           </h1>
           <p className="animate-fade-up-delay-2 mt-4 max-w-xl text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
             {t.home.support}
+          </p>
+          <p className="animate-fade-up-delay-2 mt-4 flex max-w-xl items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
+            <CheckCircle2 className="mt-0.5 shrink-0 text-success" size={17} aria-hidden="true" />
+            {t.home.heroNote}
           </p>
           <div className="animate-fade-up-delay-2 mt-9 flex flex-col gap-3 sm:flex-row">
             <Link

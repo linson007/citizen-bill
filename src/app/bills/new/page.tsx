@@ -18,6 +18,7 @@ export default async function NewBillPage() {
 
   return (
     <main
+      id="main-content"
       className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}
     >
       <SiteHeader />

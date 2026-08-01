@@ -45,12 +45,19 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
+  text-size-adjust: 100%;
   font-family:
     var(--font-source-sans),
     var(--font-manjari),
     Arial,
     Helvetica,
     sans-serif;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--hero-ink);
 }
 
 .font-display {
@@ -74,6 +81,7 @@ input,
 textarea,
 select {
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :where(a, button, input, textarea, select):focus-visible {
@@ -120,6 +128,12 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
   .animate-fade-up,
   .animate-fade-up-delay,
   .animate-fade-up-delay-2,

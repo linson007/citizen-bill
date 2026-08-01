@@ -82,6 +82,12 @@ export default async function RootLayout({
       className={`${sourceSans.variable} ${fraunces.variable} ${manjari.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-accent px-4 py-3 text-sm font-semibold text-white focus:not-sr-only"
+        >
+          Skip to main content
+        </a>
         <AuthProvider session={session}>{children}</AuthProvider>
       </body>
     </html>
