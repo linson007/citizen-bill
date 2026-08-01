@@ -180,7 +180,7 @@ export default async function BillsPage({
                     <h2 className="font-display text-lg font-semibold leading-7 tracking-tight">
                       {formatDisplayTitle(bill.title)}
                     </h2>
-                    <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-muted">
+                    <p className="mt-2 max-w-3xl line-clamp-3 text-sm leading-6 text-ink-muted">
                       {bill.description}
                     </p>
                     <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">

@@ -1,11 +1,11 @@
 import {
+  ArrowRight,
   ArrowUpRight,
   CheckCircle2,
   FileText,
   Gavel,
   MessageSquare,
   PenLine,
-  Share2,
   ShieldCheck,
   ThumbsUp,
   Users,
@@ -111,14 +111,14 @@ export default async function Home() {
           <div className="animate-fade-up-delay-2 mt-9 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/bills/new"
-              className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
+              className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             >
               <PenLine size={18} aria-hidden="true" />
               {t.home.ctaPrimary}
             </Link>
             <Link
               href="/bills"
-              className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised"
+              className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             >
               <FileText size={18} aria-hidden="true" />
               {t.home.ctaSecondary}
@@ -146,19 +146,30 @@ export default async function Home() {
               {t.home.exampleProblem}
             </p>
           </div>
-          <ol className="space-y-0 border-t border-border">
-            {draftSteps.map((step, index) => (
-              <li
-                key={step}
-                className="flex items-baseline gap-4 border-b border-border py-4"
-              >
-                <span className="font-display w-8 shrink-0 text-lg font-semibold text-accent">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="text-base font-medium text-ink-soft">{step}</span>
-              </li>
-            ))}
-          </ol>
+          <div>
+            <ol className="space-y-0 border-t border-border">
+              {draftSteps.map((step, index) => (
+                <li
+                  key={step}
+                  className="flex items-baseline gap-4 border-b border-border py-4"
+                >
+                  <span className="font-display w-8 shrink-0 text-lg font-semibold text-accent">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-base font-medium text-ink-soft">
+                    {step}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <Link
+              href="/bills/new"
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            >
+              {t.home.howCta}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -207,7 +218,7 @@ export default async function Home() {
                       >
                         {formatDisplayTitle(bill.title)}
                       </Link>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">
+                      <p className="mt-2 max-w-2xl line-clamp-3 text-sm leading-6 text-ink-muted">
                         {bill.description}
                       </p>
                     </div>
@@ -225,10 +236,10 @@ export default async function Home() {
                       />
                       <Link
                         href={`/bills/${bill.slug}`}
-                        className="grid size-10 place-items-center rounded-md border border-border text-ink-soft transition-colors hover:bg-surface-raised"
-                        aria-label={`View ${formatDisplayTitle(bill.title)}`}
+                        className="grid size-10 place-items-center rounded-md border border-border text-ink-soft transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+                        aria-label={`Open ${formatDisplayTitle(bill.title)}`}
                       >
-                        <Share2 size={17} aria-hidden="true" />
+                        <ArrowRight size={17} aria-hidden="true" />
                       </Link>
                     </div>
                   </div>
@@ -297,9 +308,18 @@ export default async function Home() {
                 </Link>
               ))
             ) : (
-              <p className="text-sm leading-6 text-ink-muted">
-                {t.home.emptyActivity}
-              </p>
+              <div className="rounded-md border border-dashed border-border bg-surface px-4 py-5">
+                <p className="text-sm leading-6 text-ink-muted">
+                  {t.home.emptyActivity}
+                </p>
+                <Link
+                  href="/bills"
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent"
+                >
+                  {t.home.emptyActivityCta}
+                  <ArrowUpRight size={15} aria-hidden="true" />
+                </Link>
+              </div>
             )}
           </div>
         </div>
