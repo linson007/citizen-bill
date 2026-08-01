@@ -121,6 +121,7 @@ npm run db:studio    # Prisma Studio
 
 Vercel uses `vercel-build`, which runs `prisma migrate deploy` before `next build` on **production** only (preview skips migrate).
 Ensure `DATABASE_URL` (and `DIRECT_URL` if using the pooler) are enabled for **Production + Build** in Vercel.
+If the direct Supabase host is unreachable from Vercel (P1001), the script retries with `DATABASE_URL` and will not block the frontend build on connectivity failures.
 
 
 ## Project Layout
