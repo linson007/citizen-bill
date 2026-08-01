@@ -120,22 +120,23 @@ export async function consumeAiUsage(
 
   if (store.$transaction) {
     return store.$transaction(
-      (tx) => consumeAiUsageWithoutTransaction(userId, route, {
-        ...options,
-        store: tx,
-      }),
+      (tx) =>
+        consumeAiUsageWithoutTransaction(userId, route, {
+          ...options,
+          store: tx,
+        }),
       {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
         maxWait: 5000,
         timeout: 5000,
       },
     );
+  } else {
+    return consumeAiUsageWithoutTransaction(userId, route, {
+      ...options,
+      store,
+    });
   }
-
-  return consumeAiUsageWithoutTransaction(userId, route, {
-    ...options,
-    store,
-  });
 }
 
 async function consumeAiUsageWithoutTransaction(
