@@ -3,6 +3,8 @@ export function safeBillExportFileName(value: string) {
 }
 
 export function createPdf(lines: string[]) {
+  // Helvetica Type1 is Latin-focused. Prefer DOCX export for Malayalam or other
+  // non-ASCII bill text until a Unicode-capable PDF font is embedded.
   const encoder = new TextEncoder();
   const wrapped = lines.flatMap((line) => wrapLine(line, 86));
   const linesPerPage = 52;

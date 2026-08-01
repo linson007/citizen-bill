@@ -9,9 +9,10 @@ import {
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
 import {
-  consumeAiUsage,
+  checkAiUsageLimit,
   createAiUsageHeaders,
   createAiUsageLimitMessage,
+  recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
 
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
   const guardrail = checkAiGuardrails(`${title}\n${prompt}`);
   if (!guardrail.ok) {
     await logAiSafetyEvent({
+      userId: session.user.id,
       reason: guardrail.reason,
       prompt: `${title}\n${prompt}`,
     });
@@ -80,7 +82,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const usage = await consumeAiUsage(session.user.id, "ai-draft");
+  const usage = await checkAiUsageLimit(session.user.id);
   if (!usage.ok) {
     return NextResponse.json(
       {
@@ -97,6 +99,8 @@ export async function POST(request: Request) {
   }
 
   if (!process.env.OPENAI_API_KEY) {
+    await recordAiUsage(session.user.id, "ai-draft");
+
     if (mode !== "draft" && mode !== "legal") {
       return NextResponse.json({
         text: createFallbackText(title, prompt, mode),
@@ -112,53 +116,68 @@ export async function POST(request: Request) {
     });
   }
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const completion = await client.chat.completions.create({
-    model: getOpenAiModel(),
-    messages: [
-      {
-        role: "system",
-        content: guardedSystemInstruction(modes[mode]),
-      },
-      {
-        role: "user",
-        content: buildPrompt(title, prompt, mode),
-      },
-    ],
-    response_format:
-      mode === "draft" || mode === "legal"
-        ? { type: "json_object" }
-        : { type: "text" },
-  });
-
-  const raw = completion.choices[0]?.message.content ?? "{}";
-
-  if (mode !== "draft" && mode !== "legal") {
-    return NextResponse.json({
-      text: raw.trim() || createFallbackText(title, prompt, mode),
-      fields: null,
+  try {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const completion = await client.chat.completions.create({
+      model: getOpenAiModel(),
+      messages: [
+        {
+          role: "system",
+          content: guardedSystemInstruction(modes[mode]),
+        },
+        {
+          role: "user",
+          content: buildPrompt(title, prompt, mode),
+        },
+      ],
+      response_format:
+        mode === "draft" || mode === "legal"
+          ? { type: "json_object" }
+          : { type: "text" },
     });
+
+    await recordAiUsage(session.user.id, "ai-draft");
+
+    const raw = completion.choices[0]?.message.content ?? "{}";
+
+    if (mode !== "draft" && mode !== "legal") {
+      return NextResponse.json({
+        text: raw.trim() || createFallbackText(title, prompt, mode),
+        fields: null,
+      });
+    }
+
+    const fields =
+      parseStructuredDraft(raw) ?? createFallbackFields(title, prompt, mode);
+
+    return NextResponse.json({
+      text: formatDraftPreview(title, prompt, fields),
+      fields,
+    });
+  } catch {
+    return NextResponse.json(
+      {
+        error:
+          "The AI drafting service is unavailable right now. Please try again shortly.",
+      },
+      { status: 502 },
+    );
   }
-
-  const fields =
-    parseStructuredDraft(raw) ?? createFallbackFields(title, prompt, mode);
-
-  return NextResponse.json({
-    text: formatDraftPreview(title, prompt, fields),
-    fields,
-  });
 }
 
 async function logAiSafetyEvent({
+  userId,
   reason,
   prompt,
 }: {
+  userId?: string;
   reason: string;
   prompt: string;
 }) {
   await prisma.aiSafetyEvent
     .create({
       data: {
+        userId,
         reason,
         prompt: prompt.slice(0, 2000),
       },

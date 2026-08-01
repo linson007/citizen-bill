@@ -52,12 +52,27 @@ export default async function VersionComparePage({
   });
   const fallbackFrom = versions[1]?.id;
   const fallbackTo = versions[0]?.id;
-  const fromVersion = versions.find(
-    (version) => version.id === (from ?? fallbackFrom),
-  );
-  const toVersion = versions.find(
-    (version) => version.id === (to ?? fallbackTo),
-  );
+  const fromId = from ?? fallbackFrom;
+  const toId = to ?? fallbackTo;
+
+  const [fromVersion, toVersion] = await Promise.all([
+    fromId
+      ? prisma.billVersion.findFirst({
+          where: {
+            id: fromId,
+            billId: bill.id,
+          },
+        })
+      : Promise.resolve(null),
+    toId
+      ? prisma.billVersion.findFirst({
+          where: {
+            id: toId,
+            billId: bill.id,
+          },
+        })
+      : Promise.resolve(null),
+  ]);
 
   if (!fromVersion || !toVersion) {
     notFound();

@@ -9,8 +9,8 @@ export async function sendEmailNotification(message: EmailNotification) {
     return;
   }
 
-  // Provider integration point. In development we keep this observable without
-  // adding a paid email dependency.
+  // Email delivery is not wired to a provider yet. EMAIL_FROM only marks that
+  // a production sender identity is configured; events are logged for now.
   if (!process.env.EMAIL_FROM) {
     console.info("[email:dev]", {
       to: message.to,
@@ -20,7 +20,7 @@ export async function sendEmailNotification(message: EmailNotification) {
     return;
   }
 
-  console.info("[email:queued]", {
+  console.info("[email:queued-not-sent]", {
     from: process.env.EMAIL_FROM,
     to: message.to,
     subject: message.subject,

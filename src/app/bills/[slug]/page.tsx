@@ -35,7 +35,7 @@ import {
 import { SharePanel } from "@/components/share-panel";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
-import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
+import { canViewBill, isPublicBillStatus, PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { prisma } from "@/lib/prisma";
@@ -58,10 +58,7 @@ export async function generateMetadata({
     },
   });
 
-  if (
-    !bill ||
-    !["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"].includes(bill.status)
-  ) {
+  if (!bill || !isPublicBillStatus(bill.status)) {
     return {
       title: "Citizen Bill",
     };
@@ -221,7 +218,7 @@ export default async function BillDetailPage({
             where: {
               categoryId: bill.categoryId,
               status: {
-                in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+                in: [...PUBLIC_BILL_STATUSES],
               },
             },
             select: {
@@ -630,7 +627,7 @@ export default async function BillDetailPage({
             </form>
           ) : null}
 
-          {isPublicBill ? (
+          {isPublicBill && !isAuthor ? (
             <form
               action={toggleVoteAction}
               className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
@@ -652,6 +649,14 @@ export default async function BillDetailPage({
                 {userVote ? "Remove vote" : "Support this bill"}
               </button>
             </form>
+          ) : isPublicBill && isAuthor ? (
+            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+              <h2 className="font-semibold">Public support</h2>
+              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+                {bill._count.votes} people have supported this bill. Authors
+                cannot vote on their own proposals.
+              </p>
+            </div>
           ) : null}
 
           {isPublicBill ? (
@@ -1071,7 +1076,7 @@ async function getAuthorStats(authorId: string) {
       where: {
         authorId,
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
     }),

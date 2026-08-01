@@ -2,41 +2,15 @@
 
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
 import { authOptions } from "@/lib/auth";
 import { resolveBillCategory } from "@/lib/bill-categories";
+import {
+  billDraftSchema,
+  billPublishSchema,
+} from "@/lib/bill-form-schema";
 import { prisma } from "@/lib/prisma";
 import { createUniqueSlug, slugify } from "@/lib/slug";
-
-const billSchema = z.object({
-  title: z.string().trim().min(3, "Add a bill title before saving."),
-  description: z.string().trim().optional(),
-  category: z.string().trim().optional(),
-  categoryOther: z.string().trim().optional(),
-  tags: z.string().trim().optional(),
-  problem: z.string().trim().optional(),
-  proposedSolution: z.string().trim().optional(),
-  expectedImpact: z.string().trim().optional(),
-  body: z.string().trim().optional(),
-  references: z.string().trim().max(4000).optional(),
-});
-
-const publishSchema = billSchema.extend({
-  description: z
-    .string()
-    .trim()
-    .min(20, "Add a public description before publishing."),
-  problem: z
-    .string()
-    .trim()
-    .min(20, "Describe the public problem before publishing."),
-  proposedSolution: z
-    .string()
-    .trim()
-    .min(20, "Add a proposed solution before publishing."),
-  body: z.string().trim().min(30, "Add draft bill text before publishing."),
-});
 
 export type BillFormState = {
   errors?: Record<string, string[]>;
@@ -68,7 +42,7 @@ export async function createBillAction(
     body: formData.get("body"),
     references: formData.get("references"),
   };
-  const parsed = (shouldPublish ? publishSchema : billSchema).safeParse(
+  const parsed = (shouldPublish ? billPublishSchema : billDraftSchema).safeParse(
     rawData,
   );
 

@@ -17,6 +17,7 @@ import {
 } from "@/app/profile/actions";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
@@ -63,7 +64,7 @@ export default async function ProfilePage() {
       where: {
         authorId: session.user.id,
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
     }),

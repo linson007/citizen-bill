@@ -5,12 +5,28 @@ import GoogleProvider from "next-auth/providers/google";
 import type { UserRole } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
+function requireGoogleOAuthEnv(name: "GOOGLE_CLIENT_ID" | "GOOGLE_CLIENT_SECRET") {
+  const value = process.env[name]?.trim();
+
+  if (value) {
+    return value;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      `${name} is required in production. Set it in the deployment environment.`,
+    );
+  }
+
+  return "";
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+      clientId: requireGoogleOAuthEnv("GOOGLE_CLIENT_ID"),
+      clientSecret: requireGoogleOAuthEnv("GOOGLE_CLIENT_SECRET"),
       allowDangerousEmailAccountLinking: false,
     }),
   ],
