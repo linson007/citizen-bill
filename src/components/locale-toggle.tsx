@@ -37,7 +37,7 @@ export function LocaleToggle({ locale, labels }: LocaleToggleProps) {
     >
       <button
         type="button"
-        className={`rounded px-2.5 py-1.5 transition-colors ${
+        className={`rounded px-2.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
           locale === "en"
             ? "bg-accent text-white"
             : "text-ink-muted hover:text-foreground"
@@ -50,7 +50,7 @@ export function LocaleToggle({ locale, labels }: LocaleToggleProps) {
       </button>
       <button
         type="button"
-        className={`rounded px-2.5 py-1.5 font-malayalam transition-colors ${
+        className={`rounded px-2.5 py-1.5 font-malayalam transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
           locale === "ml"
             ? "bg-accent text-white"
             : "text-ink-muted hover:text-foreground"

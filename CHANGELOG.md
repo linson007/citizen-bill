@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Polished marketing UX: sticky header, clearer mobile nav, title-case small words, description clamps, how-it-works CTA, and login token alignment
 - Rebuilt the marketing UI: brand-first hero, slimmer nav, design tokens, Fraunces/Source Sans/Manjari typography, EN/ML locale toggle, and title-cased bill display
 - Rebranded the product from Citizen Bill to MattamUndo ([mattamundo.com](https://mattamundo.com))
 

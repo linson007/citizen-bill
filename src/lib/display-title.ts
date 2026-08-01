@@ -1,3 +1,25 @@
+const SMALL_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "as",
+  "at",
+  "but",
+  "by",
+  "for",
+  "from",
+  "in",
+  "into",
+  "nor",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "via",
+  "with",
+]);
+
 /**
  * Formats bill titles for on-screen display.
  * Converts ALL-CAPS Latin titles to title case; leaves mixed-case and
@@ -19,9 +41,26 @@ export function formatDisplayTitle(title: string): string {
     return trimmed;
   }
 
-  return trimmed
-    .toLowerCase()
-    .replace(/(^|[\s\-–—/(])(\p{L})/gu, (_, boundary: string, char: string) => {
-      return `${boundary}${char.toUpperCase()}`;
-    });
+  const parts = trimmed.toLowerCase().split(/(\s+|[-–—/()])/);
+  const wordCount = parts.filter(
+    (part) => part && !/^[\s\-–—/()]+$/.test(part),
+  ).length;
+  let wordIndex = 0;
+
+  return parts
+    .map((part) => {
+      if (!part || /^[\s\-–—/()]+$/.test(part)) {
+        return part;
+      }
+
+      const isEdge = wordIndex === 0 || wordIndex === wordCount - 1;
+      wordIndex += 1;
+
+      if (!isEdge && SMALL_WORDS.has(part)) {
+        return part;
+      }
+
+      return part.replace(/^\p{L}/u, (char) => char.toUpperCase());
+    })
+    .join("");
 }

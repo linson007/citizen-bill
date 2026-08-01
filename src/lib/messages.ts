@@ -41,6 +41,7 @@ type MessageTree = {
     thisWeek: string;
     viewBills: string;
     emptyActivity: string;
+    emptyActivityCta: string;
     publicBills: string;
     billsInReview: string;
     communityVotes: string;
@@ -55,6 +56,7 @@ type MessageTree = {
     trustWorkflowText: string;
     exampleProblemLabel: string;
     exampleProblem: string;
+    howCta: string;
   };
   bills: {
     eyebrow: string;
@@ -120,6 +122,8 @@ export const messages: Record<Locale, MessageTree> = {
       viewBills: "View bills",
       emptyActivity:
         "No public activity yet. Votes, comments, and shares will show up here.",
+      emptyActivityCta: "Browse published bills",
+      howCta: "Start drafting",
       publicBills: "Public bills",
       billsInReview: "Bills in review",
       communityVotes: "Community votes",
@@ -204,6 +208,8 @@ export const messages: Record<Locale, MessageTree> = {
       viewBills: "ബില്ലുകൾ കാണുക",
       emptyActivity:
         "ഇതുവരെ പൊതു പ്രവർത്തനമില്ല. വോട്ടുകളും അഭിപ്രായങ്ങളും പങ്കിടലുകളും ഇവിടെ കാണാം.",
+      emptyActivityCta: "പ്രസിദ്ധീകരിച്ച ബില്ലുകൾ കാണുക",
+      howCta: "ഡ്രാഫ്റ്റ് ആരംഭിക്കുക",
       publicBills: "പൊതു ബില്ലുകൾ",
       billsInReview: "പരിശോധനയിലുള്ള ബില്ലുകൾ",
       communityVotes: "കമ്മ്യൂണിറ്റി വോട്ടുകൾ",

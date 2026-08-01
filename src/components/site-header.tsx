@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { AccountMenu } from "@/components/account-menu";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { MobileNav } from "@/components/mobile-nav";
+import { NavLink } from "@/components/nav-link";
 import { authOptions } from "@/lib/auth";
 import { getRequestMessages } from "@/lib/request-locale";
 
@@ -26,17 +27,17 @@ export async function SiteHeader() {
   ];
 
   return (
-    <header className="relative z-30 border-b border-border bg-surface/90 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-lg bg-accent text-white">
+    <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-3 sm:gap-4 sm:px-8 sm:py-4">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent text-white">
             <Scale size={22} aria-hidden="true" />
           </span>
-          <span>
-            <span className="font-display block text-lg font-semibold tracking-tight">
+          <span className="min-w-0">
+            <span className="font-display block truncate text-lg font-semibold tracking-tight">
               MattamUndo
             </span>
-            <span className="font-malayalam block text-xs font-medium tracking-[0.04em] text-ink-muted">
+            <span className="font-malayalam hidden text-xs font-medium tracking-[0.04em] text-ink-muted sm:block">
               മാറ്റം ഉണ്ടോ?
             </span>
           </span>
@@ -47,13 +48,14 @@ export async function SiteHeader() {
           aria-label="Primary"
         >
           {publicLinks.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
               className="transition-colors hover:text-accent"
+              activeClassName="text-accent"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
@@ -61,20 +63,29 @@ export async function SiteHeader() {
           <MobileNav
             publicLinks={publicLinks}
             accountLinks={session?.user ? accountLinks : []}
+            locale={locale}
+            signedIn={Boolean(session?.user)}
             labels={{
               openMenu: t.nav.openMenu,
               closeMenu: t.nav.closeMenu,
               account: t.nav.account,
-            }}
-          />
-          <LocaleToggle
-            locale={locale}
-            labels={{
               language: t.nav.language,
               english: t.nav.english,
               malayalam: t.nav.malayalam,
+              newBill: t.nav.newBill,
+              signIn: t.nav.signIn,
             }}
           />
+          <div className="hidden md:block">
+            <LocaleToggle
+              locale={locale}
+              labels={{
+                language: t.nav.language,
+                english: t.nav.english,
+                malayalam: t.nav.malayalam,
+              }}
+            />
+          </div>
           <AccountMenu
             labels={{
               account: t.nav.account,
@@ -86,11 +97,11 @@ export async function SiteHeader() {
           />
           <Link
             href="/bills/new"
-            className="flex h-10 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
+            aria-label={t.nav.newBill}
+            className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 sm:px-4"
           >
             <Plus size={16} aria-hidden="true" />
             <span className="hidden sm:inline">{t.nav.newBill}</span>
-            <span className="sm:hidden">{t.nav.new}</span>
           </Link>
         </div>
       </div>
