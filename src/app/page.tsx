@@ -19,13 +19,10 @@ import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { BillStatus } from "@/generated/prisma/enums";
+import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 
-const publicStatuses = [
-  BillStatus.PUBLISHED,
-  BillStatus.UNDER_DISCUSSION,
-  BillStatus.READY_FOR_REVIEW,
-];
+const publicStatuses = [...PUBLIC_BILL_STATUSES];
 
 const draftSteps = [
   "Describe the public problem",

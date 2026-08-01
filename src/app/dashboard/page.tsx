@@ -17,6 +17,7 @@ import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { getSavedBillEmptyMessage } from "@/lib/bill-engagement";
 import { getBillFollowEmptyMessage } from "@/lib/bill-follow";
+import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
       where: {
         authorId: session.user.id,
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
     }),
@@ -144,7 +145,7 @@ export default async function DashboardPage() {
     prisma.bill.findMany({
       where: {
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
       orderBy: [
@@ -179,7 +180,7 @@ export default async function DashboardPage() {
     prisma.bill.findMany({
       where: {
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
       orderBy: {
@@ -202,7 +203,7 @@ export default async function DashboardPage() {
     prisma.bill.findMany({
       where: {
         status: {
-          in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+          in: [...PUBLIC_BILL_STATUSES],
         },
       },
       orderBy: {
@@ -225,7 +226,7 @@ export default async function DashboardPage() {
         bills: {
           some: {
             status: {
-              in: ["PUBLISHED", "UNDER_DISCUSSION", "READY_FOR_REVIEW"],
+              in: [...PUBLIC_BILL_STATUSES],
             },
           },
         },

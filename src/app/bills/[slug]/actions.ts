@@ -7,6 +7,7 @@ import { put } from "@vercel/blob";
 
 import { authOptions } from "@/lib/auth";
 import { resolveBillCategory } from "@/lib/bill-categories";
+import { canPublishBillFields } from "@/lib/bill-form-schema";
 import { isPublicBillStatus } from "@/lib/bill-visibility";
 import {
   createBillUploadKey,
@@ -40,11 +41,23 @@ export async function publishBillAction(formData: FormData) {
       title: true,
       body: true,
       summary: true,
+      description: true,
+      problem: true,
+      proposedSolution: true,
+      status: true,
     },
   });
 
   if (!bill || bill.authorId !== session.user.id) {
     redirect("/dashboard");
+  }
+
+  if (bill.status !== "DRAFT") {
+    redirect(`/bills/${slug}`);
+  }
+
+  if (!canPublishBillFields(bill)) {
+    redirect(`/bills/${slug}/edit?error=publish`);
   }
 
   await prisma.$transaction([
@@ -175,6 +188,10 @@ export async function toggleVoteAction(formData: FormData) {
   });
 
   if (!bill || !isPublicBillStatus(bill.status)) {
+    redirect(`/bills/${slug}`);
+  }
+
+  if (bill.authorId === session.user.id) {
     redirect(`/bills/${slug}`);
   }
 
@@ -499,14 +516,14 @@ export async function updateBillAction(formData: FormData) {
         description:
           formData.get("description")?.toString().trim() ||
           "Draft bill proposal",
-        region: null,
         problem: formData.get("problem")?.toString().trim() || null,
         proposedSolution:
           formData.get("proposedSolution")?.toString().trim() || null,
         expectedImpact:
           formData.get("expectedImpact")?.toString().trim() || null,
         body: formData.get("body")?.toString().trim() || null,
-        references: formData.get("references")?.toString().trim() || null,
+        references:
+          formData.get("references")?.toString().trim().slice(0, 4000) || null,
         category:
           categoryName && categorySlug
             ? {
@@ -640,24 +657,33 @@ export async function reportBillAction(formData: FormData) {
     redirect("/bills");
   }
 
-  await prisma.$transaction([
-    prisma.report.create({
-      data: {
-        billId: bill.id,
-        reporterId: session.user.id,
-        reason,
-        details: details || null,
+  const existingReport = await prisma.report.findFirst({
+    where: {
+      billId: bill.id,
+      reporterId: session.user.id,
+      status: {
+        in: ["OPEN", "REVIEWING"],
       },
-    }),
-    prisma.bill.update({
-      where: {
-        id: bill.id,
-      },
-      data: {
-        status: "REPORTED",
-      },
-    }),
-  ]);
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingReport) {
+    redirect(`/bills/${slug}?reported=bill`);
+  }
+
+  // Reports enter the moderation queue without hiding the bill. Moderators
+  // can remove or dismiss content from the moderation dashboard.
+  await prisma.report.create({
+    data: {
+      billId: bill.id,
+      reporterId: session.user.id,
+      reason,
+      details: details || null,
+    },
+  });
 
   await notifyUser({
     userId: bill.authorId,
@@ -667,6 +693,7 @@ export async function reportBillAction(formData: FormData) {
   }).catch(() => undefined);
 
   revalidatePath(`/bills/${slug}`);
+  revalidatePath("/moderation");
   redirect(`/bills/${slug}?reported=bill`);
 }
 
@@ -822,8 +849,16 @@ export async function reviewSuggestionAction(formData: FormData) {
     },
   });
 
-  if (!suggestion || suggestion.bill.authorId !== session.user.id) {
+  if (
+    !suggestion ||
+    suggestion.bill.authorId !== session.user.id ||
+    suggestion.bill.slug !== slug
+  ) {
     redirect(`/bills/${slug}`);
+  }
+
+  if (suggestion.status !== "OPEN") {
+    redirect(`/bills/${slug}#suggestions`);
   }
 
   if (intent === "reject") {
