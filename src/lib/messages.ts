@@ -22,8 +22,10 @@ type MessageTree = {
   home: {
     brand: string;
     tagline: string;
+    eyebrow: string;
     headline: string;
     support: string;
+    heroNote: string;
     ctaPrimary: string;
     ctaSecondary: string;
     howHeading: string;
@@ -100,9 +102,11 @@ export const messages: Record<Locale, MessageTree> = {
     home: {
       brand: "MattamUndo",
       tagline: "മാറ്റം ഉണ്ടോ?",
+      eyebrow: "A civic platform for Kerala",
       headline: "Turn public problems into bills people can support.",
       support:
         "A Kerala-first civic space to draft, review, vote on, and share public bill proposals—with AI help and community oversight.",
+      heroNote: "No legal expertise needed—start with the problem you see.",
       ctaPrimary: "Draft a bill",
       ctaSecondary: "Browse bills",
       howHeading: "How it works",
@@ -186,9 +190,11 @@ export const messages: Record<Locale, MessageTree> = {
     home: {
       brand: "MattamUndo",
       tagline: "മാറ്റം ഉണ്ടോ?",
+      eyebrow: "കേരളത്തിനായുള്ള പൗര വേദി",
       headline: "പൊതു പ്രശ്നങ്ങളെ ജനങ്ങൾക്ക് പിന്തുണയ്ക്കാവുന്ന ബില്ലുകളാക്കാം.",
       support:
         "കേരളത്തിന് മുൻഗണന നൽകി, AI സഹായത്തോടെയും സമൂഹ നിരീക്ഷണത്തോടെയും പൊതു ബിൽ നിർദേശങ്ങൾ തയ്യാറാക്കാനും ചർച്ച ചെയ്യാനും വോട്ട് ചെയ്യാനും പങ്കിടാനുമുള്ള പൗരസ്ഥലം.",
+      heroNote: "നിയമ പരിജ്ഞാനം ആവശ്യമില്ല—നിങ്ങൾ കാണുന്ന പ്രശ്നത്തിൽ നിന്ന് തുടങ്ങാം.",
       ctaPrimary: "ബിൽ തയ്യാറാക്കുക",
       ctaSecondary: "ബില്ലുകൾ കാണുക",
       howHeading: "എങ്ങനെ പ്രവർത്തിക്കുന്നു",

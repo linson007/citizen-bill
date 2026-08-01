@@ -273,7 +273,10 @@ export default async function BillDetailPage({
   ].filter((item): item is { label: string; date: Date } => Boolean(item));
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
+    <main
+      id="main-content"
+      className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]"
+    >
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">

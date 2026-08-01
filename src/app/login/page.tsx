@@ -5,7 +5,10 @@ import { AuthButton } from "@/components/auth-button";
 
 export default function LoginPage() {
   return (
-    <main className="grid min-h-screen place-items-center bg-background px-5 text-foreground">
+    <main
+      id="main-content"
+      className="grid min-h-screen place-items-center bg-background px-5 text-foreground"
+    >
       <section className="w-full max-w-md rounded-md border border-border bg-surface-raised p-6">
         <div className="mb-6 flex items-center gap-3">
           <Link

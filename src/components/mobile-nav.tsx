@@ -45,6 +45,9 @@ export function MobileNav({
       return;
     }
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
@@ -52,11 +55,14 @@ export function MobileNav({
     }
 
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="relative md:hidden">
       <button
         type="button"
         className="grid size-10 place-items-center rounded-md border border-border-strong bg-surface-raised text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
@@ -69,17 +75,24 @@ export function MobileNav({
       </button>
 
       {open ? (
-        <div
-          id={menuId}
-          className="absolute inset-x-0 top-full z-40 border-b border-border bg-surface px-5 py-4 shadow-none sm:px-8"
-        >
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 top-[64px] z-30 cursor-default bg-hero-ink/15 backdrop-blur-[1px]"
+            aria-label={labels.closeMenu}
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id={menuId}
+            className="absolute right-0 top-[calc(100%+0.75rem)] z-40 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-surface-raised p-2 shadow-xl shadow-hero-ink/15"
+          >
+            <nav className="flex flex-col gap-1" aria-label="Mobile">
             {publicLinks.map((link) => (
               <NavLink
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-surface-raised"
-                activeClassName="bg-surface-raised text-accent"
+                className="rounded-md px-3 py-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface"
+                activeClassName="bg-accent-soft text-accent"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -87,7 +100,7 @@ export function MobileNav({
             ))}
             <Link
               href="/bills/new"
-              className="rounded-md px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-surface-raised"
+              className="rounded-md px-3 py-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface"
               onClick={() => setOpen(false)}
             >
               {labels.newBill}
@@ -95,7 +108,7 @@ export function MobileNav({
             {!signedIn ? (
               <Link
                 href="/login"
-                className="rounded-md px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-surface-raised"
+                className="rounded-md px-3 py-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface"
                 onClick={() => setOpen(false)}
               >
                 {labels.signIn}
@@ -103,7 +116,7 @@ export function MobileNav({
             ) : null}
           </nav>
 
-          <div className="mt-3 border-t border-border pt-3">
+            <div className="mt-2 border-t border-border pt-3">
             <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
               {labels.language}
             </p>
@@ -117,10 +130,10 @@ export function MobileNav({
                 }}
               />
             </div>
-          </div>
+            </div>
 
           {accountLinks.length > 0 ? (
-            <div className="mt-3 border-t border-border pt-3">
+              <div className="mt-2 border-t border-border pt-3">
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 {labels.account}
               </p>
@@ -129,17 +142,18 @@ export function MobileNav({
                   <NavLink
                     key={link.href}
                     href={link.href}
-                    className="rounded-md px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-surface-raised"
-                    activeClassName="bg-surface-raised text-accent"
+                    className="rounded-md px-3 py-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface"
+                    activeClassName="bg-accent-soft text-accent"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
                   </NavLink>
                 ))}
               </nav>
-            </div>
+              </div>
           ) : null}
-        </div>
+          </div>
+        </>
       ) : null}
     </div>
   );
