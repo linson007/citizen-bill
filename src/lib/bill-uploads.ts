@@ -73,9 +73,13 @@ export async function hasAllowedBillUploadSignature(file: File) {
 }
 
 function getFileExtension(fileName: string) {
-  const extension = fileName.split(".").pop()?.toLowerCase() ?? "";
+  const extension = fileName.split(".").pop()?.toLowerCase();
 
-  return extension === fileName.toLowerCase() ? "" : extension;
+  if (!extension || extension === fileName.toLowerCase()) {
+    return "";
+  }
+
+  return extension;
 }
 
 function startsWith(bytes: Uint8Array, expected: number[]) {

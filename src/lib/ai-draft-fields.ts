@@ -49,11 +49,10 @@ export function parseAiDraftFieldsFromText(
   };
 
   if (!fields.description && fields.body) {
-    fields.description =
-      fields.body.split("\n").find(Boolean)?.slice(0, 300) ?? "";
+    fields.description = fields.body.split("\n")[0].slice(0, 300);
   }
 
-  return Object.values(fields).some(Boolean) ? fields : null;
+  return fields;
 }
 
 function findSections(text: string) {
@@ -112,7 +111,7 @@ function matchHeading(
       if (match) {
         return {
           key: heading.key,
-          inlineValue: match[1]?.trim() ?? "",
+          inlineValue: match[1].trim(),
         };
       }
     }

@@ -46,4 +46,42 @@ Clause 2
   it("returns null when no known headings exist", () => {
     expect(parseAiDraftFieldsFromText("Plain chat response")).toBeNull();
   });
+
+  it("returns null for blank input", () => {
+    expect(parseAiDraftFieldsFromText("   ")).toBeNull();
+  });
+
+  it("derives a short description from draft bill text when missing", () => {
+    const fields = parseAiDraftFieldsFromText(`
+Draft Bill Text:
+First clause about water quality reporting.
+Second clause about oversight.
+`);
+
+    expect(fields).toEqual({
+      description: "First clause about water quality reporting.",
+      proposedSolution: "",
+      expectedImpact: "",
+      body: "First clause about water quality reporting.\nSecond clause about oversight.",
+    });
+  });
+
+  it("ignores empty headed sections and markdown-style headings", () => {
+    const fields = parseAiDraftFieldsFromText(`
+# Description:
+Public water accountability draft.
+
+## Proposed Solution:
+
+### Expected Impact:
+Better oversight for citizens.
+`);
+
+    expect(fields).toEqual({
+      description: "Public water accountability draft.",
+      proposedSolution: "",
+      expectedImpact: "Better oversight for citizens.",
+      body: "",
+    });
+  });
 });

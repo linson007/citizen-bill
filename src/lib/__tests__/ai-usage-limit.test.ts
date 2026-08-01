@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   checkAiUsageLimit,
   consumeAiUsage,
+  createAiUsageHeaders,
   createAiUsageLimitMessage,
   getAiUsageWindow,
   getDailyAiLimit,
@@ -56,6 +57,25 @@ describe("checkAiUsageLimit", () => {
       remaining: 2,
       limit: 5,
     });
+  });
+
+  it("uses the configured daily limit when none is passed", async () => {
+    vi.stubEnv("AI_DAILY_LIMIT", "4");
+    const store = createStore(1);
+
+    await expect(
+      checkAiUsageLimit("user-1", {
+        now: new Date("2026-05-16T10:30:00.000Z"),
+        store,
+      }),
+    ).resolves.toMatchObject({
+      ok: true,
+      used: 1,
+      remaining: 3,
+      limit: 4,
+    });
+
+    vi.unstubAllEnvs();
   });
 
   it("blocks users at the daily limit", async () => {
@@ -170,6 +190,47 @@ describe("createAiUsageLimitMessage", () => {
     });
 
     expect(message).toContain("Daily AI limit reached");
+  });
+});
+
+describe("createAiUsageHeaders", () => {
+  it("exposes retry and quota headers", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-16T12:00:00.000Z"));
+
+    expect(
+      createAiUsageHeaders({
+        ok: false,
+        used: 20,
+        remaining: 0,
+        limit: 20,
+        resetAt: new Date("2026-05-17T00:00:00.000Z"),
+      }),
+    ).toEqual({
+      "Retry-After": "43200",
+      "X-AI-Limit": "20",
+      "X-AI-Remaining": "0",
+      "X-AI-Reset": "2026-05-17T00:00:00.000Z",
+    });
+
+    vi.useRealTimers();
+  });
+
+  it("never reports a zero Retry-After", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-17T00:00:00.500Z"));
+
+    expect(
+      createAiUsageHeaders({
+        ok: false,
+        used: 20,
+        remaining: 0,
+        limit: 20,
+        resetAt: new Date("2026-05-17T00:00:00.000Z"),
+      })["Retry-After"],
+    ).toBe("1");
+
+    vi.useRealTimers();
   });
 });
 
