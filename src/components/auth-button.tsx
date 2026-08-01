@@ -10,7 +10,7 @@ export function AuthButton() {
     return (
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-medium text-[#2f2a22] shadow-sm"
+        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
         disabled
       >
         <UserCircle size={16} aria-hidden="true" />
@@ -23,7 +23,7 @@ export function AuthButton() {
     return (
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-medium text-[#2f2a22] shadow-sm"
+        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
         onClick={() => signOut({ callbackUrl: "/" })}
       >
         <LogOut size={16} aria-hidden="true" />
@@ -35,7 +35,7 @@ export function AuthButton() {
   return (
     <button
       type="button"
-      className="flex h-10 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-medium text-[#2f2a22] shadow-sm"
+      className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
       onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
     >
       <LogIn size={16} aria-hidden="true" />

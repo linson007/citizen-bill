@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono, Manjari, Source_Sans_3 } from "next/font/google";
 import { getServerSession } from "next-auth";
 
 import { AuthProvider } from "@/components/auth-provider";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
+import { localeHtmlLang } from "@/lib/locale";
+import { getRequestLocale } from "@/lib/request-locale";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+});
+
+const manjari = Manjari({
+  variable: "--font-manjari",
+  subsets: ["malayalam"],
+  weight: ["400", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -61,11 +74,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
+  const locale = await getRequestLocale();
 
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={localeHtmlLang(locale)}
+      className={`${sourceSans.variable} ${fraunces.variable} ${manjari.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <AuthProvider session={session}>{children}</AuthProvider>
