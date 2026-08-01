@@ -119,8 +119,8 @@ npm run db:deploy    # Apply pending migrations (production)
 npm run db:studio    # Prisma Studio
 ```
 
-Vercel uses `vercel-build`, which runs `prisma migrate deploy` before `next build`.
-Ensure `DATABASE_URL` (and `DIRECT_URL` if using the pooler) are enabled for the **Build** environment in Vercel.
+Vercel uses `vercel-build`, which runs `prisma migrate deploy` before `next build` on **production** only (preview skips migrate).
+Ensure `DATABASE_URL` (and `DIRECT_URL` if using the pooler) are enabled for **Production + Build** in Vercel.
 
 
 ## Project Layout

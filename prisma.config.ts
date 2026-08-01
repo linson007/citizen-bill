@@ -5,8 +5,11 @@ import { defineConfig } from "prisma/config";
 
 // Prefer DIRECT_URL for migrate/CLI (Supabase session/direct, port 5432).
 // Runtime Prisma Client still uses DATABASE_URL (transaction pooler, port 6543).
+// Prisma requires a defined string here; migrate is only invoked when a real URL exists.
 const migrationUrl =
-  process.env["DIRECT_URL"]?.trim() || process.env["DATABASE_URL"];
+  process.env["DIRECT_URL"]?.trim() ||
+  process.env["DATABASE_URL"]?.trim() ||
+  "postgresql://postgres:postgres@127.0.0.1:5432/postgres";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
