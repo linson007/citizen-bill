@@ -42,23 +42,22 @@ export async function SiteFooter() {
             {t.nav.dashboard}
           </Link>
           <Link href="/terms" className="hover:text-accent">
-            Terms
+            {t.footer.terms}
           </Link>
           <Link href="/privacy" className="hover:text-accent">
-            Privacy
+            {t.footer.privacy}
           </Link>
           <a
             href="mailto:linsonkurian007@gmail.com"
             className="hover:text-accent"
           >
-            Contact
+            {t.footer.contact}
           </a>
         </nav>
       </div>
       <div className="border-t border-border">
         <p className="mx-auto max-w-7xl px-5 py-4 text-xs text-ink-muted sm:px-8">
-          © {new Date().getFullYear()} MattamUndo. Open source under the MIT
-          License.
+          © {new Date().getFullYear()} MattamUndo. {t.footer.copyright}
         </p>
       </div>
     </footer>

@@ -145,7 +145,7 @@ export default async function BillDetailPage({
       notFound();
     }
 
-    redirect("/login");
+    redirect(`/login?callbackUrl=/bills/${slug}`);
   }
 
   const userVote = session?.user?.id
@@ -399,7 +399,7 @@ export default async function BillDetailPage({
                 </form>
               ) : (
                 <Link
-                  href="/login"
+                  href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#comments`)}`}
                   className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
                 >
                   Sign in to comment
@@ -504,7 +504,7 @@ export default async function BillDetailPage({
                 </form>
               ) : (
                 <Link
-                  href="/login"
+                  href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#suggestions`)}`}
                   className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
                 >
                   Sign in to suggest
@@ -1039,7 +1039,7 @@ function BillEngagementPrompt({
 
   const href = signedIn
     ? "#comments"
-    : `/login?callbackUrl=/bills/${slug}#comments`;
+    : `/login?callbackUrl=${encodeURIComponent(`/bills/${slug}#comments`)}`;
 
   return (
     <section className="rounded-lg border border-[#b8cadb] bg-[#edf4fa] p-5">
