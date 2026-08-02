@@ -1,13 +1,10 @@
 import Image from "next/image";
 
-import heroImageEn from "../../public/hero-niyama-sabha.webp";
-import heroImageMl from "../../public/hero-niyama-sabha-ml.webp";
-
 import type { Locale } from "@/lib/locale";
 
 const HERO_IMAGE_BY_LOCALE = {
-  en: heroImageEn,
-  ml: heroImageMl,
+  en: "/hero-niyama-sabha.webp",
+  ml: "/hero-niyama-sabha-ml.webp",
 } as const;
 
 /** Decorative civic landscape for the homepage hero. */
