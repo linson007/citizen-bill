@@ -2,6 +2,8 @@
 
 Last reconfirmed: August 2, 2026.
 
+Authoritative open-product checklist for MattamUndo. The gaps table and near-term backlog in [`product.md`](product.md) should stay aligned with this file.
+
 ## High priority
 
 - [ ] **Public legislative lifecycle:** Make `SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, and `PASSED` publicly visible, and add author workflows for recording those outcomes. Today only `PUBLISHED`, `UNDER_DISCUSSION`, and `READY_FOR_REVIEW` are treated as public.
