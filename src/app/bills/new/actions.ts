@@ -9,6 +9,7 @@ import {
   billDraftSchema,
   billPublishSchema,
 } from "@/lib/bill-form-schema";
+import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 import { createUniqueSlug, slugify } from "@/lib/slug";
 
@@ -125,6 +126,10 @@ export async function createBillAction(
       slug: true,
     },
   });
+
+  if (shouldPublish) {
+    revalidateHomepageData();
+  }
 
   redirect(`/bills/${bill.slug}`);
 }

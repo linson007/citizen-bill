@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 import { getAiUsageWindow } from "@/lib/ai-usage-limit";
+import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 
 async function requireModerator() {
@@ -79,6 +80,7 @@ export async function removeReportedBillAction(formData: FormData) {
 
   revalidatePath("/moderation");
   revalidatePath("/bills");
+  revalidateHomepageData();
   redirect("/moderation");
 }
 

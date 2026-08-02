@@ -1,31 +1,18 @@
 "use client";
 
-import { LogIn, LogOut, UserCircle } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { LogIn, LogOut } from "lucide-react";
+import { signIn, signOut } from "next-auth/react";
 
 export function AuthButton({
   callbackUrl = "/dashboard",
   labels,
+  signedIn,
 }: {
   callbackUrl?: string;
   labels: { checking: string; signIn: string; signOut: string };
+  signedIn: boolean;
 }) {
-  const { data: session, status } = useSession();
-
-  if (status === "loading") {
-    return (
-      <button
-        type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
-        disabled
-      >
-        <UserCircle size={16} aria-hidden="true" />
-        {labels.checking}
-      </button>
-    );
-  }
-
-  if (session?.user) {
+  if (signedIn) {
     return (
       <button
         type="button"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronDown, LogIn, LogOut, UserCircle } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useEffect, useId, useRef, useState } from "react";
 
 type AccountLink = {
@@ -15,13 +15,14 @@ type AccountMenuProps = {
     account: string;
     signIn: string;
     signOut: string;
-    checking: string;
   };
   links: AccountLink[];
+  user?: {
+    name?: string | null;
+  };
 };
 
-export function AccountMenu({ labels, links }: AccountMenuProps) {
-  const { data: session, status } = useSession();
+export function AccountMenu({ labels, links, user }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -51,20 +52,7 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
     };
   }, [open]);
 
-  if (status === "loading") {
-    return (
-      <button
-        type="button"
-        className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
-        disabled
-      >
-        <UserCircle size={16} aria-hidden="true" />
-        <span className="hidden sm:inline">{labels.checking}</span>
-      </button>
-    );
-  }
-
-  if (!session?.user) {
+  if (!user) {
     return (
       <button
         type="button"
@@ -83,7 +71,7 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
       <button
         type="button"
         className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
-        aria-label={session.user.name ?? labels.account}
+        aria-label={user.name ?? labels.account}
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="menu"
@@ -91,7 +79,7 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
       >
         <UserCircle size={16} aria-hidden="true" />
         <span className="hidden max-w-28 truncate sm:inline">
-          {session.user.name?.split(" ")[0] ?? labels.account}
+          {user.name?.split(" ")[0] ?? labels.account}
         </span>
         <ChevronDown size={14} aria-hidden="true" />
       </button>

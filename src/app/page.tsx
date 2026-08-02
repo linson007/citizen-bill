@@ -11,38 +11,22 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { connection } from "next/server";
 
 import { CivicHeroImage, HeroVisual } from "@/components/hero-visual";
 import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { hasEstablishedCommunity } from "@/lib/home-community";
-import { prisma } from "@/lib/prisma";
+import { getHomepageData } from "@/lib/homepage";
 import { getRequestMessages } from "@/lib/request-locale";
 
-const publicStatuses = [...PUBLIC_BILL_STATUSES];
-
 export default async function Home() {
-  await connection();
   const { locale, t } = await getRequestMessages();
   const copyClass = locale === "ml" ? "font-malayalam" : "";
 
-  const [publicBillCount, voteCount, commentCount, trendingBills] =
-    await Promise.all([
-      prisma.bill.count({
-        where: {
-          status: {
-            in: publicStatuses,
-          },
-        },
-      }),
-      prisma.vote.count(),
-      prisma.comment.count(),
-      getTrendingBills(),
-    ]);
+  const { commentCount, publicBillCount, trendingBills, voteCount } =
+    await getHomepageData();
   const establishedCommunity = hasEstablishedCommunity({
     publicBills: publicBillCount,
     votes: voteCount,
@@ -293,44 +277,6 @@ export default async function Home() {
       <SiteFooter />
     </main>
   );
-}
-
-async function getTrendingBills() {
-  return prisma.bill.findMany({
-    where: {
-      status: {
-        in: publicStatuses,
-      },
-    },
-    include: {
-      category: true,
-      _count: {
-        select: {
-          votes: true,
-          comments: true,
-        },
-      },
-    },
-    orderBy: [
-      {
-        votes: {
-          _count: "desc",
-        },
-      },
-      {
-        comments: {
-          _count: "desc",
-        },
-      },
-      {
-        publishedAt: "desc",
-      },
-      {
-        updatedAt: "desc",
-      },
-    ],
-    take: 3,
-  });
 }
 
 function formatStatus(status: string) {

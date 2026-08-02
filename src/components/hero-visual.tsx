@@ -1,10 +1,13 @@
 import Image from "next/image";
 
+import heroImageEn from "../../public/hero-niyama-sabha.webp";
+import heroImageMl from "../../public/hero-niyama-sabha-ml.webp";
+
 import type { Locale } from "@/lib/locale";
 
 const HERO_IMAGE_BY_LOCALE = {
-  en: "/hero-niyama-sabha.png",
-  ml: "/hero-niyama-sabha-ml.png",
+  en: heroImageEn,
+  ml: heroImageMl,
 } as const;
 
 /** Decorative civic landscape for the homepage hero. */
@@ -77,7 +80,7 @@ export function CivicHeroImage({ locale }: { locale: Locale }) {
         alt="A citizen presenting a bill at the Kerala Legislative Assembly."
         width={1536}
         height={1024}
-        priority
+        preload
         sizes="(min-width: 1024px) 44vw, 100vw"
         className="h-auto w-full"
       />

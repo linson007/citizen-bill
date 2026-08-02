@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist_Mono, Manjari, Source_Sans_3 } from "next/font/google";
-import { getServerSession } from "next-auth";
+import { Fraunces, Manjari, Source_Sans_3 } from "next/font/google";
 
-import { AuthProvider } from "@/components/auth-provider";
 import { getAppUrl } from "@/lib/app-url";
-import { authOptions } from "@/lib/auth";
 import { localeHtmlLang } from "@/lib/locale";
 import { getRequestLocale } from "@/lib/request-locale";
 
@@ -24,11 +21,6 @@ const manjari = Manjari({
   variable: "--font-manjari",
   subsets: ["malayalam"],
   weight: ["400", "700"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 const siteDescription =
@@ -73,13 +65,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
   const locale = await getRequestLocale();
 
   return (
     <html
       lang={localeHtmlLang(locale)}
-      className={`${sourceSans.variable} ${fraunces.variable} ${manjari.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sourceSans.variable} ${fraunces.variable} ${manjari.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <a
@@ -88,7 +79,7 @@ export default async function RootLayout({
         >
           Skip to main content
         </a>
-        <AuthProvider session={session}>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );
