@@ -96,29 +96,24 @@ export default async function Home() {
     >
       <SiteHeader />
 
-      <section className="relative isolate min-h-[min(88vh,820px)] overflow-hidden border-b border-border">
-        <HeroVisual />
-        <div className="relative mx-auto flex max-w-7xl flex-col justify-end px-5 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-28 lg:min-h-[min(88vh,820px)] lg:justify-center lg:pb-24 lg:pt-24">
-          <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent backdrop-blur-sm">
-            {t.home.eyebrow}
-          </p>
-          <p className="animate-fade-up font-display text-5xl font-semibold tracking-tight text-hero-ink sm:text-6xl lg:text-7xl">
-            {t.home.brand}
-          </p>
-          <p className="animate-fade-up-delay font-malayalam mt-3 text-2xl font-medium tracking-wide text-accent sm:text-3xl">
-            {t.home.tagline}
-          </p>
-          <h1 className="animate-fade-up-delay mt-6 max-w-2xl text-xl font-medium leading-snug text-ink-soft sm:text-2xl">
-            {t.home.headline}
-          </h1>
-          <p className="animate-fade-up-delay-2 mt-4 max-w-xl text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
-            {t.home.support}
-          </p>
-          <p className="animate-fade-up-delay-2 mt-4 flex max-w-xl items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
-            <CheckCircle2 className="mt-0.5 shrink-0 text-success" size={17} aria-hidden="true" />
-            {t.home.heroNote}
-          </p>
-          <div className="animate-fade-up-delay-2 mt-9 flex flex-col gap-3 sm:flex-row">
+      <section className="overflow-hidden border-b border-border">
+        <HeroVisual locale={locale} />
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 sm:py-10">
+          <div className="max-w-xl">
+            <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+              {t.home.eyebrow}
+            </p>
+            <p className="animate-fade-up font-display mt-3 text-3xl font-semibold tracking-tight text-hero-ink sm:text-4xl">
+              {t.home.brand}
+            </p>
+            <p className="animate-fade-up-delay font-malayalam mt-1 text-lg font-medium tracking-wide text-accent sm:text-xl">
+              {t.home.tagline}
+            </p>
+            <p className="animate-fade-up-delay-2 mt-3 text-sm leading-6 text-ink-muted sm:text-base sm:leading-7">
+              {t.home.heroNote}
+            </p>
+          </div>
+          <div className="animate-fade-up-delay-2 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:shrink-0">
             <Link
               href="/bills/new"
               className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
@@ -128,7 +123,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/bills"
-              className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-6 text-sm font-semibold text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             >
               <FileText size={18} aria-hidden="true" />
               {t.home.ctaSecondary}
