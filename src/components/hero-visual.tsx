@@ -3,8 +3,8 @@ import Image from "next/image";
 import type { Locale } from "@/lib/locale";
 
 const HERO_IMAGE_BY_LOCALE = {
-  en: "/hero-niyama-sabha.png",
-  ml: "/hero-niyama-sabha-ml.png",
+  en: "/hero-niyama-sabha.webp",
+  ml: "/hero-niyama-sabha-ml.webp",
 } as const;
 
 /** Decorative civic landscape for the homepage hero. */
@@ -77,7 +77,7 @@ export function CivicHeroImage({ locale }: { locale: Locale }) {
         alt="A citizen presenting a bill at the Kerala Legislative Assembly."
         width={1536}
         height={1024}
-        priority
+        preload
         sizes="(min-width: 1024px) 44vw, 100vw"
         className="h-auto w-full"
       />

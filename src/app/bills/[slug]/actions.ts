@@ -17,6 +17,7 @@ import {
   sanitizeUploadFileName,
 } from "@/lib/bill-uploads";
 import { sendEmailNotification } from "@/lib/email";
+import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 
@@ -97,6 +98,7 @@ export async function publishBillAction(formData: FormData) {
   });
 
   revalidatePath("/bills");
+  revalidateHomepageData();
   revalidatePath(`/bills/${slug}`);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
@@ -260,6 +262,7 @@ export async function toggleVoteAction(formData: FormData) {
   }
 
   revalidatePath("/bills");
+  revalidateHomepageData();
   revalidatePath(`/bills/${slug}`);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
@@ -451,6 +454,7 @@ export async function createCommentAction(formData: FormData) {
   });
 
   revalidatePath("/bills");
+  revalidateHomepageData();
   revalidatePath(`/bills/${slug}`);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#comments`);
@@ -563,6 +567,7 @@ export async function updateBillAction(formData: FormData) {
   ]);
 
   revalidatePath("/bills");
+  revalidateHomepageData();
   revalidatePath(`/bills/${slug}`);
   revalidatePath(`/bills/${slug}/edit`);
   revalidatePath("/dashboard");

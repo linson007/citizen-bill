@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Scale } from "lucide-react";
+import { getServerSession } from "next-auth";
 
 import { AuthButton } from "@/components/auth-button";
+import { authOptions } from "@/lib/auth";
 import { getRequestMessages } from "@/lib/request-locale";
 
 export default async function LoginPage({
@@ -13,7 +15,10 @@ export default async function LoginPage({
   const safeCallbackUrl = callbackUrl?.startsWith("/")
     ? callbackUrl
     : "/dashboard";
-  const { locale, t } = await getRequestMessages();
+  const [session, { locale, t }] = await Promise.all([
+    getServerSession(authOptions),
+    getRequestMessages(),
+  ]);
   return (
     <main
       id="main-content"
@@ -43,6 +48,7 @@ export default async function LoginPage({
             signIn: t.login.signIn,
             signOut: t.login.signOut,
           }}
+          signedIn={Boolean(session?.user)}
         />
 
         <p className="mt-5 text-sm leading-6 text-ink-muted">

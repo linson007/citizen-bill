@@ -80,9 +80,9 @@ export async function SiteHeader() {
               account: t.nav.account,
               signIn: t.nav.signIn,
               signOut: t.nav.signOut,
-              checking: t.nav.checking,
             }}
             links={accountLinks}
+            user={session?.user}
           />
           <Link
             href="/bills/new"
