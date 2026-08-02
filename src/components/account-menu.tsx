@@ -55,7 +55,7 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
     return (
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
+        className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft"
         disabled
       >
         <UserCircle size={16} aria-hidden="true" />
@@ -68,7 +68,8 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
     return (
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        aria-label={labels.signIn}
         onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
       >
         <LogIn size={16} aria-hidden="true" />
@@ -81,7 +82,8 @@ export function AccountMenu({ labels, links }: AccountMenuProps) {
     <div className="relative" ref={rootRef}>
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        aria-label={session.user.name ?? labels.account}
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="menu"

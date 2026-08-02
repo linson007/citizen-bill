@@ -26,6 +26,7 @@ type MessageTree = {
     headline: string;
     support: string;
     heroNote: string;
+    independence: string;
     ctaPrimary: string;
     ctaSecondary: string;
     howHeading: string;
@@ -36,6 +37,8 @@ type MessageTree = {
     step4: string;
     trendingHeading: string;
     trendingSupport: string;
+    proposalsHeading: string;
+    proposalsSupport: string;
     allProposals: string;
     emptyBills: string;
     snapshotHeading: string;
@@ -83,7 +86,7 @@ export const messages: Record<Locale, MessageTree> = {
   en: {
     nav: {
       bills: "Bills",
-      newBill: "New bill",
+      newBill: "Start a bill",
       new: "New",
       dashboard: "Dashboard",
       profile: "Profile",
@@ -107,7 +110,9 @@ export const messages: Record<Locale, MessageTree> = {
       support:
         "A Kerala-first civic space to draft, review, vote on, and share public bill proposals—with AI help and community oversight.",
       heroNote: "No legal expertise needed—start with the problem you see.",
-      ctaPrimary: "Draft a bill",
+      independence:
+        "Independent civic platform — not a government service. Published drafts are public proposals, not official legislation.",
+      ctaPrimary: "Start a bill",
       ctaSecondary: "Browse bills",
       howHeading: "How it works",
       howSupport: "Four steps from a public problem to a shareable draft.",
@@ -117,6 +122,9 @@ export const messages: Record<Locale, MessageTree> = {
       step4: "Publish for voting and comments",
       trendingHeading: "Trending bills",
       trendingSupport: "Ranked by votes, discussion, and recent activity.",
+      proposalsHeading: "Public proposals",
+      proposalsSupport:
+        "Explore the first public proposals and help shape the discussion.",
       allProposals: "All proposals",
       emptyBills:
         "No public bills yet. Publish a proposal and it will appear here for review.",
@@ -127,7 +135,7 @@ export const messages: Record<Locale, MessageTree> = {
       emptyActivity:
         "No public activity yet. Votes, comments, and shares will show up here.",
       emptyActivityCta: "Browse published bills",
-      howCta: "Start drafting",
+      howCta: "Start a bill",
       publicBills: "Public bills",
       billsInReview: "Bills in review",
       communityVotes: "Community votes",
@@ -171,7 +179,7 @@ export const messages: Record<Locale, MessageTree> = {
   ml: {
     nav: {
       bills: "ബില്ലുകൾ",
-      newBill: "പുതിയ ബിൽ",
+      newBill: "ബിൽ ആരംഭിക്കുക",
       new: "പുതിയത്",
       dashboard: "ഡാഷ്‌ബോർഡ്",
       profile: "പ്രൊഫൈൽ",
@@ -191,20 +199,28 @@ export const messages: Record<Locale, MessageTree> = {
       brand: "MattamUndo",
       tagline: "മാറ്റം ഉണ്ടോ?",
       eyebrow: "കേരളത്തിനായുള്ള പൗര വേദി",
-      headline: "പൊതു പ്രശ്നങ്ങളെ ജനങ്ങൾക്ക് പിന്തുണയ്ക്കാവുന്ന ബില്ലുകളാക്കാം.",
+      headline:
+        "പൊതു പ്രശ്നങ്ങളെ ജനങ്ങൾക്ക് പിന്തുണയ്ക്കാവുന്ന ബില്ലുകളാക്കാം.",
       support:
         "കേരളത്തിന് മുൻഗണന നൽകി, AI സഹായത്തോടെയും സമൂഹ നിരീക്ഷണത്തോടെയും പൊതു ബിൽ നിർദേശങ്ങൾ തയ്യാറാക്കാനും ചർച്ച ചെയ്യാനും വോട്ട് ചെയ്യാനും പങ്കിടാനുമുള്ള പൗരസ്ഥലം.",
-      heroNote: "നിയമ പരിജ്ഞാനം ആവശ്യമില്ല—നിങ്ങൾ കാണുന്ന പ്രശ്നത്തിൽ നിന്ന് തുടങ്ങാം.",
-      ctaPrimary: "ബിൽ തയ്യാറാക്കുക",
+      heroNote:
+        "നിയമ പരിജ്ഞാനം ആവശ്യമില്ല—നിങ്ങൾ കാണുന്ന പ്രശ്നത്തിൽ നിന്ന് തുടങ്ങാം.",
+      independence:
+        "സ്വതന്ത്ര പൗര വേദി — സർക്കാർ സേവനമല്ല. പ്രസിദ്ധീകരിച്ച ഡ്രാഫ്റ്റുകൾ പൊതു നിർദേശങ്ങളാണ്; ഔദ്യോഗിക നിയമനിർമ്മാണമല്ല.",
+      ctaPrimary: "ബിൽ ആരംഭിക്കുക",
       ctaSecondary: "ബില്ലുകൾ കാണുക",
       howHeading: "എങ്ങനെ പ്രവർത്തിക്കുന്നു",
-      howSupport: "പൊതു പ്രശ്നത്തിൽ നിന്ന് പങ്കിടാവുന്ന ഡ്രാഫ്റ്റിലേക്ക് നാല് ഘട്ടങ്ങൾ.",
+      howSupport:
+        "പൊതു പ്രശ്നത്തിൽ നിന്ന് പങ്കിടാവുന്ന ഡ്രാഫ്റ്റിലേക്ക് നാല് ഘട്ടങ്ങൾ.",
       step1: "പൊതു പ്രശ്നം വിവരിക്കുക",
       step2: "AI ഉപയോഗിച്ച് ബിൽ ഔട്ട്‌ലൈൻ ഉണ്ടാക്കുക",
       step3: "വകുപ്പുകളും ലളിതമായ സംഗ്രഹവും പരിശോധിക്കുക",
       step4: "വോട്ടിനും അഭിപ്രായങ്ങൾക്കുമായി പ്രസിദ്ധീകരിക്കുക",
       trendingHeading: "ട്രെൻഡിംഗ് ബില്ലുകൾ",
       trendingSupport: "വോട്ട്, ചർച്ച, സമീപകാല പ്രവർത്തനം അടിസ്ഥാനമാക്കി.",
+      proposalsHeading: "പൊതു നിർദേശങ്ങൾ",
+      proposalsSupport:
+        "ആദ്യ പൊതു നിർദേശങ്ങൾ കാണുക; ചർച്ച രൂപപ്പെടുത്തുന്നതിൽ പങ്കാളിയാകുക.",
       allProposals: "എല്ലാ നിർദേശങ്ങളും",
       emptyBills:
         "ഇതുവരെ പൊതു ബില്ലുകളില്ല. ഒരു നിർദേശം പ്രസിദ്ധീകരിച്ചാൽ അത് ഇവിടെ കാണാം.",
@@ -215,7 +231,7 @@ export const messages: Record<Locale, MessageTree> = {
       emptyActivity:
         "ഇതുവരെ പൊതു പ്രവർത്തനമില്ല. വോട്ടുകളും അഭിപ്രായങ്ങളും പങ്കിടലുകളും ഇവിടെ കാണാം.",
       emptyActivityCta: "പ്രസിദ്ധീകരിച്ച ബില്ലുകൾ കാണുക",
-      howCta: "ഡ്രാഫ്റ്റ് ആരംഭിക്കുക",
+      howCta: "ബിൽ ആരംഭിക്കുക",
       publicBills: "പൊതു ബില്ലുകൾ",
       billsInReview: "പരിശോധനയിലുള്ള ബില്ലുകൾ",
       communityVotes: "കമ്മ്യൂണിറ്റി വോട്ടുകൾ",

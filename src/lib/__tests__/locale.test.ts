@@ -21,7 +21,7 @@ describe("localeHtmlLang", () => {
 
 describe("getMessages", () => {
   it("returns localized home CTAs", () => {
-    expect(getMessages("en").home.ctaPrimary).toBe("Draft a bill");
-    expect(getMessages("ml").home.ctaPrimary).toBe("ബിൽ തയ്യാറാക്കുക");
+    expect(getMessages("en").home.ctaPrimary).toBe("Start a bill");
+    expect(getMessages("ml").home.ctaPrimary).toBe("ബിൽ ആരംഭിക്കുക");
   });
 });
