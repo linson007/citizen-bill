@@ -71,6 +71,20 @@ type MessageTree = {
     searchPlaceholder: string;
     allCategories: string;
     search: string;
+    statusFilter: string;
+    sort: string;
+    allPublicStatuses: string;
+    published: string;
+    underDiscussion: string;
+    readyForReview: string;
+    newest: string;
+    mostActive: string;
+    mostSupported: string;
+    mostDiscussed: string;
+    newProposal: string;
+    votes: string;
+    comments: string;
+    shares: string;
     emptyHeading: string;
     emptySupport: string;
     by: string;
@@ -164,6 +178,20 @@ export const messages: Record<Locale, MessageTree> = {
       searchPlaceholder: "Search title, description, or problem",
       allCategories: "All categories",
       search: "Search",
+      statusFilter: "Filter by bill status",
+      sort: "Sort bills",
+      allPublicStatuses: "All public statuses",
+      published: "Published",
+      underDiscussion: "Under discussion",
+      readyForReview: "Ready for review",
+      newest: "Newest",
+      mostActive: "Most active",
+      mostSupported: "Most supported",
+      mostDiscussed: "Most discussed",
+      newProposal: "New public proposal",
+      votes: "votes",
+      comments: "comments",
+      shares: "shares",
       emptyHeading: "No published bills yet",
       emptySupport:
         "Create a draft, publish it from the bill detail page, and it will appear here for public review.",
@@ -260,6 +288,20 @@ export const messages: Record<Locale, MessageTree> = {
       searchPlaceholder: "തലക്കെട്ട്, വിവരണം, അല്ലെങ്കിൽ പ്രശ്നം തിരയുക",
       allCategories: "എല്ലാ വിഭാഗങ്ങളും",
       search: "തിരയുക",
+      statusFilter: "ബിൽ സ്റ്റാറ്റസ് പ്രകാരം ഫിൽട്ടർ ചെയ്യുക",
+      sort: "ബില്ലുകൾ ക്രമീകരിക്കുക",
+      allPublicStatuses: "എല്ലാ പൊതു സ്റ്റാറ്റസുകളും",
+      published: "പ്രസിദ്ധീകരിച്ചത്",
+      underDiscussion: "ചർച്ചയിലാണ്",
+      readyForReview: "അവലോകനത്തിന് തയ്യാറാണ്",
+      newest: "ഏറ്റവും പുതിയത്",
+      mostActive: "ഏറ്റവും സജീവം",
+      mostSupported: "ഏറ്റവും പിന്തുണയുള്ളത്",
+      mostDiscussed: "ഏറ്റവും ചർച്ച ചെയ്യപ്പെട്ടത്",
+      newProposal: "പുതിയ പൊതു നിർദേശം",
+      votes: "വോട്ടുകൾ",
+      comments: "അഭിപ്രായങ്ങൾ",
+      shares: "പങ്കിടലുകൾ",
       emptyHeading: "ഇതുവരെ പ്രസിദ്ധീകരിച്ച ബില്ലുകളില്ല",
       emptySupport:
         "ഒരു ഡ്രാഫ്റ്റ് ഉണ്ടാക്കി ബിൽ വിശദാംശ പേജിൽ നിന്ന് പ്രസിദ്ധീകരിച്ചാൽ അത് ഇവിടെ കാണാം.",

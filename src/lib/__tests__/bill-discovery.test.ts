@@ -38,10 +38,10 @@ describe("bill discovery sorting", () => {
     ]);
   });
 
-  it("defaults unknown or missing sort values to trending", () => {
-    expect(parseBillDiscoverySort(undefined)).toBe("trending");
-    expect(parseBillDiscoverySort("")).toBe("trending");
-    expect(parseBillDiscoverySort("invalid")).toBe("trending");
+  it("defaults unknown or missing sort values to newest", () => {
+    expect(parseBillDiscoverySort(undefined)).toBe("newest");
+    expect(parseBillDiscoverySort("")).toBe("newest");
+    expect(parseBillDiscoverySort("invalid")).toBe("newest");
   });
 
   it("accepts every configured sort option", () => {

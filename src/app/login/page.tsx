@@ -3,7 +3,15 @@ import { Scale } from "lucide-react";
 
 import { AuthButton } from "@/components/auth-button";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
+  const safeCallbackUrl = callbackUrl?.startsWith("/")
+    ? callbackUrl
+    : "/dashboard";
   return (
     <main
       id="main-content"
@@ -28,7 +36,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <AuthButton />
+        <AuthButton callbackUrl={safeCallbackUrl} />
 
         <p className="mt-5 text-sm leading-6 text-ink-muted">
           AI-generated bill drafts are assistance only and should be reviewed

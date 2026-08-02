@@ -37,7 +37,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
-import { canViewBill, isPublicBillStatus, PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
+import {
+  canViewBill,
+  isPublicBillStatus,
+  PUBLIC_BILL_STATUSES,
+} from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { formatDisplayTitle } from "@/lib/display-title";
@@ -245,6 +249,14 @@ export default async function BillDetailPage({
     .findIndex((item) => item.id === bill.id);
   const reputationScore = calculateReputationScore(authorStats);
   const reputationLevel = getReputationLevel(reputationScore);
+  const engagementTotal =
+    bill._count.votes +
+    bill._count.comments +
+    bill._count.shares +
+    bill._count.savedBy +
+    bill._count.followers +
+    bill._count.suggestions;
+  const hasEstablishedActivity = engagementTotal >= 5;
   const activityItems = [
     bill.publishedAt
       ? {
@@ -295,34 +307,52 @@ export default async function BillDetailPage({
               <Calendar size={16} aria-hidden="true" />
               Created {bill.createdAt.toLocaleDateString("en-IN")}
             </span>
-            <span className="flex items-center gap-2">
-              <ThumbsUp size={16} aria-hidden="true" />
-              {bill._count.votes} votes
-            </span>
-            <span className="flex items-center gap-2">
-              <MessageSquare size={16} aria-hidden="true" />
-              {bill._count.comments} comments
-            </span>
-            <span className="flex items-center gap-2">
-              <Share2 size={16} aria-hidden="true" />
-              {bill._count.shares} shares
-            </span>
+            {hasEstablishedActivity ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <ThumbsUp size={16} aria-hidden="true" />
+                  {bill._count.votes} votes
+                </span>
+                <span className="flex items-center gap-2">
+                  <MessageSquare size={16} aria-hidden="true" />
+                  {bill._count.comments} comments
+                </span>
+                <span className="flex items-center gap-2">
+                  <Share2 size={16} aria-hidden="true" />
+                  {bill._count.shares} shares
+                </span>
+              </>
+            ) : (
+              <span>New public proposal — be the first to contribute.</span>
+            )}
           </div>
         </div>
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_320px]">
         <article className="space-y-5">
+          {isPublicBill ? (
+            <BillEngagementPrompt
+              slug={bill.slug}
+              signedIn={Boolean(session?.user)}
+              hasEstablishedActivity={hasEstablishedActivity}
+            />
+          ) : null}
           <ContentBlock title="Problem statement" content={bill.problem} />
           <ContentBlock
             title="Proposed solution"
             content={bill.proposedSolution}
           />
-          <ContentBlock title="Expected impact" content={bill.expectedImpact} />
-          <ContentBlock title="Draft bill text" content={bill.body} />
+          <ContentBlock
+            title="Expected impact"
+            content={bill.expectedImpact}
+            hideWhenEmpty
+          />
+          <ContentBlock title="Draft bill text" content={bill.body} formatted />
           <ContentBlock
             title="References and supporting links"
             content={bill.references}
+            hideWhenEmpty
           />
 
           {isPublicBill ? (
@@ -547,9 +577,14 @@ export default async function BillDetailPage({
             followers={bill._count.followers}
             suggestions={bill._count.suggestions}
             categoryName={bill.category?.name}
-            categoryRank={categoryRank >= 0 ? categoryRank + 1 : null}
+            categoryRank={
+              hasEstablishedActivity && categoryRank >= 0
+                ? categoryRank + 1
+                : null
+            }
             categoryTotal={categoryBills.length}
             activityItems={activityItems}
+            hasEstablishedActivity={hasEstablishedActivity}
           />
 
           <StatusWorkflow status={bill.status} />
@@ -921,20 +956,106 @@ function SuggestionButton({
 function ContentBlock({
   title,
   content,
+  hideWhenEmpty = false,
+  formatted = false,
 }: {
   title: string;
   content: string | null;
+  hideWhenEmpty?: boolean;
+  formatted?: boolean;
 }) {
+  if (!content && hideWhenEmpty) {
+    return null;
+  }
+
   return (
     <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
       <h2 className="mb-3 text-lg font-semibold">{title}</h2>
       {content ? (
-        <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
-          {content}
-        </p>
+        formatted ? (
+          <FormattedBillText content={content} />
+        ) : (
+          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+            {content}
+          </p>
+        )
       ) : (
         <p className="text-sm text-[#6d6658]">Not added yet.</p>
       )}
+    </section>
+  );
+}
+
+function FormattedBillText({ content }: { content: string }) {
+  return (
+    <div className="space-y-4 text-sm leading-7 text-[#3f3a32]">
+      {content.split(/\n{2,}/).map((paragraph, index) => {
+        const heading = paragraph.match(/^(?:#{1,3}\s+|\*\*)(.+?)(?:\*\*)?$/);
+
+        if (heading) {
+          return (
+            <h3
+              key={`${heading[1]}-${index}`}
+              className="font-semibold text-[#161616]"
+            >
+              {heading[1]}
+            </h3>
+          );
+        }
+
+        return (
+          <p
+            key={`${paragraph.slice(0, 24)}-${index}`}
+            className="whitespace-pre-wrap"
+          >
+            {paragraph
+              .split(/(\*\*[^*]+\*\*)/)
+              .map((part, partIndex) =>
+                part.startsWith("**") && part.endsWith("**") ? (
+                  <strong key={partIndex}>{part.slice(2, -2)}</strong>
+                ) : (
+                  part
+                ),
+              )}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function BillEngagementPrompt({
+  slug,
+  signedIn,
+  hasEstablishedActivity,
+}: {
+  slug: string;
+  signedIn: boolean;
+  hasEstablishedActivity: boolean;
+}) {
+  if (hasEstablishedActivity) {
+    return null;
+  }
+
+  const href = signedIn
+    ? "#comments"
+    : `/login?callbackUrl=/bills/${slug}#comments`;
+
+  return (
+    <section className="rounded-lg border border-[#b8cadb] bg-[#edf4fa] p-5">
+      <h2 className="text-lg font-semibold text-[#123c69]">
+        Help start the public discussion
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#3f4f60]">
+        This proposal is new. Add a practical comment, suggest an amendment, or
+        support it if it addresses a public need.
+      </p>
+      <Link
+        href={href}
+        className="mt-4 inline-flex h-11 items-center rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+      >
+        Join the discussion
+      </Link>
     </section>
   );
 }
@@ -950,6 +1071,7 @@ function BillAnalytics({
   categoryRank,
   categoryTotal,
   activityItems,
+  hasEstablishedActivity,
 }: {
   votes: number;
   comments: number;
@@ -961,6 +1083,7 @@ function BillAnalytics({
   categoryRank: number | null;
   categoryTotal: number;
   activityItems: { label: string; date: Date }[];
+  hasEstablishedActivity: boolean;
 }) {
   return (
     <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
@@ -968,15 +1091,22 @@ function BillAnalytics({
         <ChartNoAxesColumn size={17} aria-hidden="true" />
         Public analytics
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <StatLabel label="Votes" value={votes} />
-        <StatLabel label="Comments" value={comments} />
-        <StatLabel label="Shares" value={shares} />
-        <StatLabel label="Saves" value={saves} />
-        <StatLabel label="Followers" value={followers} />
-        <StatLabel label="Suggestions" value={suggestions} />
-      </div>
-      {categoryName && categoryRank ? (
+      {hasEstablishedActivity ? (
+        <div className="grid grid-cols-2 gap-2">
+          <StatLabel label="Votes" value={votes} />
+          <StatLabel label="Comments" value={comments} />
+          <StatLabel label="Shares" value={shares} />
+          <StatLabel label="Saves" value={saves} />
+          <StatLabel label="Followers" value={followers} />
+          <StatLabel label="Suggestions" value={suggestions} />
+        </div>
+      ) : (
+        <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm leading-6 text-[#4f4a40]">
+          This proposal is gathering its first public responses. Activity will
+          appear here once people begin participating.
+        </p>
+      )}
+      {hasEstablishedActivity && categoryName && categoryRank ? (
         <p className="mt-4 rounded-md bg-[#fbfaf7] px-3 py-2 text-sm text-[#4f4a40]">
           Ranked #{categoryRank} of {categoryTotal} in {categoryName}
         </p>
