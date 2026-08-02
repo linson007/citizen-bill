@@ -68,23 +68,27 @@ MattamUndo is a public participation layer for legislative drafting:
 
 ### Gaps and incomplete work
 
-Compared with this product plan and the schema, these items are still missing or only partial:
+Living checklist: [`GAP.md`](GAP.md) (reconfirmed August 2, 2026). Compared with this product plan and the schema, these items are still missing or only partial:
 
 | Gap | Status | Notes |
 | --- | --- | --- |
-| Petition signatures (`BillSignature`) | Schema + helpers only | No bill-page action or UI to sign / update a petition note |
+| Legislative outreach statuses in product UX | Enum only | `SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, `PASSED` are not public or first-class author workflows; public statuses today are `PUBLISHED`, `UNDER_DISCUSSION`, `READY_FOR_REVIEW` |
+| Petition signatures (`BillSignature`) | Schema + helpers only | No bill-page action or UI to sign / update a petition note or show counts |
 | Threaded comment replies | Schema has `parentId` | UI posts and lists flat comments only |
-| Tag filters on discovery | Tags stored on bills | Browse/search filters by query, category, status, and sort — not by tag |
-| Dedicated “bills I voted on” dashboard list | Partial | Dashboard shows vote **count**; profile lists recent votes |
-| Email delivery | Stub | `EMAIL_FROM` logs queued events; no provider (Resend/SES/etc.) |
-| Unused `Bill.region` field | Schema only | Not exposed in forms or discovery |
-| shadcn/ui | Not adopted | Custom Tailwind UI + Lucide; React Hook Form + Zod are in use |
-| Analytics / error tracking | Not wired | No Vercel Analytics, Sentry, or PostHog |
+| Tag filters / `Bill.region` | Partial | Tags stored on bills; browse filters by query, category, status, and sort — not by tag. `region` is schema-only — expose or remove |
+| Malayalam product UI | Partial | Nav, home, and bill discovery are localized; dashboard, notifications, profile, and much bill-detail copy remain English-first. Discovery FTS is English `tsvector`; PDF export is Helvetica / Latin-focused |
+| Dedicated “bills I voted on” list | Partial | Dashboard shows vote **count**; profile lists up to 10 recent votes |
+| Attachment management | Partial | Authors can upload PDF/DOCX; cannot remove/replace or delete the Vercel Blob object |
+| Accepted suggestions in version history | Partial | Accept/merge updates the live bill; history does not label “from accepted suggestion” |
+| Public author profiles | Not built | `/profile` is private to the signed-in user |
+| Notifications UX | Partial | Mark-all-read exists; page caps at 50; no pagination, per-item read, or preferences |
+| Content quality / abuse beyond reports | Partial | Report + moderator queue exist; richer spam/abuse controls, rate limits, and quality signals do not |
 | Admin user management | Not built | Roles exist; no user admin UI beyond moderation tools |
-| Content quality / abuse flags beyond reports | Partial | Report workflow exists; richer quality scoring is not built |
-| Malayalam product UI | Partial | AI has a Malayalam drafting mode; app chrome and bills listing remain English-first |
-| Accepted suggestions in version history | Partial | Accept/merge updates the live bill and can create versions on edit/publish; history does not explicitly label “from accepted suggestion” |
-| Legislative outreach statuses in product UX | Enum only | `SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, `PASSED` exist in Prisma but are not first-class author workflows |
+| Email delivery | Stub | `EMAIL_FROM` logs queued events; no provider (Resend/SES/etc.) |
+| Analytics / error tracking | Not wired | No Vercel Analytics, Sentry, or PostHog |
+| Discovery scale | Partial | Unfiltered discovery loads all public bills; search results cap at 100 |
+| Test coverage beyond helpers | Partial | CI runs helper-focused unit tests; no DB-backed action/API or e2e journey tests |
+| shadcn/ui | Intentional non-gap | Not adopted; retain custom Tailwind unless the team chooses a migration |
 
 ## 6. MVP Feature Detail
 
@@ -378,20 +382,22 @@ Practices in use:
 
 ## 13. Near-Term Product Backlog
 
-Priority gaps to close next:
+Priority gaps to close next (see [`GAP.md`](GAP.md) for the full checklist):
 
-1. Wire petition signatures end-to-end (sign / update note / counts on bill page and dashboard).
-2. Threaded comment replies using existing `parentId`.
-3. Tag filter on public discovery.
-4. Email provider for notification delivery.
-5. Dashboard list of bills the user voted on.
-6. Analytics and error tracking.
-7. Optional: expose `region` or drop the unused column.
-8. Optional: Malayalam UI strings for core chrome.
+1. Public legislative lifecycle statuses and author workflows (`SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, `PASSED`).
+2. Wire petition signatures end-to-end (sign / update note / counts on bill page).
+3. Threaded comment replies using existing `parentId`.
+4. Tag filter on public discovery; decide whether to expose or remove `Bill.region`.
+5. Malayalam completeness for dashboard, notifications, profile, and bill detail; Malayalam-aware search and Unicode PDF export.
+6. Dedicated “bills I voted on” list (dashboard and/or paginated profile).
+7. Attachment remove/replace with Vercel Blob delete.
+8. Email provider for notification delivery.
+9. Discovery pagination / cursor loading.
+10. Analytics and error tracking.
 
 ## 14. Future Enhancements
 
-- Full Malayalam interface and bilingual bill drafting UX.
+- Full Malayalam interface and bilingual bill drafting UX beyond the localized nav/home/discovery chrome.
 - Legislative format templates.
 - Public petitions attached to bills (beyond the unfinished signature model).
 - MLA outreach workflow using reserved statuses.

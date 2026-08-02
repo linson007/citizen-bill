@@ -43,22 +43,6 @@ export async function SiteHeader() {
           </span>
         </Link>
 
-        <nav
-          className="hidden items-center gap-7 text-sm font-medium text-ink-soft md:flex"
-          aria-label="Primary"
-        >
-          {publicLinks.map((link) => (
-            <NavLink
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-accent"
-              activeClassName="text-accent"
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <MobileNav
             publicLinks={publicLinks}
@@ -86,6 +70,13 @@ export async function SiteHeader() {
               }}
             />
           </div>
+          <NavLink
+            href="/bills"
+            className="hidden h-10 items-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 md:inline-flex"
+            activeClassName="border-accent bg-accent-soft text-accent"
+          >
+            {t.nav.bills}
+          </NavLink>
           <AccountMenu
             labels={{
               account: t.nav.account,
