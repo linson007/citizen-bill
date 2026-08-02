@@ -78,13 +78,13 @@ export function MobileNav({
         <>
           <button
             type="button"
-            className="fixed inset-0 top-[64px] z-30 cursor-default bg-hero-ink/15 backdrop-blur-[1px]"
+            className="fixed inset-0 top-[64px] z-40 cursor-default bg-hero-ink/20 backdrop-blur-[1px]"
             aria-label={labels.closeMenu}
             onClick={() => setOpen(false)}
           />
           <div
             id={menuId}
-            className="absolute right-0 top-[calc(100%+0.75rem)] z-40 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-surface-raised p-2 shadow-xl shadow-hero-ink/15"
+            className="fixed right-4 top-[4.75rem] z-50 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-surface-raised p-2 shadow-xl shadow-hero-ink/15"
           >
             <nav className="flex flex-col gap-1" aria-label="Mobile">
             {publicLinks.map((link) => (

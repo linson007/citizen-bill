@@ -20,22 +20,22 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-raised: var(--surface-raised);
-  --color-ink-muted: var(--ink-muted);
-  --color-ink-soft: var(--ink-soft);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-warning-bg: var(--warning-bg);
-  --color-warning-ink: var(--warning-ink);
-  --color-hero-ink: var(--hero-ink);
-  --color-hero-mist: var(--hero-mist);
+  --color-background: #f0eee6;
+  --color-foreground: #141414;
+  --color-surface: #f7f5ef;
+  --color-surface-raised: #ffffff;
+  --color-ink-muted: #5f584c;
+  --color-ink-soft: #3f3a32;
+  --color-border: #d2cbb8;
+  --color-border-strong: #bdb59f;
+  --color-accent: #0f355c;
+  --color-accent-soft: #dce8f2;
+  --color-success: #2a6f58;
+  --color-success-soft: #e2efe8;
+  --color-warning-bg: #f7f0e0;
+  --color-warning-ink: #5c4718;
+  --color-hero-ink: #0a2440;
+  --color-hero-mist: #d9e4ef;
   --font-sans: var(--font-source-sans);
   --font-display: var(--font-fraunces);
   --font-malayalam: var(--font-manjari);
