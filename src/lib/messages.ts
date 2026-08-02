@@ -71,6 +71,20 @@ type MessageTree = {
     searchPlaceholder: string;
     allCategories: string;
     search: string;
+    statusFilter: string;
+    sort: string;
+    allPublicStatuses: string;
+    published: string;
+    underDiscussion: string;
+    readyForReview: string;
+    newest: string;
+    mostActive: string;
+    mostSupported: string;
+    mostDiscussed: string;
+    newProposal: string;
+    votes: string;
+    comments: string;
+    shares: string;
     emptyHeading: string;
     emptySupport: string;
     by: string;
@@ -79,6 +93,23 @@ type MessageTree = {
     eyebrow: string;
     heading: string;
     support: string;
+  };
+  footer: {
+    terms: string;
+    privacy: string;
+    contact: string;
+    copyright: string;
+  };
+  login: {
+    home: string;
+    heading: string;
+    support: string;
+    checking: string;
+    signIn: string;
+    signOut: string;
+    disclaimer: string;
+    agreement: string;
+    privacyPolicy: string;
   };
 };
 
@@ -160,10 +191,24 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "Published public bills",
       support:
         "Browse bills published for reading, discussion, voting, and sharing.",
-      create: "Create bill",
+      create: "Start a bill",
       searchPlaceholder: "Search title, description, or problem",
       allCategories: "All categories",
       search: "Search",
+      statusFilter: "Filter by bill status",
+      sort: "Sort bills",
+      allPublicStatuses: "All public statuses",
+      published: "Published",
+      underDiscussion: "Under discussion",
+      readyForReview: "Ready for review",
+      newest: "Newest",
+      mostActive: "Most active",
+      mostSupported: "Most supported",
+      mostDiscussed: "Most discussed",
+      newProposal: "New public proposal",
+      votes: "votes",
+      comments: "comments",
+      shares: "shares",
       emptyHeading: "No published bills yet",
       emptySupport:
         "Create a draft, publish it from the bill detail page, and it will appear here for public review.",
@@ -174,6 +219,24 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "Create a structured bill proposal",
       support:
         "Start with the public problem and save a private draft. Publishing, voting, comments, uploads, and AI drafting build on this record.",
+    },
+    footer: {
+      terms: "Terms",
+      privacy: "Privacy",
+      contact: "Contact",
+      copyright: "Open source under the MIT License.",
+    },
+    login: {
+      home: "MattamUndo home",
+      heading: "Sign in to MattamUndo",
+      support: "Use your Google account to create drafts, vote, and comment.",
+      checking: "Checking",
+      signIn: "Sign in",
+      signOut: "Sign out",
+      disclaimer:
+        "AI-generated bill drafts are assistance only and should be reviewed before being treated as legal or policy text.",
+      agreement: "By continuing you agree to the",
+      privacyPolicy: "Privacy policy",
     },
   },
   ml: {
@@ -256,10 +319,24 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "പ്രസിദ്ധീകരിച്ച പൊതു ബില്ലുകൾ",
       support:
         "വായന, ചർച്ച, വോട്ട്, പങ്കിടൽ എന്നിവയ്ക്കായി പ്രസിദ്ധീകരിച്ച ബില്ലുകൾ കാണുക.",
-      create: "ബിൽ ഉണ്ടാക്കുക",
+      create: "ബിൽ ആരംഭിക്കുക",
       searchPlaceholder: "തലക്കെട്ട്, വിവരണം, അല്ലെങ്കിൽ പ്രശ്നം തിരയുക",
       allCategories: "എല്ലാ വിഭാഗങ്ങളും",
       search: "തിരയുക",
+      statusFilter: "ബിൽ സ്റ്റാറ്റസ് പ്രകാരം ഫിൽട്ടർ ചെയ്യുക",
+      sort: "ബില്ലുകൾ ക്രമീകരിക്കുക",
+      allPublicStatuses: "എല്ലാ പൊതു സ്റ്റാറ്റസുകളും",
+      published: "പ്രസിദ്ധീകരിച്ചത്",
+      underDiscussion: "ചർച്ചയിലാണ്",
+      readyForReview: "അവലോകനത്തിന് തയ്യാറാണ്",
+      newest: "ഏറ്റവും പുതിയത്",
+      mostActive: "ഏറ്റവും സജീവം",
+      mostSupported: "ഏറ്റവും പിന്തുണയുള്ളത്",
+      mostDiscussed: "ഏറ്റവും ചർച്ച ചെയ്യപ്പെട്ടത്",
+      newProposal: "പുതിയ പൊതു നിർദേശം",
+      votes: "വോട്ടുകൾ",
+      comments: "അഭിപ്രായങ്ങൾ",
+      shares: "പങ്കിടലുകൾ",
       emptyHeading: "ഇതുവരെ പ്രസിദ്ധീകരിച്ച ബില്ലുകളില്ല",
       emptySupport:
         "ഒരു ഡ്രാഫ്റ്റ് ഉണ്ടാക്കി ബിൽ വിശദാംശ പേജിൽ നിന്ന് പ്രസിദ്ധീകരിച്ചാൽ അത് ഇവിടെ കാണാം.",
@@ -270,6 +347,25 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "ഘടനയുള്ള ബിൽ നിർദേശം തയ്യാറാക്കുക",
       support:
         "പൊതു പ്രശ്നത്തിൽ നിന്ന് ആരംഭിച്ച് സ്വകാര്യ ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുക. പ്രസിദ്ധീകരണം, വോട്ട്, അഭിപ്രായങ്ങൾ, അപ്‌ലോഡുകൾ, AI ഡ്രാഫ്റ്റിംഗ് എന്നിവ ഈ റെക്കോർഡിൽ നിർമ്മിക്കപ്പെടും.",
+    },
+    footer: {
+      terms: "നിബന്ധനകൾ",
+      privacy: "സ്വകാര്യത",
+      contact: "ബന്ധപ്പെടുക",
+      copyright: "MIT ലൈസൻസിന് കീഴിലുള്ള ഓപ്പൺ സോഴ്സ്.",
+    },
+    login: {
+      home: "MattamUndo ഹോം",
+      heading: "MattamUndo-ലേക്ക് സൈൻ ഇൻ ചെയ്യുക",
+      support:
+        "ഡ്രാഫ്റ്റുകൾ ഉണ്ടാക്കാനും വോട്ട് ചെയ്യാനും അഭിപ്രായം രേഖപ്പെടുത്താനും Google അക്കൗണ്ട് ഉപയോഗിക്കുക.",
+      checking: "പരിശോധിക്കുന്നു",
+      signIn: "സൈൻ ഇൻ",
+      signOut: "സൈൻ ഔട്ട്",
+      disclaimer:
+        "AI സൃഷ്ടിക്കുന്ന ബിൽ ഡ്രാഫ്റ്റുകൾ സഹായത്തിനായി മാത്രമാണ്; നിയമമോ നയമോ ആയി പരിഗണിക്കുന്നതിന് മുമ്പ് അവ പരിശോധിക്കണം.",
+      agreement: "തുടരുന്നതിലൂടെ നിങ്ങൾ",
+      privacyPolicy: "സ്വകാര്യതാ നയം",
     },
   },
 };

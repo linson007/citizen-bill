@@ -131,12 +131,22 @@ export default async function BillsPage({
           <select
             name="status"
             defaultValue={selectedStatus}
-            aria-label="Filter by bill status"
+            aria-label={t.bills.statusFilter}
             className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
             {PUBLIC_BILL_STATUS_FILTER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {
+                  t.bills[
+                    option.value === "all"
+                      ? "allPublicStatuses"
+                      : option.value === "published"
+                        ? "published"
+                        : option.value === "under-discussion"
+                          ? "underDiscussion"
+                          : "readyForReview"
+                  ]
+                }
               </option>
             ))}
           </select>
@@ -144,12 +154,22 @@ export default async function BillsPage({
           <select
             name="sort"
             defaultValue={selectedSort}
-            aria-label="Sort bills"
+            aria-label={t.bills.sort}
             className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
           >
             {BILL_DISCOVERY_SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {
+                  t.bills[
+                    option.value === "newest"
+                      ? "newest"
+                      : option.value === "trending"
+                        ? "mostActive"
+                        : option.value === "most-supported"
+                          ? "mostSupported"
+                          : "mostDiscussed"
+                  ]
+                }
               </option>
             ))}
           </select>
@@ -192,23 +212,29 @@ export default async function BillsPage({
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 gap-2">
-                    <Metric
-                      icon={ThumbsUp}
-                      value={bill._count.votes}
-                      label="votes"
-                    />
-                    <Metric
-                      icon={MessageSquare}
-                      value={bill._count.comments}
-                      label="comments"
-                    />
-                    <Metric
-                      icon={Share2}
-                      value={bill._count.shares}
-                      label="shares"
-                    />
-                  </div>
+                  {hasEngagement(bill._count) ? (
+                    <div className="flex shrink-0 gap-2">
+                      <Metric
+                        icon={ThumbsUp}
+                        value={bill._count.votes}
+                        label={t.bills.votes}
+                      />
+                      <Metric
+                        icon={MessageSquare}
+                        value={bill._count.comments}
+                        label={t.bills.comments}
+                      />
+                      <Metric
+                        icon={Share2}
+                        value={bill._count.shares}
+                        label={t.bills.shares}
+                      />
+                    </div>
+                  ) : (
+                    <p className="shrink-0 text-sm font-medium text-ink-muted">
+                      {t.bills.newProposal}
+                    </p>
+                  )}
                 </div>
               </Link>
             ))}
@@ -315,6 +341,14 @@ async function findPublicBills({
   });
 
   return sortBillsForDiscovery(relevanceSortedBills, sort);
+}
+
+function hasEngagement(counts: {
+  votes: number;
+  comments: number;
+  shares: number;
+}) {
+  return counts.votes + counts.comments + counts.shares > 0;
 }
 
 function Badge({ children }: { children: React.ReactNode }) {

@@ -57,12 +57,12 @@ export function getPublicBillStatusWhereValues(
 
 export const BILL_DISCOVERY_SORT_OPTIONS = [
   {
-    value: "trending",
-    label: "Trending",
-  },
-  {
     value: "newest",
     label: "Newest",
+  },
+  {
+    value: "trending",
+    label: "Most active",
   },
   {
     value: "most-supported",
@@ -90,7 +90,7 @@ export function parseBillDiscoverySort(
     return trimmedValue as BillDiscoverySort;
   }
 
-  return "trending";
+  return "newest";
 }
 
 export function getBillDiscoveryOrderBy(

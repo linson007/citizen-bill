@@ -13,7 +13,7 @@ export default async function NewBillPage() {
   const copyClass = locale === "ml" ? "font-malayalam" : "";
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/login?callbackUrl=/bills/new");
   }
 
   return (

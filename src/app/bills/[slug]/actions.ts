@@ -20,11 +20,20 @@ import { sendEmailNotification } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 
+function redirectToBillLogin(formData: FormData): never {
+  const slug = formData.get("slug")?.toString();
+  redirect(
+    slug
+      ? `/login?callbackUrl=${encodeURIComponent(`/bills/${slug}`)}`
+      : "/login",
+  );
+}
+
 export async function publishBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -168,7 +177,7 @@ export async function toggleVoteAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -260,7 +269,7 @@ export async function toggleSavedBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -317,7 +326,7 @@ export async function toggleFollowBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -374,7 +383,7 @@ export async function createCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -451,7 +460,7 @@ export async function updateBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -564,7 +573,7 @@ export async function uploadBillFileAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -632,7 +641,7 @@ export async function reportBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -701,7 +710,7 @@ export async function reportCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -750,7 +759,7 @@ export async function createSuggestionAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -828,7 +837,7 @@ export async function reviewSuggestionAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
