@@ -31,7 +31,7 @@ export function LocaleToggle({ locale, labels }: LocaleToggleProps) {
 
   return (
     <div
-      className="inline-flex h-10 items-center rounded-md border border-border-strong bg-surface-raised p-0.5 text-sm font-medium text-ink-soft"
+      className="inline-flex h-11 items-center rounded-md border border-border-strong bg-surface-raised p-0.5 text-sm font-medium text-ink-soft"
       role="group"
       aria-label={labels.language}
     >
@@ -43,6 +43,7 @@ export function LocaleToggle({ locale, labels }: LocaleToggleProps) {
             : "text-ink-muted hover:text-foreground"
         }`}
         aria-pressed={locale === "en"}
+        aria-label={labels.english}
         disabled={pending}
         onClick={() => setLocale("en")}
       >
@@ -56,10 +57,11 @@ export function LocaleToggle({ locale, labels }: LocaleToggleProps) {
             : "text-ink-muted hover:text-foreground"
         }`}
         aria-pressed={locale === "ml"}
+        aria-label={labels.malayalam}
         disabled={pending}
         onClick={() => setLocale("ml")}
       >
-        മല
+        മലയാളം
       </button>
     </div>
   );

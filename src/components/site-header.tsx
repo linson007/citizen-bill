@@ -21,9 +21,7 @@ export async function SiteHeader() {
     { href: "/dashboard", label: t.nav.dashboard },
     { href: "/profile", label: t.nav.profile },
     { href: "/notifications", label: t.nav.notifications },
-    ...(canModerate
-      ? [{ href: "/moderation", label: t.nav.moderation }]
-      : []),
+    ...(canModerate ? [{ href: "/moderation", label: t.nav.moderation }] : []),
   ];
 
   return (
@@ -72,7 +70,7 @@ export async function SiteHeader() {
           </div>
           <NavLink
             href="/bills"
-            className="hidden h-10 items-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 md:inline-flex"
+            className="hidden h-11 items-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 md:inline-flex"
             activeClassName="border-accent bg-accent-soft text-accent"
           >
             {t.nav.bills}
@@ -89,7 +87,7 @@ export async function SiteHeader() {
           <Link
             href="/bills/new"
             aria-label={t.nav.newBill}
-            className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 sm:px-4"
+            className="flex h-11 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 sm:px-4"
           >
             <Plus size={16} aria-hidden="true" />
             <span className="hidden sm:inline">{t.nav.newBill}</span>
