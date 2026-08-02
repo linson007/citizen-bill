@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { connection } from "next/server";
 
-import { HeroVisual } from "@/components/hero-visual";
+import { CivicHeroImage, HeroVisual } from "@/components/hero-visual";
 import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -58,10 +58,10 @@ export default async function Home() {
     >
       <SiteHeader />
 
-      <section className="relative isolate min-h-[min(88vh,820px)] overflow-hidden border-b border-border">
+      <section className="relative isolate overflow-hidden border-b border-border">
         <HeroVisual />
-        <div className="relative mx-auto flex max-w-7xl flex-col justify-end px-5 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-28 lg:min-h-[min(88vh,820px)] lg:justify-center lg:pb-24 lg:pt-24">
-          <div className="max-w-2xl">
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:min-h-[min(88vh,820px)] lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.9fr)] lg:items-center lg:gap-12 lg:py-20">
+          <div className="order-2 max-w-2xl lg:order-1">
             <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent backdrop-blur-sm">
               {t.home.eyebrow}
             </p>
@@ -74,6 +74,22 @@ export default async function Home() {
             <h1 className="animate-fade-up-delay mt-6 text-xl font-medium leading-snug text-ink-soft sm:text-2xl">
               {t.home.headline}
             </h1>
+            <div className="animate-fade-up-delay-2 mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/bills/new"
+                className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              >
+                <PenLine size={18} aria-hidden="true" />
+                {t.home.ctaPrimary}
+              </Link>
+              <Link
+                href="/bills"
+                className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              >
+                <FileText size={18} aria-hidden="true" />
+                {t.home.ctaSecondary}
+              </Link>
+            </div>
             <p className="animate-fade-up-delay-2 mt-4 text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
               {t.home.support}
             </p>
@@ -94,21 +110,8 @@ export default async function Home() {
               {t.home.independence}
             </p>
           </div>
-          <div className="animate-fade-up-delay-2 mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/bills/new"
-              className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
-            >
-              <PenLine size={18} aria-hidden="true" />
-              {t.home.ctaPrimary}
-            </Link>
-            <Link
-              href="/bills"
-              className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
-            >
-              <FileText size={18} aria-hidden="true" />
-              {t.home.ctaSecondary}
-            </Link>
+          <div className="order-1 lg:order-2">
+            <CivicHeroImage locale={locale} />
           </div>
         </div>
       </section>
