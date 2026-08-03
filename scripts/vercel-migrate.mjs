@@ -70,8 +70,22 @@ if (canFallback) {
   if ((fallback.status ?? 1) === 0) {
     process.exit(0);
   }
+  if (isConnectivityFailure(fallback)) {
+    console.warn(
+      "Database unreachable during build; migrations were skipped. Apply them from a network that can reach the database before relying on schema changes.",
+    );
+    process.exit(0);
+  }
   process.exit(fallback.status ?? 1);
 }
 
 printResult(primary);
+
+if (isConnectivityFailure(primary)) {
+  console.warn(
+    "Database unreachable during build; migrations were skipped. Apply them from a network that can reach the database before relying on schema changes.",
+  );
+  process.exit(0);
+}
+
 process.exit(primary.status ?? 1);
