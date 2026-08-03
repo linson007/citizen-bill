@@ -5,10 +5,8 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 import { resolveBillCategory } from "@/lib/bill-categories";
-import {
-  billDraftSchema,
-  billPublishSchema,
-} from "@/lib/bill-form-schema";
+import { billDraftSchema, billPublishSchema } from "@/lib/bill-form-schema";
+import { revalidateBillDetailData } from "@/lib/bill-detail";
 import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 import { createUniqueSlug, slugify } from "@/lib/slug";
@@ -43,9 +41,9 @@ export async function createBillAction(
     body: formData.get("body"),
     references: formData.get("references"),
   };
-  const parsed = (shouldPublish ? billPublishSchema : billDraftSchema).safeParse(
-    rawData,
-  );
+  const parsed = (
+    shouldPublish ? billPublishSchema : billDraftSchema
+  ).safeParse(rawData);
 
   if (!parsed.success) {
     return {
@@ -129,6 +127,7 @@ export async function createBillAction(
 
   if (shouldPublish) {
     revalidateHomepageData();
+    revalidateBillDetailData();
   }
 
   redirect(`/bills/${bill.slug}`);

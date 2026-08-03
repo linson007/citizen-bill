@@ -37,13 +37,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
-import {
-  canViewBill,
-  isPublicBillStatus,
-  PUBLIC_BILL_STATUSES,
-} from "@/lib/bill-visibility";
+import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
 import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
 import { getBillFollowButtonLabel } from "@/lib/bill-follow";
+import { getBillDetailData } from "@/lib/bill-detail";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
@@ -56,14 +53,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const bill = await prisma.bill.findUnique({
-    where: { slug },
-    select: {
-      title: true,
-      description: true,
-      status: true,
-    },
-  });
+  const billData = await getBillDetailData(slug);
+  const bill = billData?.bill;
 
   if (!bill || !isPublicBillStatus(bill.status)) {
     return {
@@ -101,41 +92,17 @@ export default async function BillDetailPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ upload?: string }>;
 }) {
-  const session = await getServerSession(authOptions);
   const { slug } = await params;
-  const { upload } = await searchParams;
-
-  const bill = await prisma.bill.findUnique({
-    where: { slug },
-    include: {
-      author: true,
-      category: true,
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      files: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      _count: {
-        select: {
-          votes: true,
-          comments: true,
-          shares: true,
-          savedBy: true,
-          followers: true,
-          suggestions: true,
-        },
-      },
-    },
-  });
-
-  if (!bill) {
+  const [session, { upload }, billData] = await Promise.all([
+    getServerSession(authOptions),
+    searchParams,
+    getBillDetailData(slug),
+  ]);
+  if (!billData) {
     notFound();
   }
+  const { authorStats, bill, categoryBills, comments, suggestions, versions } =
+    billData;
 
   const isAuthor = session?.user?.id === bill.authorId;
   const isPublicBill = isPublicBillStatus(bill.status);
@@ -148,100 +115,37 @@ export default async function BillDetailPage({
     redirect(`/login?callbackUrl=/bills/${slug}`);
   }
 
-  const userVote = session?.user?.id
-    ? await prisma.vote.findUnique({
-        where: {
-          billId_userId: {
-            billId: bill.id,
-            userId: session.user.id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      })
-    : null;
-  const userSavedBill = session?.user?.id
-    ? await prisma.savedBill.findUnique({
-        where: {
-          billId_userId: {
-            billId: bill.id,
-            userId: session.user.id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      })
-    : null;
-  const userFollow = session?.user?.id
-    ? await prisma.billFollow.findUnique({
-        where: {
-          billId_userId: {
-            billId: bill.id,
-            userId: session.user.id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      })
-    : null;
-  const comments = await prisma.comment.findMany({
-    where: {
-      billId: bill.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      user: true,
-    },
-  });
-  const [suggestions, versions, categoryBills, authorStats] = await Promise.all(
-    [
-      prisma.amendmentSuggestion.findMany({
-        where: {
-          billId: bill.id,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        include: {
-          user: true,
-        },
-      }),
-      prisma.billVersion.findMany({
-        where: {
-          billId: bill.id,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 8,
-      }),
-      bill.categoryId
-        ? prisma.bill.findMany({
-            where: {
-              categoryId: bill.categoryId,
-              status: {
-                in: [...PUBLIC_BILL_STATUSES],
-              },
+  const [userVote, userSavedBill, userFollow] = session?.user?.id
+    ? await Promise.all([
+        prisma.vote.findUnique({
+          where: {
+            billId_userId: {
+              billId: bill.id,
+              userId: session.user.id,
             },
-            select: {
-              id: true,
-              _count: {
-                select: {
-                  votes: true,
-                },
-              },
+          },
+          select: { id: true },
+        }),
+        prisma.savedBill.findUnique({
+          where: {
+            billId_userId: {
+              billId: bill.id,
+              userId: session.user.id,
             },
-          })
-        : Promise.resolve([]),
-      getAuthorStats(bill.authorId),
-    ],
-  );
-
+          },
+          select: { id: true },
+        }),
+        prisma.billFollow.findUnique({
+          where: {
+            billId_userId: {
+              billId: bill.id,
+              userId: session.user.id,
+            },
+          },
+          select: { id: true },
+        }),
+      ])
+    : [null, null, null];
   const billUrl = `${appUrl}/bills/${bill.slug}`;
   const shareText = `Support this public bill: ${formatDisplayTitle(bill.title)}`;
   const categoryRank = categoryBills
@@ -1199,62 +1103,4 @@ function Badge({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
-}
-
-async function getAuthorStats(authorId: string) {
-  const [
-    publishedBills,
-    authorBills,
-    commentsMade,
-    suggestionsMade,
-    acceptedSuggestions,
-  ] = await Promise.all([
-    prisma.bill.count({
-      where: {
-        authorId,
-        status: {
-          in: [...PUBLIC_BILL_STATUSES],
-        },
-      },
-    }),
-    prisma.bill.findMany({
-      where: {
-        authorId,
-      },
-      select: {
-        _count: {
-          select: {
-            votes: true,
-          },
-        },
-      },
-    }),
-    prisma.comment.count({
-      where: {
-        userId: authorId,
-      },
-    }),
-    prisma.amendmentSuggestion.count({
-      where: {
-        userId: authorId,
-      },
-    }),
-    prisma.amendmentSuggestion.count({
-      where: {
-        userId: authorId,
-        status: "ACCEPTED",
-      },
-    }),
-  ]);
-
-  return {
-    publishedBills,
-    votesReceived: authorBills.reduce(
-      (total, item) => total + item._count.votes,
-      0,
-    ),
-    commentsMade,
-    suggestionsMade,
-    acceptedSuggestions,
-  };
 }
