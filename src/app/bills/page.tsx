@@ -5,6 +5,7 @@ import {
   Search,
   Share2,
   ThumbsUp,
+  X,
 } from "lucide-react";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -43,6 +44,12 @@ export default async function BillsPage({
   const selectedSort = parseBillDiscoverySort(sort);
   const selectedStatus = parsePublicBillStatusFilter(status);
   const statusWhereValues = getPublicBillStatusWhereValues(selectedStatus);
+  const hasActiveFilters = Boolean(
+    query ||
+      selectedCategory ||
+      selectedStatus !== "all" ||
+      selectedSort !== "newest",
+  );
 
   const [bills, categories] = await Promise.all([
     findPublicBills({
@@ -182,6 +189,21 @@ export default async function BillsPage({
           </button>
         </form>
 
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+          <p className="font-medium text-ink-soft" aria-live="polite">
+            {bills.length.toLocaleString()} {t.bills.results}
+          </p>
+          {hasActiveFilters ? (
+            <Link
+              href="/bills"
+              className="inline-flex items-center gap-1.5 font-semibold text-accent transition-colors hover:text-hero-ink"
+            >
+              <X size={15} aria-hidden="true" />
+              {t.bills.clearFilters}
+            </Link>
+          ) : null}
+        </div>
+
         {bills.length > 0 ? (
           <div className="divide-y divide-border border-y border-border">
             {bills.map((bill) => (
@@ -247,6 +269,13 @@ export default async function BillsPage({
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">
               {t.bills.emptySupport}
             </p>
+            <Link
+              href="/bills/new"
+              className="mt-5 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            >
+              <FileText size={16} aria-hidden="true" />
+              {t.bills.create}
+            </Link>
           </div>
         )}
       </section>
