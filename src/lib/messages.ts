@@ -85,6 +85,8 @@ type MessageTree = {
     votes: string;
     comments: string;
     shares: string;
+    results: string;
+    clearFilters: string;
     emptyHeading: string;
     emptySupport: string;
     by: string;
@@ -209,6 +211,8 @@ export const messages: Record<Locale, MessageTree> = {
       votes: "votes",
       comments: "comments",
       shares: "shares",
+      results: "proposals",
+      clearFilters: "Clear filters",
       emptyHeading: "No published bills yet",
       emptySupport:
         "Create a draft, publish it from the bill detail page, and it will appear here for public review.",
@@ -337,6 +341,8 @@ export const messages: Record<Locale, MessageTree> = {
       votes: "വോട്ടുകൾ",
       comments: "അഭിപ്രായങ്ങൾ",
       shares: "പങ്കിടലുകൾ",
+      results: "നിർദേശങ്ങൾ",
+      clearFilters: "ഫിൽട്ടറുകൾ മായ്ക്കുക",
       emptyHeading: "ഇതുവരെ പ്രസിദ്ധീകരിച്ച ബില്ലുകളില്ല",
       emptySupport:
         "ഒരു ഡ്രാഫ്റ്റ് ഉണ്ടാക്കി ബിൽ വിശദാംശ പേജിൽ നിന്ന് പ്രസിദ്ധീകരിച്ചാൽ അത് ഇവിടെ കാണാം.",
