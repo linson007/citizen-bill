@@ -53,8 +53,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const billData = await getBillDetailData(slug);
-  const bill = billData?.bill;
+  const bill = await prisma.bill.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      description: true,
+      status: true,
+    },
+  });
 
   if (!bill || !isPublicBillStatus(bill.status)) {
     return {
