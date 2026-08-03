@@ -5,9 +5,7 @@ const MIGRATE_TIMEOUT_MS = 20_000;
 
 // Preview/dev builds should not migrate (and often lack Build-time DB env).
 if (vercelEnv !== "production") {
-  console.log(
-    `Skipping prisma migrate deploy (VERCEL_ENV=${vercelEnv}).`,
-  );
+  console.log(`Skipping prisma migrate deploy (VERCEL_ENV=${vercelEnv}).`);
   process.exit(0);
 }
 
@@ -74,7 +72,7 @@ if (canFallback) {
   }
   if (isConnectivityFailure(fallback)) {
     console.warn(
-      "Skipping failed prisma migrate deploy due to database connectivity; continuing with next build.",
+      "Database unreachable during build; migrations were skipped. Apply them from a network that can reach the database before relying on schema changes.",
     );
     process.exit(0);
   }
@@ -83,10 +81,9 @@ if (canFallback) {
 
 printResult(primary);
 
-// Do not block frontend deploys when the DB is temporarily unreachable.
 if (isConnectivityFailure(primary)) {
   console.warn(
-    "Skipping failed prisma migrate deploy due to database connectivity; continuing with next build.",
+    "Database unreachable during build; migrations were skipped. Apply them from a network that can reach the database before relying on schema changes.",
   );
   process.exit(0);
 }
