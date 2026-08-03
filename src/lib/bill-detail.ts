@@ -111,11 +111,49 @@ const getCachedBillDetailData = unstable_cache(
 );
 
 export async function getBillDetailData(slug: string) {
-  return getCachedBillDetailData(slug);
+  return hydrateBillDetailDates(await getCachedBillDetailData(slug));
 }
 
 export function revalidateBillDetailData() {
   revalidateTag(BILL_DETAIL_DATA_TAG, "max");
+}
+
+function hydrateBillDetailDates(
+  billData: Awaited<ReturnType<typeof getCachedBillDetailData>>,
+) {
+  if (!billData) {
+    return null;
+  }
+
+  return {
+    ...billData,
+    bill: {
+      ...billData.bill,
+      createdAt: toDate(billData.bill.createdAt),
+      updatedAt: toDate(billData.bill.updatedAt),
+      publishedAt: billData.bill.publishedAt
+        ? toDate(billData.bill.publishedAt)
+        : null,
+    },
+    comments: billData.comments.map((comment) => ({
+      ...comment,
+      createdAt: toDate(comment.createdAt),
+      updatedAt: toDate(comment.updatedAt),
+    })),
+    suggestions: billData.suggestions.map((suggestion) => ({
+      ...suggestion,
+      createdAt: toDate(suggestion.createdAt),
+      updatedAt: toDate(suggestion.updatedAt),
+    })),
+    versions: billData.versions.map((version) => ({
+      ...version,
+      createdAt: toDate(version.createdAt),
+    })),
+  };
+}
+
+function toDate(value: Date | string) {
+  return value instanceof Date ? value : new Date(value);
 }
 
 async function getAuthorStats(authorId: string) {
