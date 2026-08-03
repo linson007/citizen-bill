@@ -240,6 +240,7 @@ model Comment {
   updatedAt DateTime  @updatedAt
 
   @@index([billId])
+  @@index([billId, createdAt(sort: Desc)])
   @@index([userId])
   @@index([parentId])
 }
@@ -356,6 +357,7 @@ model AmendmentSuggestion {
   updatedAt DateTime         @updatedAt
 
   @@index([billId])
+  @@index([billId, createdAt(sort: Desc)])
   @@index([userId])
   @@index([status])
 }

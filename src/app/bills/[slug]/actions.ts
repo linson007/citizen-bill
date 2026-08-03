@@ -17,6 +17,7 @@ import {
   sanitizeUploadFileName,
 } from "@/lib/bill-uploads";
 import { sendEmailNotification } from "@/lib/email";
+import { revalidateBillDetailData } from "@/lib/bill-detail";
 import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
@@ -28,6 +29,11 @@ function redirectToBillLogin(formData: FormData): never {
       ? `/login?callbackUrl=${encodeURIComponent(`/bills/${slug}`)}`
       : "/login",
   );
+}
+
+function revalidateBillDetailPath(slug: string) {
+  revalidateBillDetailData();
+  revalidatePath(`/bills/${slug}`);
 }
 
 export async function publishBillAction(formData: FormData) {
@@ -99,7 +105,7 @@ export async function publishBillAction(formData: FormData) {
 
   revalidatePath("/bills");
   revalidateHomepageData();
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -263,7 +269,7 @@ export async function toggleVoteAction(formData: FormData) {
 
   revalidatePath("/bills");
   revalidateHomepageData();
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -320,7 +326,7 @@ export async function toggleSavedBillAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -377,7 +383,7 @@ export async function toggleFollowBillAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -455,7 +461,7 @@ export async function createCommentAction(formData: FormData) {
 
   revalidatePath("/bills");
   revalidateHomepageData();
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#comments`);
 }
@@ -568,7 +574,7 @@ export async function updateBillAction(formData: FormData) {
 
   revalidatePath("/bills");
   revalidateHomepageData();
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath(`/bills/${slug}/edit`);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
@@ -638,7 +644,7 @@ export async function uploadBillFileAction(formData: FormData) {
     },
   });
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   redirect(`/bills/${slug}?upload=ok`);
 }
 
@@ -833,7 +839,7 @@ export async function createSuggestionAction(formData: FormData) {
     message: `New amendment suggestion on a bill you follow: "${bill.title}".`,
   });
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#suggestions`);
 }
@@ -936,7 +942,7 @@ export async function reviewSuggestionAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#suggestions`);
 }
