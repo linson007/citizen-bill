@@ -46,9 +46,9 @@ export default async function BillsPage({
   const statusWhereValues = getPublicBillStatusWhereValues(selectedStatus);
   const hasActiveFilters = Boolean(
     query ||
-      selectedCategory ||
-      selectedStatus !== "all" ||
-      selectedSort !== "newest",
+    selectedCategory ||
+    selectedStatus !== "all" ||
+    selectedSort !== "newest",
   );
 
   const [bills, categories] = await Promise.all([
@@ -218,9 +218,7 @@ export default async function BillsPage({
                       {bill.category ? (
                         <Badge>{bill.category.name}</Badge>
                       ) : null}
-                      <Badge>
-                        {bill.status.replaceAll("_", " ").toLowerCase()}
-                      </Badge>
+                      <StatusBadge status={bill.status} />
                     </div>
                     <h2 className="font-display text-lg font-semibold leading-7 tracking-tight">
                       {formatDisplayTitle(bill.title)}
@@ -240,6 +238,7 @@ export default async function BillsPage({
                         icon={ThumbsUp}
                         value={bill._count.votes}
                         label={t.bills.votes}
+                        primary
                       />
                       <Metric
                         icon={MessageSquare}
@@ -382,8 +381,26 @@ function hasEngagement(counts: {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
+    <span className="rounded-md border border-border bg-surface-raised px-2.5 py-1 text-xs font-semibold text-ink-soft">
       {children}
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const label = status.replaceAll("_", " ").toLowerCase();
+  const tone =
+    status === "READY_FOR_REVIEW"
+      ? "bg-success-soft text-success"
+      : status === "UNDER_DISCUSSION"
+        ? "bg-warning-bg text-warning-ink"
+        : "bg-accent-soft text-accent";
+
+  return (
+    <span
+      className={`rounded-md px-2.5 py-1 text-xs font-semibold capitalize ${tone}`}
+    >
+      {label}
     </span>
   );
 }
@@ -392,13 +409,19 @@ function Metric({
   icon: Icon,
   value,
   label,
+  primary = false,
 }: {
   icon: typeof ThumbsUp;
   value: number;
   label: string;
+  primary?: boolean;
 }) {
   return (
-    <div className="flex h-10 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-semibold text-ink-soft">
+    <div
+      className={`flex h-10 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold ${
+        primary ? "bg-accent text-white" : "border border-border text-ink-soft"
+      }`}
+    >
       <Icon size={16} aria-hidden="true" />
       <span>{value.toLocaleString()}</span>
       <span className="sr-only">{label}</span>
