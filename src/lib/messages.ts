@@ -91,6 +91,9 @@ type MessageTree = {
     emptyHeading: string;
     emptySupport: string;
     by: string;
+    layoutLabel: string;
+    layoutList: string;
+    layoutGrid: string;
   };
   draft: {
     eyebrow: string;
@@ -219,6 +222,9 @@ export const messages: Record<Locale, MessageTree> = {
       emptySupport:
         "Create a draft, publish it from the bill detail page, and it will appear here for public review.",
       by: "By",
+      layoutLabel: "Layout",
+      layoutList: "List view",
+      layoutGrid: "Grid view",
     },
     draft: {
       eyebrow: "New bill draft",
@@ -350,6 +356,9 @@ export const messages: Record<Locale, MessageTree> = {
       emptySupport:
         "ഒരു ഡ്രാഫ്റ്റ് ഉണ്ടാക്കി ബിൽ വിശദാംശ പേജിൽ നിന്ന് പ്രസിദ്ധീകരിച്ചാൽ അത് ഇവിടെ കാണാം.",
       by: "രചയിതാവ്",
+      layoutLabel: "കാഴ്ച രീതി",
+      layoutList: "ലിസ്റ്റ് കാഴ്ച",
+      layoutGrid: "ഗ്രിഡ് കാഴ്ച",
     },
     draft: {
       eyebrow: "പുതിയ ബിൽ ഡ്രാഫ്റ്റ്",

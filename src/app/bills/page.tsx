@@ -1,13 +1,7 @@
 import Link from "next/link";
-import {
-  FileText,
-  MessageSquare,
-  Search,
-  Share2,
-  ThumbsUp,
-  X,
-} from "lucide-react";
+import { FileText, Search } from "lucide-react";
 
+import { BillResults, type BillResultsLabels } from "@/components/bill-results";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Prisma } from "@/generated/prisma/client";
@@ -22,9 +16,8 @@ import {
   type BillDiscoverySort,
   type PublicBillStatusFilter,
 } from "@/lib/bill-discovery";
-import { formatDisplayTitle } from "@/lib/display-title";
+import { serializeBillResults } from "@/lib/bill-results";
 import { prisma } from "@/lib/prisma";
-import { formatRelativeTime } from "@/lib/relative-time";
 import { getRequestMessages } from "@/lib/request-locale";
 
 export default async function BillsPage({
@@ -74,6 +67,19 @@ export default async function BillsPage({
       },
     }),
   ]);
+
+  const labels: BillResultsLabels = {
+    results: t.bills.results,
+    clearFilters: t.bills.clearFilters,
+    votes: t.bills.votes,
+    comments: t.bills.comments,
+    shares: t.bills.shares,
+    by: t.bills.by,
+    newProposal: t.bills.newProposal,
+    layoutLabel: t.bills.layoutLabel,
+    layoutList: t.bills.layoutList,
+    layoutGrid: t.bills.layoutGrid,
+  };
 
   return (
     <main
@@ -190,89 +196,13 @@ export default async function BillsPage({
           </button>
         </form>
 
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm">
-          <p className="font-medium text-ink-soft" aria-live="polite">
-            {bills.length.toLocaleString()} {t.bills.results}
-          </p>
-          {hasActiveFilters ? (
-            <Link
-              href="/bills"
-              className="inline-flex items-center gap-1.5 font-semibold text-accent transition-colors hover:text-hero-ink"
-            >
-              <X size={15} aria-hidden="true" />
-              {t.bills.clearFilters}
-            </Link>
-          ) : null}
-        </div>
-
         {bills.length > 0 ? (
-          <div className="divide-y divide-border border-y border-border">
-            {bills.map((bill) => (
-              <Link
-                key={bill.id}
-                href={`/bills/${bill.slug}`}
-                className="block py-5 transition-colors hover:bg-surface"
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <div className="mb-3 flex flex-wrap gap-2">
-                      {bill.category ? (
-                        <Badge>{bill.category.name}</Badge>
-                      ) : null}
-                      <StatusBadge status={bill.status} />
-                    </div>
-                    <h2 className="font-display text-lg font-semibold leading-7 tracking-tight">
-                      {formatDisplayTitle(bill.title)}
-                    </h2>
-                    <p className="mt-2 max-w-3xl line-clamp-3 text-sm leading-6 text-ink-muted">
-                      {bill.description}
-                    </p>
-                    <p className="mt-3 flex flex-wrap items-center gap-x-2 text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
-                      <span>
-                        {t.bills.by}{" "}
-                        {bill.author.displayName ??
-                          bill.author.name ??
-                          "Citizen"}
-                      </span>
-                      {bill.publishedAt ? (
-                        <>
-                          <span aria-hidden="true">·</span>
-                          <time dateTime={bill.publishedAt.toISOString()}>
-                            {formatRelativeTime(bill.publishedAt, locale)}
-                          </time>
-                        </>
-                      ) : null}
-                    </p>
-                  </div>
-
-                  {hasEngagement(bill._count) ? (
-                    <div className="flex shrink-0 gap-2">
-                      <Metric
-                        icon={ThumbsUp}
-                        value={bill._count.votes}
-                        label={t.bills.votes}
-                        primary
-                      />
-                      <Metric
-                        icon={MessageSquare}
-                        value={bill._count.comments}
-                        label={t.bills.comments}
-                      />
-                      <Metric
-                        icon={Share2}
-                        value={bill._count.shares}
-                        label={t.bills.shares}
-                      />
-                    </div>
-                  ) : (
-                    <p className="shrink-0 text-sm font-medium text-ink-muted">
-                      {t.bills.newProposal}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
+          <BillResults
+            bills={serializeBillResults(bills)}
+            locale={locale}
+            labels={labels}
+            hasActiveFilters={hasActiveFilters}
+          />
         ) : (
           <div className="border border-border bg-surface px-6 py-10 text-center">
             <h2 className="font-display text-lg font-semibold">
@@ -382,62 +312,4 @@ async function findPublicBills({
   });
 
   return sortBillsForDiscovery(relevanceSortedBills, sort);
-}
-
-function hasEngagement(counts: {
-  votes: number;
-  comments: number;
-  shares: number;
-}) {
-  return counts.votes + counts.comments + counts.shares > 0;
-}
-
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-md border border-border bg-surface-raised px-2.5 py-1 text-xs font-semibold text-ink-soft">
-      {children}
-    </span>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const label = status.replaceAll("_", " ").toLowerCase();
-  const tone =
-    status === "READY_FOR_REVIEW"
-      ? "bg-success-soft text-success"
-      : status === "UNDER_DISCUSSION"
-        ? "bg-warning-bg text-warning-ink"
-        : "bg-accent-soft text-accent";
-
-  return (
-    <span
-      className={`rounded-md px-2.5 py-1 text-xs font-semibold capitalize ${tone}`}
-    >
-      {label}
-    </span>
-  );
-}
-
-function Metric({
-  icon: Icon,
-  value,
-  label,
-  primary = false,
-}: {
-  icon: typeof ThumbsUp;
-  value: number;
-  label: string;
-  primary?: boolean;
-}) {
-  return (
-    <div
-      className={`flex h-10 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold ${
-        primary ? "bg-accent text-white" : "border border-border text-ink-soft"
-      }`}
-    >
-      <Icon size={16} aria-hidden="true" />
-      <span>{value.toLocaleString()}</span>
-      <span className="sr-only">{label}</span>
-    </div>
-  );
 }
