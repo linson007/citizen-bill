@@ -6,8 +6,7 @@ Authoritative open-product checklist for MattamUndo. The gaps table and near-ter
 
 ## High priority
 
-- [ ] **Public legislative lifecycle:** Make `SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, and `PASSED` publicly visible, and add author workflows for recording those outcomes. Today only `PUBLISHED`, `UNDER_DISCUSSION`, and `READY_FOR_REVIEW` are treated as public.
-- [ ] **Petition signatures:** Schema and helpers exist (`BillSignature`, `bill-signatures.ts`), but there is no bill-page action or UI to sign a bill, update a signature note, or show the signature count.
+- [x] **Simplified public lifecycle:** Bills now follow `DRAFT` → `PUBLISHED`. Votes, comments, and amendment suggestions do not change a bill's status; legislative-outreach outcomes are intentionally out of scope.
 - [ ] **Comment replies:** Use `Comment.parentId` to add threaded replies with appropriate moderation controls. Comments are flat in the UI today.
 - [ ] **Discovery filters:** Add tag filtering; decide whether `Bill.region` should be exposed in authoring/discovery or removed. Browse currently filters by query, category, public status, and sort only.
 - [ ] **Malayalam completeness:** Localized shared navigation, home, and bill discovery exist, but dashboard, notifications, profile, and much bill-detail copy remain English-first. Add Malayalam-aware search (discovery FTS is English `tsvector` today) and Unicode-capable PDF export (PDF uses Helvetica / Latin-focused).
