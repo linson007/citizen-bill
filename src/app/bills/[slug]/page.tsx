@@ -12,6 +12,7 @@ import {
   History,
   MessageSquare,
   Pencil,
+  PenLine,
   SendHorizontal,
   Send,
   Share2,
@@ -212,29 +213,88 @@ export default async function BillDetailPage({
           <p className="mt-4 max-w-3xl text-lg leading-8 text-[#4f4a40]">
             {bill.description}
           </p>
-          <div className="mt-5 flex flex-wrap gap-4 text-sm text-[#6d6658]">
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#6d6658]">
             <span className="flex items-center gap-2">
               <Calendar size={16} aria-hidden="true" />
               Created {bill.createdAt.toLocaleDateString("en-IN")}
             </span>
-            {hasEstablishedActivity ? (
-              <>
-                <span className="flex items-center gap-2">
-                  <ThumbsUp size={16} aria-hidden="true" />
-                  {bill._count.votes} votes
-                </span>
-                <span className="flex items-center gap-2">
-                  <MessageSquare size={16} aria-hidden="true" />
-                  {bill._count.comments} comments
-                </span>
-                <span className="flex items-center gap-2">
-                  <Share2 size={16} aria-hidden="true" />
-                  {bill._count.shares} shares
-                </span>
-              </>
+            <span className="flex items-center gap-2">
+              <ThumbsUp size={16} aria-hidden="true" />
+              {bill._count.votes} supporters
+            </span>
+            <span className="flex items-center gap-2">
+              <MessageSquare size={16} aria-hidden="true" />
+              {bill._count.comments} comments
+            </span>
+            <span className="flex items-center gap-2">
+              <SendHorizontal size={16} aria-hidden="true" />
+              {bill._count.suggestions} amendments
+            </span>
+            {hasEstablishedActivity && categoryRank >= 0 ? (
+              <span className="flex items-center gap-2 font-semibold text-[#123c69]">
+                <ChartNoAxesColumn size={16} aria-hidden="true" />
+                #{categoryRank + 1} in {bill.category?.name ?? "category"}
+              </span>
             ) : (
               <span>New public proposal — be the first to contribute.</span>
             )}
+          </div>
+        </div>
+
+        <div className="sticky top-0 z-20 border-t border-[#d8d2c4] bg-[#fbfaf7]/95 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-5 py-3 sm:px-8">
+            {isPublicBill && !isAuthor ? (
+              <form action={toggleVoteAction}>
+                <input type="hidden" name="slug" value={bill.slug} />
+                <button
+                  type="submit"
+                  className={`flex h-11 items-center gap-2 rounded-md px-5 text-sm font-semibold shadow-sm transition-colors ${
+                    userVote
+                      ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                      : "bg-[#123c69] text-white hover:bg-[#0d2f54]"
+                  }`}
+                >
+                  <ThumbsUp size={17} aria-hidden="true" />
+                  {userVote
+                    ? `Supported · ${bill._count.votes}`
+                    : `Support this bill · ${bill._count.votes}`}
+                </button>
+              </form>
+            ) : null}
+            {isAuthor ? (
+              <Link
+                href={`/bills/${bill.slug}/edit`}
+                className="flex h-11 items-center gap-2 rounded-md bg-[#123c69] px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#0d2f54]"
+              >
+                <Pencil size={17} aria-hidden="true" />
+                Edit bill
+              </Link>
+            ) : null}
+            {isPublicBill ? (
+              <>
+                <a
+                  href="#comments"
+                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                >
+                  <MessageSquare size={17} aria-hidden="true" />
+                  Discuss
+                </a>
+                <a
+                  href="#suggestions"
+                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                >
+                  <PenLine size={17} aria-hidden="true" />
+                  Suggest amendment
+                </a>
+                <a
+                  href="#share"
+                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                >
+                  <Share2 size={17} aria-hidden="true" />
+                  Share
+                </a>
+              </>
+            ) : null}
           </div>
         </div>
       </section>
@@ -578,40 +638,10 @@ export default async function BillDetailPage({
             </form>
           ) : null}
 
-          {isPublicBill && !isAuthor ? (
-            <form
-              action={toggleVoteAction}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
-            >
-              <input type="hidden" name="slug" value={bill.slug} />
-              <h2 className="font-semibold">Public support</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
-                {bill._count.votes} people have supported this bill.
-              </p>
-              <button
-                type="submit"
-                className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm ${
-                  userVote
-                    ? "border border-[#c8c0ae] bg-white text-[#2f2a22]"
-                    : "bg-[#123c69] text-white"
-                }`}
-              >
-                <ThumbsUp size={17} aria-hidden="true" />
-                {userVote ? "Remove vote" : "Support this bill"}
-              </button>
-            </form>
-          ) : isPublicBill && isAuthor ? (
-            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-              <h2 className="font-semibold">Public support</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
-                {bill._count.votes} people have supported this bill. Authors
-                cannot vote on their own proposals.
-              </p>
-            </div>
-          ) : null}
-
           {isPublicBill ? (
-            <SharePanel slug={bill.slug} url={billUrl} text={shareText} />
+            <div id="share">
+              <SharePanel slug={bill.slug} url={billUrl} text={shareText} />
+            </div>
           ) : null}
 
           <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
