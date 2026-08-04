@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { isBillSectionHash } from "@/lib/bill-text";
+
 const TABS = [
   { id: "summary", label: "Summary" },
   { id: "comments", label: "Discussion" },
@@ -33,13 +35,26 @@ export function BillTabs({
 
   useEffect(() => {
     const onHashChange = () => {
-      const next = tabFromHash(window.location.hash);
+      const hash = window.location.hash;
+      const next = tabFromHash(hash);
       if (next) {
         setActive(next);
         requestAnimationFrame(() => {
           containerRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
+          });
+        });
+        return;
+      }
+
+      if (isBillSectionHash(hash)) {
+        setActive("summary");
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document
+              .getElementById(hash.slice(1))
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
           });
         });
       }
