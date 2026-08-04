@@ -5,6 +5,10 @@ import OpenAI from "openai";
 import { authOptions } from "@/lib/auth";
 import { getOpenAiModel } from "@/lib/ai-config";
 import {
+  parseAiTitleCategorySuggestion,
+  type AiTitleCategorySuggestion,
+} from "@/lib/ai-draft-fields";
+import {
   checkAiGuardrails,
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
@@ -15,6 +19,7 @@ import {
   recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
+import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
 
 type StructuredDraft = {
   description: string;
@@ -36,6 +41,8 @@ const modes = {
     "Summarize the bill idea into purpose, affected people, key duties, and expected public impact.",
   arguments:
     "Generate practical supporting arguments and likely objections or risks for public discussion.",
+  suggest:
+    "Suggest a concise, specific public-bill title and the single best matching category for the problem statement. Return JSON for author review.",
 } as const;
 
 type AiMode = keyof typeof modes;
@@ -101,6 +108,16 @@ export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
     await recordAiUsage(session.user.id, "ai-draft");
 
+    if (mode === "suggest") {
+      const suggestion = createFallbackSuggestion(prompt);
+
+      return NextResponse.json({
+        text: formatSuggestionPreview(suggestion),
+        fields: null,
+        suggestion,
+      });
+    }
+
     if (mode !== "draft" && mode !== "legal") {
       return NextResponse.json({
         text: createFallbackText(title, prompt, mode),
@@ -131,7 +148,7 @@ export async function POST(request: Request) {
         },
       ],
       response_format:
-        mode === "draft" || mode === "legal"
+        mode === "draft" || mode === "legal" || mode === "suggest"
           ? { type: "json_object" }
           : { type: "text" },
     });
@@ -139,6 +156,17 @@ export async function POST(request: Request) {
     await recordAiUsage(session.user.id, "ai-draft");
 
     const raw = completion.choices[0]?.message.content ?? "{}";
+
+    if (mode === "suggest") {
+      const suggestion =
+        parseAiTitleCategorySuggestion(raw) ?? createFallbackSuggestion(prompt);
+
+      return NextResponse.json({
+        text: formatSuggestionPreview(suggestion),
+        fields: null,
+        suggestion,
+      });
+    }
 
     if (mode !== "draft" && mode !== "legal") {
       return NextResponse.json({
@@ -190,6 +218,21 @@ function isAiMode(value: string | undefined): value is AiMode {
 }
 
 function buildPrompt(title: string, prompt: string, mode: AiMode) {
+  if (mode === "suggest") {
+    return [
+      `Problem statement:\n${prompt}`,
+      "",
+      "Return only valid JSON with these string keys:",
+      "title, category.",
+      "The title must be concise, specific, and suitable for a public bill.",
+      `The category must be exactly one of: ${billCategories
+        .map((category) =>
+          category === OTHER_BILL_CATEGORY ? "Other" : category,
+        )
+        .join(", ")}.`,
+    ].join("\n");
+  }
+
   if (mode === "draft" || mode === "legal") {
     return [
       `Bill title: ${title}`,
@@ -209,6 +252,56 @@ function buildPrompt(title: string, prompt: string, mode: AiMode) {
     "",
     "Return concise, useful text. Do not return JSON.",
   ].join("\n");
+}
+
+function createFallbackSuggestion(prompt: string): AiTitleCategorySuggestion {
+  const normalized = prompt.toLowerCase();
+  const category =
+    [
+      {
+        category: "Health",
+        keywords: ["hospital", "health", "medicine", "medical"],
+      },
+      {
+        category: "Education",
+        keywords: ["school", "education", "student", "college"],
+      },
+      {
+        category: "Environment",
+        keywords: ["water", "river", "waste", "pollution", "environment"],
+      },
+      {
+        category: "Transport",
+        keywords: ["road", "transport", "bus", "traffic"],
+      },
+      {
+        category: "Agriculture",
+        keywords: ["farm", "farmer", "agriculture", "crop"],
+      },
+    ].find(({ keywords }) =>
+      keywords.some((keyword) => normalized.includes(keyword)),
+    )?.category ?? OTHER_BILL_CATEGORY;
+  const topic = prompt
+    .replace(/\s+/g, " ")
+    .replace(/[.!?].*$/, "")
+    .trim()
+    .slice(0, 90);
+
+  return {
+    title: topic ? `${topic} Bill` : "Public Services Accountability Bill",
+    category:
+      category === OTHER_BILL_CATEGORY
+        ? OTHER_BILL_CATEGORY
+        : (billCategories.find(
+            (candidate) => candidate.toLowerCase() === category,
+          ) ?? OTHER_BILL_CATEGORY),
+  };
+}
+
+function formatSuggestionPreview(suggestion: AiTitleCategorySuggestion) {
+  return `Suggested title: ${suggestion.title}\nSuggested category: ${
+    suggestion.category === OTHER_BILL_CATEGORY ? "Other" : suggestion.category
+  }`;
 }
 
 function parseStructuredDraft(value: string): StructuredDraft | null {

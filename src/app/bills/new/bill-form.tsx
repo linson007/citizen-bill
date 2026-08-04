@@ -3,7 +3,15 @@
 import { useActionState, useSyncExternalStore } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { FileText, History, Send, Save, Trash2 } from "lucide-react";
+import {
+  FileText,
+  History,
+  Lightbulb,
+  Loader2,
+  Send,
+  Save,
+  Trash2,
+} from "lucide-react";
 
 import { createBillAction, type BillFormState } from "@/app/bills/new/actions";
 import {
@@ -21,6 +29,8 @@ import {
   type StoredBillDraft,
 } from "@/lib/draft-storage";
 import { formatRelativeTime } from "@/lib/relative-time";
+import type { MessageTree } from "@/lib/messages";
+import type { AiTitleCategorySuggestion } from "@/lib/ai-draft-fields";
 
 const initialState: BillFormState = {};
 const AUTOSAVE_DELAY_MS = 600;
@@ -29,7 +39,13 @@ function subscribeToBillDraft() {
   return () => {};
 }
 
-export function BillForm() {
+type SuggestionLabels = MessageTree["draft"]["suggestions"];
+
+export function BillForm({
+  suggestionLabels,
+}: {
+  suggestionLabels: SuggestionLabels;
+}) {
   const snapshotRef = useRef<StoredBillDraft | null | undefined>(undefined);
 
   const restoredDraft = useSyncExternalStore(
@@ -48,14 +64,17 @@ export function BillForm() {
     <BillFormEditor
       key={restoredDraft?.savedAt ?? "fresh"}
       restoredDraft={restoredDraft}
+      suggestionLabels={suggestionLabels}
     />
   );
 }
 
 function BillFormEditor({
   restoredDraft,
+  suggestionLabels,
 }: {
   restoredDraft: StoredBillDraft | null;
+  suggestionLabels: SuggestionLabels;
 }) {
   const [state, formAction] = useActionState(createBillAction, initialState);
   const [fields, setFields] = useState<BillDraftFields>(() =>
@@ -75,6 +94,10 @@ function BillFormEditor({
         },
   );
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [suggestion, setSuggestion] =
+    useState<AiTitleCategorySuggestion | null>(null);
+  const [suggestionError, setSuggestionError] = useState("");
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
   const lastSavedSnapshotRef = useRef(JSON.stringify(fields));
   const submittedRef = useRef(false);
 
@@ -140,6 +163,46 @@ function BillFormEditor({
     }));
   }
 
+  async function suggestTitleAndCategory() {
+    const problem = fields.problem.trim();
+
+    if (!problem) {
+      setSuggestionError(suggestionLabels.problemRequired);
+      setSuggestion(null);
+      return;
+    }
+
+    setSuggestionLoading(true);
+    setSuggestionError("");
+
+    try {
+      const response = await fetch("/api/ai/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: fields.title,
+          prompt: problem,
+          mode: "suggest",
+        }),
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        suggestion?: AiTitleCategorySuggestion;
+      };
+
+      if (!response.ok || !data.suggestion) {
+        setSuggestionError(data.error ?? suggestionLabels.error);
+        return;
+      }
+
+      setSuggestion(data.suggestion);
+    } catch {
+      setSuggestionError(suggestionLabels.error);
+    } finally {
+      setSuggestionLoading(false);
+    }
+  }
+
   return (
     <form action={formAction} onSubmit={handleSubmit} className="space-y-10">
       {restoredDraft && !bannerDismissed ? (
@@ -191,6 +254,79 @@ function BillFormEditor({
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
             <FormSection title="Bill details">
+              <div className="rounded-md border border-[#c9d9e8] bg-[#f4f8fb] p-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
+                    <Lightbulb
+                      size={16}
+                      aria-hidden="true"
+                      className="shrink-0 text-[#123c69]"
+                    />
+                    {suggestionLabels.help}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={suggestTitleAndCategory}
+                    disabled={suggestionLoading}
+                    className="flex h-9 items-center gap-1.5 rounded-md bg-[#123c69] px-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {suggestionLoading ? (
+                      <Loader2
+                        className="animate-spin"
+                        size={14}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Lightbulb size={14} aria-hidden="true" />
+                    )}
+                    {suggestionLabels.button}
+                  </button>
+                </div>
+                {suggestionError ? (
+                  <p className="mt-3 text-sm text-[#8a3b12]" role="status">
+                    {suggestionError}
+                  </p>
+                ) : null}
+                {suggestion ? (
+                  <div
+                    className="mt-3 flex flex-wrap items-center gap-2"
+                    role="status"
+                  >
+                    <span className="text-xs font-semibold text-[#3f3a32]">
+                      {suggestionLabels.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateField("title", suggestion.title)}
+                      className="rounded-full border border-[#123c69] bg-white px-3 py-1.5 text-xs font-semibold text-[#123c69]"
+                    >
+                      {suggestion.title} · {suggestionLabels.useTitle}
+                    </button>
+                    <span className="text-xs font-semibold text-[#3f3a32]">
+                      {suggestionLabels.category}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateField("category", suggestion.category)
+                      }
+                      className="rounded-full border border-[#123c69] bg-white px-3 py-1.5 text-xs font-semibold text-[#123c69]"
+                    >
+                      {suggestion.category === OTHER_BILL_CATEGORY
+                        ? "Other"
+                        : suggestion.category}{" "}
+                      · {suggestionLabels.useCategory}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSuggestion(null)}
+                      className="px-1 text-xs font-semibold text-[#6d6658] underline underline-offset-2"
+                    >
+                      {suggestionLabels.dismiss}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
               <Field
                 label="Title"
                 name="title"
