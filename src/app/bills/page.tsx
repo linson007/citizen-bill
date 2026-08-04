@@ -79,6 +79,7 @@ export default async function BillsPage({
     layoutLabel: t.bills.layoutLabel,
     layoutList: t.bills.layoutList,
     layoutGrid: t.bills.layoutGrid,
+    keyboardHint: t.bills.keyboardHint,
   };
 
   return (
@@ -122,6 +123,7 @@ export default async function BillsPage({
             />
             <input
               name="q"
+              data-bill-search
               defaultValue={query}
               placeholder={t.bills.searchPlaceholder}
               className="h-11 w-full rounded-md border border-border-strong bg-surface-raised pl-10 pr-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
