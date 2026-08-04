@@ -231,30 +231,11 @@ export async function toggleVoteAction(formData: FormData) {
       },
     });
   } else {
-    await prisma.$transaction(async (tx) => {
-      await tx.vote.create({
-        data: {
-          billId: bill.id,
-          userId: session.user.id,
-        },
-      });
-
-      const voteCount = await tx.vote.count({
-        where: {
-          billId: bill.id,
-        },
-      });
-
-      if (voteCount >= 25 && bill.status !== "READY_FOR_REVIEW") {
-        await tx.bill.update({
-          where: {
-            id: bill.id,
-          },
-          data: {
-            status: "READY_FOR_REVIEW",
-          },
-        });
-      }
+    await prisma.vote.create({
+      data: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
     });
 
     if (bill.authorId !== session.user.id) {
@@ -420,27 +401,13 @@ export async function createCommentAction(formData: FormData) {
     redirect(`/bills/${slug}`);
   }
 
-  await prisma.$transaction([
-    prisma.comment.create({
-      data: {
-        billId: bill.id,
-        userId: session.user.id,
-        body: body.slice(0, 2000),
-      },
-    }),
-    ...(bill.status === "PUBLISHED"
-      ? [
-          prisma.bill.update({
-            where: {
-              id: bill.id,
-            },
-            data: {
-              status: "UNDER_DISCUSSION" as const,
-            },
-          }),
-        ]
-      : []),
-  ]);
+  await prisma.comment.create({
+    data: {
+      billId: bill.id,
+      userId: session.user.id,
+      body: body.slice(0, 2000),
+    },
+  });
 
   if (bill.authorId !== session.user.id) {
     await notifyUser({
@@ -799,28 +766,14 @@ export async function createSuggestionAction(formData: FormData) {
     redirect(`/bills/${slug}`);
   }
 
-  await prisma.$transaction([
-    prisma.amendmentSuggestion.create({
-      data: {
-        billId: bill.id,
-        userId: session.user.id,
-        section: section || null,
-        body: body.slice(0, 3000),
-      },
-    }),
-    ...(bill.status === "PUBLISHED"
-      ? [
-          prisma.bill.update({
-            where: {
-              id: bill.id,
-            },
-            data: {
-              status: "UNDER_DISCUSSION" as const,
-            },
-          }),
-        ]
-      : []),
-  ]);
+  await prisma.amendmentSuggestion.create({
+    data: {
+      billId: bill.id,
+      userId: session.user.id,
+      section: section || null,
+      body: body.slice(0, 3000),
+    },
+  });
 
   if (bill.authorId !== session.user.id) {
     await notifyUser({

@@ -56,8 +56,8 @@ MattamUndo is a public participation layer for legislative drafting:
 | Public bills | Detail pages with metadata, Open Graph / Twitter previews, analytics counts |
 | Engagement | One vote per user, save/unsave, follow/unfollow, flat comments, amendment suggestions with author accept / reject / merge |
 | Notifications | In-app notifications for votes, comments, suggestions, and followed-bill activity; mark-as-read |
-| Discovery | `/bills` search (Postgres full-text), category filter, public status filter, sort (trending, newest, most supported, most discussed) |
-| Status automation | Comment or suggestion on a `PUBLISHED` bill → `UNDER_DISCUSSION`; ≥25 votes → `READY_FOR_REVIEW` |
+| Discovery | `/bills` search (Postgres full-text), category filter, sort (trending, newest, most supported, most discussed) |
+| Bill lifecycle | `DRAFT` → `PUBLISHED`; votes, comments, and amendment suggestions leave the published status unchanged |
 | Versions | Version snapshots on publish/update, version detail pages, side-by-side compare |
 | Export | Public bill PDF and DOCX export |
 | Sharing | WhatsApp, X, Facebook, LinkedIn, Telegram, copy link, share event tracking |
@@ -72,8 +72,6 @@ Living checklist: [`GAP.md`](GAP.md) (reconfirmed August 2, 2026). Compared with
 
 | Gap | Status | Notes |
 | --- | --- | --- |
-| Legislative outreach statuses in product UX | Enum only | `SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, `PASSED` are not public or first-class author workflows; public statuses today are `PUBLISHED`, `UNDER_DISCUSSION`, `READY_FOR_REVIEW` |
-| Petition signatures (`BillSignature`) | Schema + helpers only | No bill-page action or UI to sign / update a petition note or show counts |
 | Threaded comment replies | Schema has `parentId` | UI posts and lists flat comments only |
 | Tag filters / `Bill.region` | Partial | Tags stored on bills; browse filters by query, category, status, and sort — not by tag. `region` is schema-only — expose or remove |
 | Malayalam product UI | Partial | Nav, home, and bill discovery are localized; dashboard, notifications, profile, and much bill-detail copy remain English-first. Discovery FTS is English `tsvector`; PDF export is Helvetica / Latin-focused |
@@ -277,9 +275,7 @@ Important relationships:
 Current statuses in the enum:
 
 - Draft
-- Ready for Review *(auto when a public bill reaches 25 votes)*
 - Published
-- Under Discussion *(auto when comments or suggestions land on a published bill)*
 - Archived
 - Reported
 - Removed
@@ -288,9 +284,9 @@ Current statuses in the enum:
 - Rejected *(enum reserved)*
 - Passed *(enum reserved)*
 
-Publicly listable statuses today: `PUBLISHED`, `UNDER_DISCUSSION`, `READY_FOR_REVIEW`.
+The public lifecycle is intentionally limited to `DRAFT` → `PUBLISHED`. Votes, comments, and amendment suggestions do not alter the status. Existing `UNDER_DISCUSSION` and `READY_FOR_REVIEW` records are migrated to `PUBLISHED`.
 
-Future product work should expose the legislative outreach statuses as deliberate author/moderator actions, not only database values.
+Legislative outreach statuses remain reserved database values and are not part of the product workflow.
 
 ## 10. Moderation and Safety
 
@@ -363,7 +359,7 @@ Practices in use:
 ### Phase 6 - Public Participation — mostly done
 
 - Voting, comments, amendment review, sharing, category filters, search, discovery sorts.
-- Remaining: threaded replies, tag filters, petition signatures UI.
+- Remaining: threaded replies and tag filters.
 
 ### Phase 7 - Dashboard — mostly done
 
@@ -384,23 +380,19 @@ Practices in use:
 
 Priority gaps to close next (see [`GAP.md`](GAP.md) for the full checklist):
 
-1. Public legislative lifecycle statuses and author workflows (`SUBMITTED_TO_MLA`, `INTRODUCED_AS_PRIVATE_BILL`, `REJECTED`, `PASSED`).
-2. Wire petition signatures end-to-end (sign / update note / counts on bill page).
-3. Threaded comment replies using existing `parentId`.
-4. Tag filter on public discovery; decide whether to expose or remove `Bill.region`.
-5. Malayalam completeness for dashboard, notifications, profile, and bill detail; Malayalam-aware search and Unicode PDF export.
-6. Dedicated “bills I voted on” list (dashboard and/or paginated profile).
-7. Attachment remove/replace with Vercel Blob delete.
-8. Email provider for notification delivery.
-9. Discovery pagination / cursor loading.
-10. Analytics and error tracking.
+1. Threaded comment replies using existing `parentId`.
+2. Tag filter on public discovery; decide whether to expose or remove `Bill.region`.
+3. Malayalam completeness for dashboard, notifications, profile, and bill detail; Malayalam-aware search and Unicode PDF export.
+4. Dedicated “bills I voted on” list (dashboard and/or paginated profile).
+5. Attachment remove/replace with Vercel Blob delete.
+6. Email provider for notification delivery.
+7. Discovery pagination / cursor loading.
+8. Analytics and error tracking.
 
 ## 14. Future Enhancements
 
 - Full Malayalam interface and bilingual bill drafting UX beyond the localized nav/home/discovery chrome.
 - Legislative format templates.
-- Public petitions attached to bills (beyond the unfinished signature model).
-- MLA outreach workflow using reserved statuses.
 - Organization accounts for NGOs and civic groups.
 - Verified expert review badges.
 - API for public civic data access.

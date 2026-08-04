@@ -7,16 +7,13 @@ import { SiteHeader } from "@/components/site-header";
 import { Prisma } from "@/generated/prisma/client";
 import {
   BILL_DISCOVERY_SORT_OPTIONS,
-  PUBLIC_BILL_STATUS_FILTER_OPTIONS,
   getBillDiscoveryOrderBy,
-  getPublicBillStatusWhereValues,
   parseBillDiscoverySort,
-  parsePublicBillStatusFilter,
   sortBillsForDiscovery,
   type BillDiscoverySort,
-  type PublicBillStatusFilter,
 } from "@/lib/bill-discovery";
 import { serializeBillResults } from "@/lib/bill-results";
+import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 import { getRequestMessages } from "@/lib/request-locale";
 
@@ -27,22 +24,16 @@ export default async function BillsPage({
     q?: string;
     category?: string;
     sort?: string;
-    status?: string;
   }>;
 }) {
-  const { q, category, sort, status } = await searchParams;
+  const { q, category, sort } = await searchParams;
   const { locale, t } = await getRequestMessages();
   const copyClass = locale === "ml" ? "font-malayalam" : "";
   const query = q?.trim();
   const selectedCategory = category?.trim();
   const selectedSort = parseBillDiscoverySort(sort);
-  const selectedStatus = parsePublicBillStatusFilter(status);
-  const statusWhereValues = getPublicBillStatusWhereValues(selectedStatus);
   const hasActiveFilters = Boolean(
-    query ||
-    selectedCategory ||
-    selectedStatus !== "all" ||
-    selectedSort !== "newest",
+    query || selectedCategory || selectedSort !== "newest",
   );
 
   const [bills, categories] = await Promise.all([
@@ -50,14 +41,13 @@ export default async function BillsPage({
       query,
       selectedCategory,
       sort: selectedSort,
-      statusFilter: selectedStatus,
     }),
     prisma.category.findMany({
       where: {
         bills: {
           some: {
             status: {
-              in: statusWhereValues,
+              in: [...PUBLIC_BILL_STATUSES],
             },
           },
         },
@@ -113,7 +103,7 @@ export default async function BillsPage({
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <form className="mb-5 grid gap-3 rounded-md border border-border bg-surface-raised p-4 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px_180px_auto]">
+        <form className="mb-5 grid gap-3 rounded-md border border-border bg-surface-raised p-4 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px_auto]">
           <label className="relative block sm:col-span-2 lg:col-auto">
             <span className="sr-only">{t.bills.searchPlaceholder}</span>
             <Search
@@ -140,29 +130,6 @@ export default async function BillsPage({
             {categories.map((item) => (
               <option key={item.id} value={item.slug}>
                 {item.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            name="status"
-            defaultValue={selectedStatus}
-            aria-label={t.bills.statusFilter}
-            className="h-11 rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
-          >
-            {PUBLIC_BILL_STATUS_FILTER_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {
-                  t.bills[
-                    option.value === "all"
-                      ? "allPublicStatuses"
-                      : option.value === "published"
-                        ? "published"
-                        : option.value === "under-discussion"
-                          ? "underDiscussion"
-                          : "readyForReview"
-                  ]
-                }
               </option>
             ))}
           </select>
@@ -232,14 +199,12 @@ async function findPublicBills({
   query,
   selectedCategory,
   sort,
-  statusFilter,
 }: {
   query?: string;
   selectedCategory?: string;
   sort: BillDiscoverySort;
-  statusFilter: PublicBillStatusFilter;
 }) {
-  const statusWhereValues = getPublicBillStatusWhereValues(statusFilter);
+  const statusWhereValues = [...PUBLIC_BILL_STATUSES];
   const include = {
     author: true,
     category: true,
