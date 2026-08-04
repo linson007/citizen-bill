@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Scale } from "lucide-react";
+import { Bell, Plus, Scale } from "lucide-react";
 import { getServerSession } from "next-auth";
 
 import { AccountMenu } from "@/components/account-menu";
@@ -7,6 +7,7 @@ import { LocaleToggle } from "@/components/locale-toggle";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLink } from "@/components/nav-link";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { getRequestMessages } from "@/lib/request-locale";
 
 export async function SiteHeader() {
@@ -14,6 +15,11 @@ export async function SiteHeader() {
   const { locale, t } = await getRequestMessages();
   const canModerate =
     session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
+  const unreadNotificationCount = session?.user?.id
+    ? await prisma.notification.count({
+        where: { userId: session.user.id, readAt: null },
+      })
+    : 0;
 
   const publicLinks = [{ href: "/bills", label: t.nav.bills }];
 
@@ -75,6 +81,26 @@ export async function SiteHeader() {
           >
             {t.nav.bills}
           </NavLink>
+          {session?.user ? (
+            <Link
+              href="/notifications"
+              aria-label={`${t.nav.notifications}${
+                unreadNotificationCount > 0
+                  ? ` (${unreadNotificationCount} unread)`
+                  : ""
+              }`}
+              className="relative grid size-11 place-items-center rounded-md border border-border-strong bg-surface-raised text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            >
+              <Bell size={18} aria-hidden="true" />
+              {unreadNotificationCount > 0 ? (
+                <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] font-bold leading-5 text-white">
+                  {unreadNotificationCount > 99
+                    ? "99+"
+                    : unreadNotificationCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
           <AccountMenu
             labels={{
               account: t.nav.account,
