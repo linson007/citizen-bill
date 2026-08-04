@@ -34,6 +34,7 @@ import {
   uploadBillFileAction,
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
+import { BillTabs } from "@/components/bill-tabs";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
@@ -198,7 +199,7 @@ export default async function BillDetailPage({
   return (
     <main
       id="main-content"
-      className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]"
+      className="flex min-h-screen flex-col bg-[#f7f6f2] pb-20 text-[#161616] lg:pb-0"
     >
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
@@ -232,8 +233,8 @@ export default async function BillDetailPage({
             </span>
             {hasEstablishedActivity && categoryRank >= 0 ? (
               <span className="flex items-center gap-2 font-semibold text-[#123c69]">
-                <ChartNoAxesColumn size={16} aria-hidden="true" />
-                #{categoryRank + 1} in {bill.category?.name ?? "category"}
+                <ChartNoAxesColumn size={16} aria-hidden="true" />#
+                {categoryRank + 1} in {bill.category?.name ?? "category"}
               </span>
             ) : (
               <span>New public proposal — be the first to contribute.</span>
@@ -300,7 +301,7 @@ export default async function BillDetailPage({
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_320px]">
-        <article className="space-y-5">
+        <article>
           {isPublicBill ? (
             <BillEngagementPrompt
               slug={bill.slug}
@@ -308,234 +309,297 @@ export default async function BillDetailPage({
               hasEstablishedActivity={hasEstablishedActivity}
             />
           ) : null}
-          <ContentBlock title="Problem statement" content={bill.problem} />
-          <ContentBlock
-            title="Proposed solution"
-            content={bill.proposedSolution}
-          />
-          <ContentBlock
-            title="Expected impact"
-            content={bill.expectedImpact}
-            hideWhenEmpty
-          />
-          <ContentBlock title="Draft bill text" content={bill.body} formatted />
-          <ContentBlock
-            title="References and supporting links"
-            content={bill.references}
-            hideWhenEmpty
-          />
-
-          {isPublicBill ? (
-            <section
-              id="comments"
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
-            >
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-semibold">Comments</h2>
-                  <p className="text-sm text-[#6d6658]">
-                    Discuss public impact, gaps, and improvements.
-                  </p>
+          <BillTabs
+            counts={{
+              comments: comments.length,
+              suggestions: suggestions.length,
+              versions: versions.length,
+            }}
+            sections={{
+              summary: (
+                <div className="space-y-5">
+                  <ContentBlock
+                    title="Problem statement"
+                    content={bill.problem}
+                  />
+                  <ContentBlock
+                    title="Proposed solution"
+                    content={bill.proposedSolution}
+                  />
+                  <ContentBlock
+                    title="Expected impact"
+                    content={bill.expectedImpact}
+                    hideWhenEmpty
+                  />
+                  <ContentBlock
+                    title="Draft bill text"
+                    content={bill.body}
+                    formatted
+                  />
+                  <ContentBlock
+                    title="References and supporting links"
+                    content={bill.references}
+                    hideWhenEmpty
+                  />
                 </div>
-                <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
-                  {comments.length}
-                </span>
-              </div>
-
-              {session?.user ? (
-                <form action={createCommentAction} className="mb-5">
-                  <input type="hidden" name="slug" value={bill.slug} />
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[#3f3a32]">
-                      Add a comment
-                    </span>
-                    <textarea
-                      name="body"
-                      rows={4}
-                      minLength={3}
-                      maxLength={2000}
-                      required
-                      placeholder="Share a question, concern, or suggestion for improving this bill."
-                      className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
-                  >
-                    <SendHorizontal size={16} aria-hidden="true" />
-                    Post comment
-                  </button>
-                </form>
-              ) : (
-                <Link
-                  href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#comments`)}`}
-                  className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+              ),
+              comments: isPublicBill ? (
+                <section
+                  id="comments"
+                  className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
                 >
-                  Sign in to comment
-                </Link>
-              )}
+                  <div className="mb-5 flex items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-lg font-semibold">Comments</h2>
+                      <p className="text-sm text-[#6d6658]">
+                        Discuss public impact, gaps, and improvements.
+                      </p>
+                    </div>
+                    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+                      {comments.length}
+                    </span>
+                  </div>
 
-              {comments.length > 0 ? (
-                <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
-                  {comments.map((comment) => (
-                    <article key={comment.id} className="py-4">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <p className="font-semibold">
-                          {comment.user.displayName ??
-                            comment.user.name ??
-                            "Citizen"}
-                        </p>
-                        <span className="text-xs text-[#8a8170]">
-                          {comment.createdAt.toLocaleDateString("en-IN", {
+                  {session?.user ? (
+                    <form action={createCommentAction} className="mb-5">
+                      <input type="hidden" name="slug" value={bill.slug} />
+                      <label className="block">
+                        <span className="text-sm font-semibold text-[#3f3a32]">
+                          Add a comment
+                        </span>
+                        <textarea
+                          name="body"
+                          rows={4}
+                          minLength={3}
+                          maxLength={2000}
+                          required
+                          placeholder="Share a question, concern, or suggestion for improving this bill."
+                          className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                        />
+                      </label>
+                      <button
+                        type="submit"
+                        className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                      >
+                        <SendHorizontal size={16} aria-hidden="true" />
+                        Post comment
+                      </button>
+                    </form>
+                  ) : (
+                    <Link
+                      href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#comments`)}`}
+                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                    >
+                      Sign in to comment
+                    </Link>
+                  )}
+
+                  {comments.length > 0 ? (
+                    <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
+                      {comments.map((comment) => (
+                        <article key={comment.id} className="py-4">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <p className="font-semibold">
+                              {comment.user.displayName ??
+                                comment.user.name ??
+                                "Citizen"}
+                            </p>
+                            <span className="text-xs text-[#8a8170]">
+                              {comment.createdAt.toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+                            {comment.body}
+                          </p>
+                          {session?.user ? (
+                            <form action={reportCommentAction} className="mt-2">
+                              <input
+                                type="hidden"
+                                name="slug"
+                                value={bill.slug}
+                              />
+                              <input
+                                type="hidden"
+                                name="commentId"
+                                value={comment.id}
+                              />
+                              <button
+                                type="submit"
+                                className="text-xs font-semibold text-[#8a3a2f]"
+                              >
+                                Report comment
+                              </button>
+                            </form>
+                          ) : null}
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
+                      No comments yet. Start the discussion with a practical
+                      suggestion.
+                    </p>
+                  )}
+                </section>
+              ) : (
+                <UnavailableSection message="Discussion opens when this bill is published." />
+              ),
+              suggestions: isPublicBill ? (
+                <section
+                  id="suggestions"
+                  className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+                >
+                  <div className="mb-5 flex items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-lg font-semibold">
+                        Amendment suggestions
+                      </h2>
+                      <p className="text-sm text-[#6d6658]">
+                        Suggest changes without editing the author&apos;s bill.
+                      </p>
+                    </div>
+                    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+                      {suggestions.length}
+                    </span>
+                  </div>
+
+                  {session?.user ? (
+                    <form
+                      action={createSuggestionAction}
+                      className="mb-5 space-y-3"
+                    >
+                      <input type="hidden" name="slug" value={bill.slug} />
+                      <input
+                        name="section"
+                        placeholder="Section or clause, optional"
+                        className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                      />
+                      <textarea
+                        name="body"
+                        rows={4}
+                        minLength={5}
+                        maxLength={3000}
+                        required
+                        placeholder="Write the amendment or improvement you suggest."
+                        className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                      />
+                      <button
+                        type="submit"
+                        className="flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                      >
+                        <SendHorizontal size={16} aria-hidden="true" />
+                        Suggest amendment
+                      </button>
+                    </form>
+                  ) : (
+                    <Link
+                      href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#suggestions`)}`}
+                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                    >
+                      Sign in to suggest
+                    </Link>
+                  )}
+
+                  {suggestions.length > 0 ? (
+                    <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
+                      {suggestions.map((suggestion) => (
+                        <article key={suggestion.id} className="py-4">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <p className="font-semibold">
+                              {suggestion.user.displayName ??
+                                suggestion.user.name ??
+                                "Citizen"}
+                            </p>
+                            <Badge>{suggestion.status.toLowerCase()}</Badge>
+                            {suggestion.section ? (
+                              <span className="text-xs text-[#8a8170]">
+                                {suggestion.section}
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+                            {suggestion.body}
+                          </p>
+                          {isAuthor && suggestion.status === "OPEN" ? (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <SuggestionButton
+                                slug={bill.slug}
+                                suggestionId={suggestion.id}
+                                intent="accept"
+                              >
+                                Accept
+                              </SuggestionButton>
+                              <SuggestionButton
+                                slug={bill.slug}
+                                suggestionId={suggestion.id}
+                                intent="merge"
+                              >
+                                Accept and merge
+                              </SuggestionButton>
+                              <SuggestionButton
+                                slug={bill.slug}
+                                suggestionId={suggestion.id}
+                                intent="reject"
+                              >
+                                Reject
+                              </SuggestionButton>
+                            </div>
+                          ) : null}
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
+                      No amendment suggestions yet.
+                    </p>
+                  )}
+                </section>
+              ) : (
+                <UnavailableSection message="Amendment suggestions open when this bill is published." />
+              ),
+              versions: (
+                <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+                  <div className="mb-3 flex items-center gap-2 font-semibold">
+                    <History size={17} aria-hidden="true" />
+                    Version history
+                  </div>
+                  {versions.length > 0 ? (
+                    <div className="space-y-2">
+                      {versions.length >= 2 ? (
+                        <Link
+                          href={`/bills/${bill.slug}/versions/compare?from=${versions[1].id}&to=${versions[0].id}`}
+                          className="block rounded-md bg-[#123c69] px-3 py-2 text-sm font-semibold text-white"
+                        >
+                          Compare latest versions
+                        </Link>
+                      ) : null}
+                      {versions.map((version) => (
+                        <Link
+                          key={version.id}
+                          href={`/bills/${bill.slug}/versions/${version.id}`}
+                          className="block rounded-md border border-[#e7e1d3] px-3 py-2 text-sm font-medium text-[#123c69]"
+                        >
+                          {version.createdAt.toLocaleDateString("en-IN", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",
                           })}
-                        </span>
-                      </div>
-                      <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
-                        {comment.body}
-                      </p>
-                      {session?.user ? (
-                        <form action={reportCommentAction} className="mt-2">
-                          <input type="hidden" name="slug" value={bill.slug} />
-                          <input
-                            type="hidden"
-                            name="commentId"
-                            value={comment.id}
-                          />
-                          <button
-                            type="submit"
-                            className="text-xs font-semibold text-[#8a3a2f]"
-                          >
-                            Report comment
-                          </button>
-                        </form>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
-                  No comments yet. Start the discussion with a practical
-                  suggestion.
-                </p>
-              )}
-            </section>
-          ) : null}
-
-          {isPublicBill ? (
-            <section
-              id="suggestions"
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
-            >
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    Amendment suggestions
-                  </h2>
-                  <p className="text-sm text-[#6d6658]">
-                    Suggest changes without editing the author&apos;s bill.
-                  </p>
-                </div>
-                <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
-                  {suggestions.length}
-                </span>
-              </div>
-
-              {session?.user ? (
-                <form
-                  action={createSuggestionAction}
-                  className="mb-5 space-y-3"
-                >
-                  <input type="hidden" name="slug" value={bill.slug} />
-                  <input
-                    name="section"
-                    placeholder="Section or clause, optional"
-                    className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
-                  />
-                  <textarea
-                    name="body"
-                    rows={4}
-                    minLength={5}
-                    maxLength={3000}
-                    required
-                    placeholder="Write the amendment or improvement you suggest."
-                    className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
-                  />
-                  <button
-                    type="submit"
-                    className="flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
-                  >
-                    <SendHorizontal size={16} aria-hidden="true" />
-                    Suggest amendment
-                  </button>
-                </form>
-              ) : (
-                <Link
-                  href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#suggestions`)}`}
-                  className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
-                >
-                  Sign in to suggest
-                </Link>
-              )}
-
-              {suggestions.length > 0 ? (
-                <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
-                  {suggestions.map((suggestion) => (
-                    <article key={suggestion.id} className="py-4">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <p className="font-semibold">
-                          {suggestion.user.displayName ??
-                            suggestion.user.name ??
-                            "Citizen"}
-                        </p>
-                        <Badge>{suggestion.status.toLowerCase()}</Badge>
-                        {suggestion.section ? (
-                          <span className="text-xs text-[#8a8170]">
-                            {suggestion.section}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
-                        {suggestion.body}
-                      </p>
-                      {isAuthor && suggestion.status === "OPEN" ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <SuggestionButton
-                            slug={bill.slug}
-                            suggestionId={suggestion.id}
-                            intent="accept"
-                          >
-                            Accept
-                          </SuggestionButton>
-                          <SuggestionButton
-                            slug={bill.slug}
-                            suggestionId={suggestion.id}
-                            intent="merge"
-                          >
-                            Accept and merge
-                          </SuggestionButton>
-                          <SuggestionButton
-                            slug={bill.slug}
-                            suggestionId={suggestion.id}
-                            intent="reject"
-                          >
-                            Reject
-                          </SuggestionButton>
-                        </div>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
-                  No amendment suggestions yet.
-                </p>
-              )}
-            </section>
-          ) : null}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#6d6658]">
+                      No previous versions yet.
+                    </p>
+                  )}
+                </section>
+              ),
+            }}
+          />
         </article>
 
         <aside className="space-y-4">
@@ -672,42 +736,6 @@ export default async function BillDetailPage({
             </div>
           </div>
 
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-            <div className="mb-3 flex items-center gap-2 font-semibold">
-              <History size={17} aria-hidden="true" />
-              Version history
-            </div>
-            {versions.length > 0 ? (
-              <div className="space-y-2">
-                {versions.length >= 2 ? (
-                  <Link
-                    href={`/bills/${bill.slug}/versions/compare?from=${versions[1].id}&to=${versions[0].id}`}
-                    className="block rounded-md bg-[#123c69] px-3 py-2 text-sm font-semibold text-white"
-                  >
-                    Compare latest versions
-                  </Link>
-                ) : null}
-                {versions.map((version) => (
-                  <Link
-                    key={version.id}
-                    href={`/bills/${bill.slug}/versions/${version.id}`}
-                    className="block rounded-md border border-[#e7e1d3] px-3 py-2 text-sm font-medium text-[#123c69]"
-                  >
-                    {version.createdAt.toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-[#6d6658]">
-                No previous versions yet.
-              </p>
-            )}
-          </div>
-
           {isAuthor && bill.status === "DRAFT" ? (
             <form
               action={publishBillAction}
@@ -835,6 +863,51 @@ export default async function BillDetailPage({
           </Link>
         </aside>
       </section>
+
+      {isPublicBill ? (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#d8d2c4] bg-white/95 backdrop-blur-sm lg:hidden">
+          <div className="flex items-center gap-2 px-4 py-3">
+            {!isAuthor ? (
+              <form action={toggleVoteAction} className="flex-1">
+                <input type="hidden" name="slug" value={bill.slug} />
+                <button
+                  type="submit"
+                  className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
+                    userVote
+                      ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                      : "bg-[#123c69] text-white"
+                  }`}
+                >
+                  <ThumbsUp size={16} aria-hidden="true" />
+                  {userVote ? "Supported" : "Support"}
+                </button>
+              </form>
+            ) : (
+              <Link
+                href={`/bills/${bill.slug}/edit`}
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+              >
+                <Pencil size={16} aria-hidden="true" />
+                Edit bill
+              </Link>
+            )}
+            <a
+              href="#comments"
+              aria-label="Discuss"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-[#c8c0ae] bg-white text-[#2f2a22] shadow-sm"
+            >
+              <MessageSquare size={17} aria-hidden="true" />
+            </a>
+            <a
+              href="#suggestions"
+              aria-label="Suggest amendment"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-[#c8c0ae] bg-white text-[#2f2a22] shadow-sm"
+            >
+              <PenLine size={17} aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      ) : null}
       <SiteFooter />
     </main>
   );
@@ -1130,6 +1203,14 @@ function StatLabel({ label, value }: { label: string; value: number }) {
       </p>
       <p className="text-xs font-medium text-[#6d6658]">{label}</p>
     </div>
+  );
+}
+
+function UnavailableSection({ message }: { message: string }) {
+  return (
+    <p className="rounded-lg border border-[#d8d2c4] bg-white px-4 py-4 text-sm leading-6 text-[#6d6658] shadow-sm">
+      {message}
+    </p>
   );
 }
 
