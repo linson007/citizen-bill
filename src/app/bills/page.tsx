@@ -24,6 +24,7 @@ import {
 } from "@/lib/bill-discovery";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
+import { formatRelativeTime } from "@/lib/relative-time";
 import { getRequestMessages } from "@/lib/request-locale";
 
 export default async function BillsPage({
@@ -226,9 +227,21 @@ export default async function BillsPage({
                     <p className="mt-2 max-w-3xl line-clamp-3 text-sm leading-6 text-ink-muted">
                       {bill.description}
                     </p>
-                    <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
-                      {t.bills.by}{" "}
-                      {bill.author.displayName ?? bill.author.name ?? "Citizen"}
+                    <p className="mt-3 flex flex-wrap items-center gap-x-2 text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
+                      <span>
+                        {t.bills.by}{" "}
+                        {bill.author.displayName ??
+                          bill.author.name ??
+                          "Citizen"}
+                      </span>
+                      {bill.publishedAt ? (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <time dateTime={bill.publishedAt.toISOString()}>
+                            {formatRelativeTime(bill.publishedAt, locale)}
+                          </time>
+                        </>
+                      ) : null}
                     </p>
                   </div>
 
