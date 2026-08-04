@@ -94,6 +94,7 @@ export type MessageTree = {
     layoutLabel: string;
     layoutList: string;
     layoutGrid: string;
+    keyboardHint: string;
   };
   draft: {
     eyebrow: string;
@@ -236,6 +237,8 @@ export const messages: Record<Locale, MessageTree> = {
       layoutLabel: "Layout",
       layoutList: "List view",
       layoutGrid: "Grid view",
+      keyboardHint:
+        "Keyboard: arrow keys move between bills; Enter or Space opens one. G = grid, L = list, / = search.",
     },
     draft: {
       eyebrow: "New bill draft",
@@ -382,6 +385,8 @@ export const messages: Record<Locale, MessageTree> = {
       layoutLabel: "കാഴ്ച രീതി",
       layoutList: "ലിസ്റ്റ് കാഴ്ച",
       layoutGrid: "ഗ്രിഡ് കാഴ്ച",
+      keyboardHint:
+        "കീബോർഡ്: അമ്പടയാള കീകൾ ബില്ലുകൾക്കിടയിൽ നീങ്ങും; Enter അല്ലെങ്കിൽ Space തുറക്കും. G = ഗ്രിഡ്, L = ലിസ്റ്റ്, / = തിരയൽ.",
     },
     draft: {
       eyebrow: "പുതിയ ബിൽ ഡ്രാഫ്റ്റ്",

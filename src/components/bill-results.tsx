@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   LayoutGrid,
@@ -16,6 +16,10 @@ import {
   type BillResultItem,
 } from "@/lib/bill-results";
 import { formatDisplayTitle } from "@/lib/display-title";
+import {
+  getNextBillResultIndex,
+  isKeyboardShortcutTarget,
+} from "@/lib/bill-keyboard";
 import {
   DEFAULT_BILL_LAYOUT,
   loadBillLayout,
@@ -37,6 +41,7 @@ export type BillResultsLabels = {
   layoutLabel: string;
   layoutList: string;
   layoutGrid: string;
+  keyboardHint: string;
 };
 
 export function BillResults({
@@ -55,6 +60,80 @@ export function BillResults({
     () => loadBillLayout(),
     () => DEFAULT_BILL_LAYOUT,
   );
+  const [activeResultIndex, setActiveResultIndex] = useState(0);
+  const resultRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+
+  const rovingResultIndex = Math.min(
+    activeResultIndex,
+    Math.max(bills.length - 1, 0),
+  );
+
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if (
+        event.defaultPrevented ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        isKeyboardShortcutTarget(event.target)
+      ) {
+        return;
+      }
+
+      if (event.key === "/") {
+        event.preventDefault();
+        document.querySelector<HTMLInputElement>("[data-bill-search]")?.focus();
+      }
+
+      if (event.key.toLowerCase() === "g") {
+        saveBillLayout("grid");
+      }
+
+      if (event.key.toLowerCase() === "l") {
+        saveBillLayout("list");
+      }
+    }
+
+    document.addEventListener("keydown", handleShortcut);
+    return () => document.removeEventListener("keydown", handleShortcut);
+  }, []);
+
+  function moveResultFocus(currentIndex: number, direction: -1 | 1) {
+    const nextIndex = getNextBillResultIndex({
+      currentIndex,
+      direction,
+      total: bills.length,
+    });
+
+    if (nextIndex < 0) {
+      return;
+    }
+
+    setActiveResultIndex(nextIndex);
+    resultRefs.current[nextIndex]?.focus();
+  }
+
+  function handleResultKeyDown(
+    event: React.KeyboardEvent<HTMLAnchorElement>,
+    index: number,
+  ) {
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+      event.preventDefault();
+      moveResultFocus(index, 1);
+      return;
+    }
+
+    if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+      event.preventDefault();
+      moveResultFocus(index, -1);
+      return;
+    }
+
+    if (event.key === " ") {
+      event.preventDefault();
+      event.currentTarget.click();
+    }
+  }
 
   return (
     <>
@@ -75,26 +154,39 @@ export function BillResults({
           <LayoutToggle layout={layout} labels={labels} />
         </div>
       </div>
+      <p className="mb-4 text-xs text-ink-muted">{labels.keyboardHint}</p>
 
       {layout === "grid" ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {bills.map((bill) => (
+          {bills.map((bill, index) => (
             <BillCard
               key={bill.id}
               bill={bill}
               locale={locale}
               labels={labels}
+              tabIndex={index === rovingResultIndex ? 0 : -1}
+              resultRef={(element) => {
+                resultRefs.current[index] = element;
+              }}
+              onFocus={() => setActiveResultIndex(index)}
+              onKeyDown={(event) => handleResultKeyDown(event, index)}
             />
           ))}
         </div>
       ) : (
         <div className="divide-y divide-border border-y border-border">
-          {bills.map((bill) => (
+          {bills.map((bill, index) => (
             <BillRow
               key={bill.id}
               bill={bill}
               locale={locale}
               labels={labels}
+              tabIndex={index === rovingResultIndex ? 0 : -1}
+              resultRef={(element) => {
+                resultRefs.current[index] = element;
+              }}
+              onFocus={() => setActiveResultIndex(index)}
+              onKeyDown={(event) => handleResultKeyDown(event, index)}
             />
           ))}
         </div>
@@ -154,7 +246,7 @@ function LayoutToggleButton({
         active
           ? "bg-accent text-white"
           : "bg-surface-raised text-ink-muted hover:text-foreground"
-      }`}
+      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
     >
       <Icon size={16} aria-hidden="true" />
     </button>
@@ -219,15 +311,27 @@ function BillRow({
   bill,
   locale,
   labels,
+  tabIndex,
+  resultRef,
+  onFocus,
+  onKeyDown,
 }: {
   bill: BillResultItem;
   locale: Locale;
   labels: BillResultsLabels;
+  tabIndex: number;
+  resultRef: (element: HTMLAnchorElement | null) => void;
+  onFocus: () => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <Link
       href={`/bills/${bill.slug}`}
-      className="block py-5 transition-colors hover:bg-surface"
+      ref={resultRef}
+      tabIndex={tabIndex}
+      onFocus={onFocus}
+      onKeyDown={onKeyDown}
+      className="block py-5 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
     >
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
@@ -254,15 +358,27 @@ function BillCard({
   bill,
   locale,
   labels,
+  tabIndex,
+  resultRef,
+  onFocus,
+  onKeyDown,
 }: {
   bill: BillResultItem;
   locale: Locale;
   labels: BillResultsLabels;
+  tabIndex: number;
+  resultRef: (element: HTMLAnchorElement | null) => void;
+  onFocus: () => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <Link
       href={`/bills/${bill.slug}`}
-      className="flex flex-col rounded-lg border border-border bg-surface-raised p-5 shadow-sm transition-colors hover:border-accent/50"
+      ref={resultRef}
+      tabIndex={tabIndex}
+      onFocus={onFocus}
+      onKeyDown={onKeyDown}
+      className="flex flex-col rounded-lg border border-border bg-surface-raised p-5 shadow-sm transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
     >
       <div className="mb-3 flex flex-wrap gap-2">
         {bill.categoryName ? <Badge>{bill.categoryName}</Badge> : null}
