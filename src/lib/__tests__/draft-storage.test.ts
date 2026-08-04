@@ -3,7 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   BILL_DRAFT_STORAGE_KEY,
   clearBillDraft,
+  countBillDraftFilledFields,
   EMPTY_BILL_DRAFT_FIELDS,
+  getBillDraftDisplayTitle,
   hasBillDraftContent,
   loadBillDraft,
   parseBillDraft,
@@ -59,6 +61,49 @@ describe("hasBillDraftContent", () => {
 
   it("returns true when any field has content", () => {
     expect(hasBillDraftContent(sampleFields)).toBe(true);
+  });
+});
+
+describe("countBillDraftFilledFields", () => {
+  it("returns zero for a blank draft", () => {
+    expect(countBillDraftFilledFields(EMPTY_BILL_DRAFT_FIELDS)).toBe(0);
+  });
+
+  it("ignores whitespace-only fields", () => {
+    expect(
+      countBillDraftFilledFields({ ...EMPTY_BILL_DRAFT_FIELDS, tags: "   " }),
+    ).toBe(0);
+  });
+
+  it("counts every field that has content", () => {
+    expect(countBillDraftFilledFields(sampleFields)).toBe(2);
+    expect(
+      countBillDraftFilledFields({
+        ...sampleFields,
+        category: "Health",
+        body: "Text",
+      }),
+    ).toBe(4);
+  });
+});
+
+describe("getBillDraftDisplayTitle", () => {
+  it("returns the trimmed title when present", () => {
+    expect(
+      getBillDraftDisplayTitle({
+        ...EMPTY_BILL_DRAFT_FIELDS,
+        title: "  My Bill ",
+      }),
+    ).toBe("My Bill");
+  });
+
+  it("falls back to a placeholder for blank titles", () => {
+    expect(getBillDraftDisplayTitle(EMPTY_BILL_DRAFT_FIELDS)).toBe(
+      "Untitled draft",
+    );
+    expect(
+      getBillDraftDisplayTitle({ ...EMPTY_BILL_DRAFT_FIELDS, title: "   " }),
+    ).toBe("Untitled draft");
   });
 });
 

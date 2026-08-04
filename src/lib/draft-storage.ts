@@ -48,6 +48,15 @@ export function hasBillDraftContent(fields: BillDraftFields): boolean {
   return BILL_DRAFT_FIELD_KEYS.some((key) => fields[key].trim().length > 0);
 }
 
+export function countBillDraftFilledFields(fields: BillDraftFields): number {
+  return BILL_DRAFT_FIELD_KEYS.filter((key) => fields[key].trim().length > 0)
+    .length;
+}
+
+export function getBillDraftDisplayTitle(fields: BillDraftFields): string {
+  return fields.title.trim() || "Untitled draft";
+}
+
 function resolveStorage(storage?: Storage | null): Storage | null {
   if (storage) {
     return storage;
