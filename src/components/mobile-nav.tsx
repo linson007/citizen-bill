@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useEffect, useId, useState } from "react";
 
 import { LocaleToggle } from "@/components/locale-toggle";
@@ -26,6 +27,7 @@ type MobileNavProps = {
     malayalam: string;
     newBill: string;
     signIn: string;
+    signOut: string;
   };
   signedIn: boolean;
 };
@@ -153,6 +155,13 @@ export function MobileNav({
                       {link.label}
                     </NavLink>
                   ))}
+                  <button
+                    type="button"
+                    className="rounded-md px-3 py-3 text-left text-sm font-medium text-ink-soft transition-colors hover:bg-surface"
+                    onClick={() => void signOut({ callbackUrl: "/" })}
+                  >
+                    {labels.signOut}
+                  </button>
                 </nav>
               </div>
             ) : null}

@@ -62,6 +62,7 @@ export async function SiteHeader() {
               malayalam: t.nav.malayalam,
               newBill: t.nav.newBill,
               signIn: t.nav.signIn,
+              signOut: t.nav.signOut,
             }}
           />
           <div className="hidden md:block">
@@ -89,7 +90,7 @@ export async function SiteHeader() {
                   ? ` (${unreadNotificationCount} unread)`
                   : ""
               }`}
-              className="relative grid size-11 place-items-center rounded-md border border-border-strong bg-surface-raised text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              className="relative hidden size-11 place-items-center rounded-md border border-border-strong bg-surface-raised text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 md:grid"
             >
               <Bell size={18} aria-hidden="true" />
               {unreadNotificationCount > 0 ? (
@@ -101,15 +102,17 @@ export async function SiteHeader() {
               ) : null}
             </Link>
           ) : null}
-          <AccountMenu
-            labels={{
-              account: t.nav.account,
-              signIn: t.nav.signIn,
-              signOut: t.nav.signOut,
-            }}
-            links={accountLinks}
-            user={session?.user}
-          />
+          <div className="hidden md:block">
+            <AccountMenu
+              labels={{
+                account: t.nav.account,
+                signIn: t.nav.signIn,
+                signOut: t.nav.signOut,
+              }}
+              links={accountLinks}
+              user={session?.user}
+            />
+          </div>
           <Link
             href="/bills/new"
             aria-label={t.nav.newBill}
