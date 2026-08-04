@@ -7,9 +7,11 @@ import {
   Bell,
   Calendar,
   ChartNoAxesColumn,
+  Clock,
   Flag,
   FileText,
   History,
+  ListTree,
   MessageSquare,
   Pencil,
   PenLine,
@@ -41,6 +43,13 @@ import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
 import { getBillDetailData } from "@/lib/bill-detail";
+import {
+  estimateReadingTimeMinutes,
+  extractBillSections,
+  matchBillTextHeading,
+  billSectionId,
+  splitBillTextParagraphs,
+} from "@/lib/bill-text";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
@@ -167,6 +176,17 @@ export default async function BillDetailPage({
     bill._count.followers +
     bill._count.suggestions;
   const hasEstablishedActivity = engagementTotal >= 5;
+  const readableContent = [
+    bill.problem,
+    bill.proposedSolution,
+    bill.expectedImpact,
+    bill.body,
+    bill.references,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join("\n\n");
+  const readingMinutes = estimateReadingTimeMinutes(readableContent);
+  const bodySections = extractBillSections(bill.body ?? "");
   const activityItems = [
     bill.publishedAt
       ? {
@@ -229,6 +249,12 @@ export default async function BillDetailPage({
               <SendHorizontal size={16} aria-hidden="true" />
               {bill._count.suggestions} amendments
             </span>
+            {readingMinutes > 0 ? (
+              <span className="flex items-center gap-2">
+                <Clock size={16} aria-hidden="true" />
+                {readingMinutes} min read
+              </span>
+            ) : null}
             {hasEstablishedActivity && categoryRank >= 0 ? (
               <span className="flex items-center gap-2 font-semibold text-[#123c69]">
                 <ChartNoAxesColumn size={16} aria-hidden="true" />#
@@ -601,6 +627,33 @@ export default async function BillDetailPage({
         </article>
 
         <aside className="space-y-4">
+          {bodySections.length >= 2 ? (
+            <nav
+              aria-label="Bill sections"
+              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+            >
+              <h2 className="mb-3 flex items-center gap-2 font-semibold">
+                <ListTree size={17} aria-hidden="true" />
+                On this page
+              </h2>
+              <ol className="space-y-2">
+                {bodySections.map((section, index) => (
+                  <li key={section.id}>
+                    <a
+                      href={`#${section.id}`}
+                      className="flex gap-2 text-sm leading-6 text-[#4f4a40] transition-colors hover:text-[#123c69]"
+                    >
+                      <span className="shrink-0 font-semibold text-[#123c69]">
+                        {index + 1}.
+                      </span>
+                      <span>{section.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          ) : null}
+
           <BillAnalytics
             votes={bill._count.votes}
             comments={bill._count.comments}
@@ -979,28 +1032,50 @@ function ContentBlock({
 }
 
 function FormattedBillText({ content }: { content: string }) {
+  const blocks = splitBillTextParagraphs(content).reduce<
+    {
+      paragraph: string;
+      heading: string | null;
+      id: string | null;
+    }[]
+  >((accumulator, paragraph) => {
+    const heading = matchBillTextHeading(paragraph);
+
+    if (!heading) {
+      return [...accumulator, { paragraph, heading: null, id: null }];
+    }
+
+    const headingCount = accumulator.filter(
+      (block) => block.id !== null,
+    ).length;
+
+    return [
+      ...accumulator,
+      { paragraph, heading, id: billSectionId(headingCount) },
+    ];
+  }, []);
+
   return (
     <div className="space-y-4 text-sm leading-7 text-[#3f3a32]">
-      {content.split(/\n{2,}/).map((paragraph, index) => {
-        const heading = paragraph.match(/^(?:#{1,3}\s+|\*\*)(.+?)(?:\*\*)?$/);
-
-        if (heading) {
+      {blocks.map((block, index) => {
+        if (block.heading) {
           return (
             <h3
-              key={`${heading[1]}-${index}`}
-              className="font-semibold text-[#161616]"
+              key={`${block.heading}-${index}`}
+              id={block.id ?? undefined}
+              className="scroll-mt-24 font-semibold text-[#161616]"
             >
-              {heading[1]}
+              {block.heading}
             </h3>
           );
         }
 
         return (
           <p
-            key={`${paragraph.slice(0, 24)}-${index}`}
+            key={`${block.paragraph.slice(0, 24)}-${index}`}
             className="whitespace-pre-wrap"
           >
-            {paragraph
+            {block.paragraph
               .split(/(\*\*[^*]+\*\*)/)
               .map((part, partIndex) =>
                 part.startsWith("**") && part.endsWith("**") ? (
