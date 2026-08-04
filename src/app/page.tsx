@@ -45,7 +45,7 @@ export default async function Home() {
       <section className="relative isolate overflow-hidden border-b border-border">
         <HeroVisual />
         <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:min-h-[min(88vh,820px)] lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.9fr)] lg:items-center lg:gap-12 lg:py-20">
-          <div className="order-2 max-w-2xl lg:order-1">
+          <div className="max-w-2xl">
             <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent backdrop-blur-sm">
               {t.home.eyebrow}
             </p>
@@ -84,24 +84,26 @@ export default async function Home() {
                 <ArrowRight size={16} aria-hidden="true" />
               </a>
             </div>
-            <p className="animate-fade-up-delay-2 mt-4 flex items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
-              <CheckCircle2
-                className="mt-0.5 shrink-0 text-success"
-                size={17}
-                aria-hidden="true"
-              />
-              {t.home.heroNote}
-            </p>
-            <p className="animate-fade-up-delay-2 mt-4 flex items-start gap-2 rounded-md border border-border bg-surface-raised/65 px-3 py-2 text-sm leading-6 text-ink-soft backdrop-blur-sm">
-              <ShieldCheck
-                className="mt-0.5 shrink-0 text-accent"
-                size={17}
-                aria-hidden="true"
-              />
-              {t.home.independence}
-            </p>
+            <div className="animate-fade-up-delay-2 mt-4 space-y-2 rounded-md border border-border bg-surface-raised/65 px-3 py-2.5 backdrop-blur-sm">
+              <p className="flex items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
+                <CheckCircle2
+                  className="mt-0.5 shrink-0 text-success"
+                  size={17}
+                  aria-hidden="true"
+                />
+                {t.home.heroNote}
+              </p>
+              <p className="flex items-start gap-2 text-xs leading-5 text-ink-muted">
+                <ShieldCheck
+                  className="mt-0.5 shrink-0 text-accent"
+                  size={15}
+                  aria-hidden="true"
+                />
+                {t.home.independence}
+              </p>
+            </div>
           </div>
-          <div className="order-1 lg:order-2">
+          <div className="lg:order-2">
             <CivicHeroImage locale={locale} />
           </div>
         </div>

@@ -79,7 +79,7 @@ export function CivicHeroImage({ locale }: { locale: Locale }) {
         height={1024}
         preload
         sizes="(min-width: 1024px) 44vw, 100vw"
-        className="h-auto w-full"
+        className="h-56 w-full object-cover sm:h-72 lg:h-auto lg:object-fill"
       />
     </div>
   );
