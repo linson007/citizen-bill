@@ -1,8 +1,15 @@
+import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
+
 export type AiDraftFields = {
   description: string;
   proposedSolution: string;
   expectedImpact: string;
   body: string;
+};
+
+export type AiTitleCategorySuggestion = {
+  title: string;
+  category: string;
 };
 
 const fieldHeadings = [
@@ -53,6 +60,47 @@ export function parseAiDraftFieldsFromText(
   }
 
   return fields;
+}
+
+export function parseAiTitleCategorySuggestion(
+  value: string,
+): AiTitleCategorySuggestion | null {
+  try {
+    const parsed = JSON.parse(value) as {
+      title?: unknown;
+      category?: unknown;
+    };
+    const title = typeof parsed.title === "string" ? parsed.title.trim() : "";
+    const category = normalizeSuggestedCategory(parsed.category);
+
+    if (!title || !category) {
+      return null;
+    }
+
+    return { title: title.slice(0, 200), category };
+  } catch {
+    return null;
+  }
+}
+
+function normalizeSuggestedCategory(value: unknown) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+
+  if (normalized.toLowerCase() === "other") {
+    return OTHER_BILL_CATEGORY;
+  }
+
+  return (
+    billCategories.find(
+      (category) =>
+        category !== OTHER_BILL_CATEGORY &&
+        category.toLowerCase() === normalized.toLowerCase(),
+    ) ?? null
+  );
 }
 
 function findSections(text: string) {

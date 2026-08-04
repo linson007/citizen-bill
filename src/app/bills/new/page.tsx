@@ -35,7 +35,7 @@ export default async function NewBillPage() {
       </section>
 
       <section className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8">
-        <BillForm />
+        <BillForm suggestionLabels={t.draft.suggestions} />
       </section>
       <SiteFooter />
     </main>

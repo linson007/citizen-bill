@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseAiDraftFieldsFromText } from "@/lib/ai-draft-fields";
+import {
+  parseAiDraftFieldsFromText,
+  parseAiTitleCategorySuggestion,
+} from "@/lib/ai-draft-fields";
 
 describe("parseAiDraftFieldsFromText", () => {
   it("maps labeled AI draft sections into form fields", () => {
@@ -83,5 +86,38 @@ Better oversight for citizens.
       expectedImpact: "Better oversight for citizens.",
       body: "",
     });
+  });
+});
+
+describe("parseAiTitleCategorySuggestion", () => {
+  it("accepts a title and a known category without changing its canonical name", () => {
+    expect(
+      parseAiTitleCategorySuggestion(
+        '{"title":"Kerala Medicine Availability Transparency Bill","category":"health"}',
+      ),
+    ).toEqual({
+      title: "Kerala Medicine Availability Transparency Bill",
+      category: "Health",
+    });
+  });
+
+  it("maps Other to the form's dedicated category value", () => {
+    expect(
+      parseAiTitleCategorySuggestion(
+        '{"title":"Public Services Bill","category":"Other"}',
+      ),
+    ).toEqual({
+      title: "Public Services Bill",
+      category: "__other__",
+    });
+  });
+
+  it("rejects missing fields and categories outside the allowed list", () => {
+    expect(
+      parseAiTitleCategorySuggestion(
+        '{"title":"Public Services Bill","category":"Infrastructure"}',
+      ),
+    ).toBeNull();
+    expect(parseAiTitleCategorySuggestion('{"category":"Health"}')).toBeNull();
   });
 });

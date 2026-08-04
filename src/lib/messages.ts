@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/locale";
 
-type MessageTree = {
+export type MessageTree = {
   nav: {
     bills: string;
     newBill: string;
@@ -99,6 +99,17 @@ type MessageTree = {
     eyebrow: string;
     heading: string;
     support: string;
+    suggestions: {
+      button: string;
+      help: string;
+      problemRequired: string;
+      title: string;
+      category: string;
+      useTitle: string;
+      useCategory: string;
+      dismiss: string;
+      error: string;
+    };
   };
   footer: {
     terms: string;
@@ -231,6 +242,18 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "Create a structured bill proposal",
       support:
         "Start with the public problem and save a private draft. Publishing, voting, comments, uploads, and AI drafting build on this record.",
+      suggestions: {
+        button: "Suggest title & category",
+        help: "Use your problem statement to get optional ideas. Nothing changes until you choose a suggestion.",
+        problemRequired:
+          "Add a problem statement before asking for suggestions.",
+        title: "Suggested title",
+        category: "Suggested category",
+        useTitle: "Use title",
+        useCategory: "Use category",
+        dismiss: "Dismiss suggestions",
+        error: "Unable to suggest a title and category right now.",
+      },
     },
     footer: {
       terms: "Terms",
@@ -365,6 +388,18 @@ export const messages: Record<Locale, MessageTree> = {
       heading: "ഘടനയുള്ള ബിൽ നിർദേശം തയ്യാറാക്കുക",
       support:
         "പൊതു പ്രശ്നത്തിൽ നിന്ന് ആരംഭിച്ച് സ്വകാര്യ ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുക. പ്രസിദ്ധീകരണം, വോട്ട്, അഭിപ്രായങ്ങൾ, അപ്‌ലോഡുകൾ, AI ഡ്രാഫ്റ്റിംഗ് എന്നിവ ഈ റെക്കോർഡിൽ നിർമ്മിക്കപ്പെടും.",
+      suggestions: {
+        button: "തലക്കെട്ടും വിഭാഗവും നിർദേശിക്കുക",
+        help: "നിങ്ങളുടെ പ്രശ്ന പ്രസ്താവന ഉപയോഗിച്ച് ഐച്ഛിക നിർദേശങ്ങൾ നേടുക. നിങ്ങൾ തിരഞ്ഞെടുക്കുന്നതുവരെ ഒന്നും മാറില്ല.",
+        problemRequired:
+          "നിർദേശങ്ങൾ ചോദിക്കുന്നതിന് മുമ്പ് ഒരു പ്രശ്ന പ്രസ്താവന ചേർക്കുക.",
+        title: "നിർദേശിച്ച തലക്കെട്ട്",
+        category: "നിർദേശിച്ച വിഭാഗം",
+        useTitle: "തലക്കെട്ട് ഉപയോഗിക്കുക",
+        useCategory: "വിഭാഗം ഉപയോഗിക്കുക",
+        dismiss: "നിർദേശങ്ങൾ ഒഴിവാക്കുക",
+        error: "ഇപ്പോൾ തലക്കെട്ടും വിഭാഗവും നിർദേശിക്കാൻ കഴിയുന്നില്ല.",
+      },
     },
     footer: {
       terms: "നിബന്ധനകൾ",
