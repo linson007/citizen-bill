@@ -48,140 +48,181 @@ export function BillForm() {
   }
 
   return (
-    <form action={formAction} className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="space-y-5">
-        <FormSection title="Bill details">
-          <Field
-            label="Title"
-            name="title"
-            placeholder="Kerala Public Health Data Transparency Bill"
-            value={fields.title}
-            onChange={(value) => updateField("title", value)}
-            error={state.errors?.title?.[0]}
-          />
-          <TextArea
-            label="Short description"
-            name="description"
-            rows={3}
-            placeholder="A short public summary of what this bill should do."
-            value={fields.description}
-            onChange={(value) => updateField("description", value)}
-            error={state.errors?.description?.[0]}
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CategorySelect
-              label="Category"
-              name="category"
-              value={fields.category}
-              onChange={(value) => updateField("category", value)}
-              error={state.errors?.category?.[0]}
-            />
-            <Field
-              label="Tags"
-              name="tags"
-              placeholder="health, data, hospitals"
-              value={fields.tags}
-              onChange={(value) => updateField("tags", value)}
-              error={state.errors?.tags?.[0]}
-            />
-          </div>
-          {fields.category === OTHER_BILL_CATEGORY ? (
-            <Field
-              label="Other category"
-              name="categoryOther"
-              placeholder="Enter the department or topic"
-              value={fields.categoryOther}
-              onChange={(value) => updateField("categoryOther", value)}
-              error={state.errors?.categoryOther?.[0]}
-            />
-          ) : null}
-        </FormSection>
-
-        <FormSection title="Policy content">
-          <TextArea
-            label="Problem statement"
-            name="problem"
-            rows={5}
-            placeholder="Describe the public problem, who is affected, and why this needs legislative attention."
-            value={fields.problem}
-            onChange={(value) => updateField("problem", value)}
-            error={state.errors?.problem?.[0]}
-          />
-          <TextArea
-            label="Proposed solution"
-            name="proposedSolution"
-            rows={5}
-            placeholder="Describe the intervention, obligations, rights, duties, standards, or reporting requirements."
-            value={fields.proposedSolution}
-            onChange={(value) => updateField("proposedSolution", value)}
-            error={state.errors?.proposedSolution?.[0]}
-          />
-          <TextArea
-            label="Expected public impact"
-            name="expectedImpact"
-            rows={4}
-            placeholder="Explain how people, institutions, or local bodies should benefit."
-            value={fields.expectedImpact}
-            onChange={(value) => updateField("expectedImpact", value)}
-            error={state.errors?.expectedImpact?.[0]}
-          />
-          <TextArea
-            label="Draft bill text"
-            name="body"
-            rows={10}
-            placeholder="Paste or draft clauses here. The AI assistant will later help structure this section."
-            value={fields.body}
-            onChange={(value) => updateField("body", value)}
-            error={state.errors?.body?.[0]}
-          />
-          <TextArea
-            label="References and supporting links"
-            name="references"
-            rows={4}
-            placeholder="Add source links, reports, news articles, government pages, or notes that support this bill."
-            value={fields.references}
-            onChange={(value) => updateField("references", value)}
-            error={state.errors?.references?.[0]}
-          />
-        </FormSection>
-      </div>
-
-      <aside className="space-y-4">
-        <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
-              <FileText size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <h2 className="font-semibold">Save bill</h2>
-              <p className="text-sm text-[#6d6658]">
-                Keep it private or publish immediately.
-              </p>
-            </div>
-          </div>
-          {state.message ? (
-            <p className="mb-4 rounded-md bg-[#fff3d7] px-3 py-2 text-sm font-medium text-[#6b4e16]">
-              {state.message}
-            </p>
-          ) : null}
-          <div className="space-y-2">
-            <SubmitButton intent="draft" />
-            <SubmitButton intent="publish" />
-          </div>
-          <p className="mt-3 text-xs leading-5 text-[#6d6658]">
-            Publishing requires a description, problem statement, proposed
-            solution, and draft bill text.
-          </p>
-        </div>
-
+    <form action={formAction} className="space-y-10">
+      <section aria-label="Step 1: Draft with AI">
+        <StepHeading
+          number={1}
+          title="Start with the problem"
+          subtitle="Describe the public problem in your own words. The AI assistant will draft a bill you can refine below."
+        />
         <AiDraftHelper
           title={fields.title || "New public bill"}
           problem={fields.problem}
           onInsert={insertAiDraft}
         />
-        <LegalDisclaimer compact />
-      </aside>
+      </section>
+
+      <section aria-label="Step 2: Review and save">
+        <StepHeading
+          number={2}
+          title="Review and refine"
+          subtitle="Edit the generated draft, add the required details, then save or publish."
+        />
+        <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-5">
+            <FormSection title="Bill details">
+              <Field
+                label="Title"
+                name="title"
+                placeholder="Kerala Public Health Data Transparency Bill"
+                value={fields.title}
+                onChange={(value) => updateField("title", value)}
+                error={state.errors?.title?.[0]}
+              />
+              <TextArea
+                label="Short description"
+                name="description"
+                rows={3}
+                placeholder="A short public summary of what this bill should do."
+                value={fields.description}
+                onChange={(value) => updateField("description", value)}
+                error={state.errors?.description?.[0]}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CategorySelect
+                  label="Category"
+                  name="category"
+                  value={fields.category}
+                  onChange={(value) => updateField("category", value)}
+                  error={state.errors?.category?.[0]}
+                />
+                <Field
+                  label="Tags"
+                  name="tags"
+                  placeholder="health, data, hospitals"
+                  value={fields.tags}
+                  onChange={(value) => updateField("tags", value)}
+                  error={state.errors?.tags?.[0]}
+                />
+              </div>
+              {fields.category === OTHER_BILL_CATEGORY ? (
+                <Field
+                  label="Other category"
+                  name="categoryOther"
+                  placeholder="Enter the department or topic"
+                  value={fields.categoryOther}
+                  onChange={(value) => updateField("categoryOther", value)}
+                  error={state.errors?.categoryOther?.[0]}
+                />
+              ) : null}
+            </FormSection>
+
+            <FormSection title="Policy content">
+              <TextArea
+                label="Problem statement"
+                name="problem"
+                rows={5}
+                placeholder="Describe the public problem, who is affected, and why this needs legislative attention."
+                value={fields.problem}
+                onChange={(value) => updateField("problem", value)}
+                error={state.errors?.problem?.[0]}
+              />
+              <TextArea
+                label="Proposed solution"
+                name="proposedSolution"
+                rows={5}
+                placeholder="Describe the intervention, obligations, rights, duties, standards, or reporting requirements."
+                value={fields.proposedSolution}
+                onChange={(value) => updateField("proposedSolution", value)}
+                error={state.errors?.proposedSolution?.[0]}
+              />
+              <TextArea
+                label="Expected public impact"
+                name="expectedImpact"
+                rows={4}
+                placeholder="Explain how people, institutions, or local bodies should benefit."
+                value={fields.expectedImpact}
+                onChange={(value) => updateField("expectedImpact", value)}
+                error={state.errors?.expectedImpact?.[0]}
+              />
+              <TextArea
+                label="Draft bill text"
+                name="body"
+                rows={10}
+                placeholder="Paste or draft clauses here. The AI assistant will later help structure this section."
+                value={fields.body}
+                onChange={(value) => updateField("body", value)}
+                error={state.errors?.body?.[0]}
+              />
+              <TextArea
+                label="References and supporting links"
+                name="references"
+                rows={4}
+                placeholder="Add source links, reports, news articles, government pages, or notes that support this bill."
+                value={fields.references}
+                onChange={(value) => updateField("references", value)}
+                error={state.errors?.references?.[0]}
+              />
+            </FormSection>
+          </div>
+
+          <aside className="space-y-4">
+            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+                  <FileText size={20} aria-hidden="true" />
+                </span>
+                <div>
+                  <h2 className="font-semibold">Save bill</h2>
+                  <p className="text-sm text-[#6d6658]">
+                    Keep it private or publish immediately.
+                  </p>
+                </div>
+              </div>
+              {state.message ? (
+                <p className="mb-4 rounded-md bg-[#fff3d7] px-3 py-2 text-sm font-medium text-[#6b4e16]">
+                  {state.message}
+                </p>
+              ) : null}
+              <div className="space-y-2">
+                <SubmitButton intent="draft" />
+                <SubmitButton intent="publish" />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-[#6d6658]">
+                Publishing requires a description, problem statement, proposed
+                solution, and draft bill text.
+              </p>
+            </div>
+
+            <LegalDisclaimer compact />
+          </aside>
+        </div>
+      </section>
     </form>
+  );
+}
+
+function StepHeading({
+  number,
+  title,
+  subtitle,
+}: {
+  number: number;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="mb-4 flex items-start gap-3">
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#123c69] text-sm font-semibold text-white">
+        {number}
+      </span>
+      <div>
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <p className="mt-0.5 max-w-2xl text-sm leading-6 text-[#6d6658]">
+          {subtitle}
+        </p>
+      </div>
+    </div>
   );
 }
 
