@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
-import { useState } from "react";
+import { useActionState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { FileText, Send, Save } from "lucide-react";
+import { FileText, History, Send, Save, Trash2 } from "lucide-react";
 
 import { createBillAction, type BillFormState } from "@/app/bills/new/actions";
 import {
@@ -12,23 +12,116 @@ import {
 } from "@/components/ai-draft-helper";
 import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
+import {
+  clearBillDraft,
+  EMPTY_BILL_DRAFT_FIELDS,
+  loadBillDraft,
+  saveBillDraft,
+  type BillDraftFields,
+  type StoredBillDraft,
+} from "@/lib/draft-storage";
+import { formatRelativeTime } from "@/lib/relative-time";
 
 const initialState: BillFormState = {};
+const AUTOSAVE_DELAY_MS = 600;
+
+function subscribeToBillDraft() {
+  return () => {};
+}
 
 export function BillForm() {
+  const snapshotRef = useRef<StoredBillDraft | null | undefined>(undefined);
+
+  const restoredDraft = useSyncExternalStore(
+    subscribeToBillDraft,
+    () => {
+      if (snapshotRef.current === undefined) {
+        snapshotRef.current = loadBillDraft();
+      }
+
+      return snapshotRef.current;
+    },
+    () => null,
+  );
+
+  return (
+    <BillFormEditor
+      key={restoredDraft?.savedAt ?? "fresh"}
+      restoredDraft={restoredDraft}
+    />
+  );
+}
+
+function BillFormEditor({
+  restoredDraft,
+}: {
+  restoredDraft: StoredBillDraft | null;
+}) {
   const [state, formAction] = useActionState(createBillAction, initialState);
-  const [fields, setFields] = useState({
-    title: state.fields?.title ?? "",
-    description: state.fields?.description ?? "",
-    category: state.fields?.category ?? "",
-    categoryOther: state.fields?.categoryOther ?? "",
-    tags: state.fields?.tags ?? "",
-    problem: state.fields?.problem ?? "",
-    proposedSolution: state.fields?.proposedSolution ?? "",
-    expectedImpact: state.fields?.expectedImpact ?? "",
-    body: state.fields?.body ?? "",
-    references: state.fields?.references ?? "",
-  });
+  const [fields, setFields] = useState<BillDraftFields>(() =>
+    restoredDraft
+      ? restoredDraft.fields
+      : {
+          title: state.fields?.title ?? "",
+          description: state.fields?.description ?? "",
+          category: state.fields?.category ?? "",
+          categoryOther: state.fields?.categoryOther ?? "",
+          tags: state.fields?.tags ?? "",
+          problem: state.fields?.problem ?? "",
+          proposedSolution: state.fields?.proposedSolution ?? "",
+          expectedImpact: state.fields?.expectedImpact ?? "",
+          body: state.fields?.body ?? "",
+          references: state.fields?.references ?? "",
+        },
+  );
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const lastSavedSnapshotRef = useRef(JSON.stringify(fields));
+  const submittedRef = useRef(false);
+
+  useEffect(() => {
+    if (submittedRef.current) {
+      return;
+    }
+
+    const snapshot = JSON.stringify(fields);
+
+    if (snapshot === lastSavedSnapshotRef.current) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (submittedRef.current) {
+        return;
+      }
+
+      lastSavedSnapshotRef.current = snapshot;
+      saveBillDraft(fields);
+    }, AUTOSAVE_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [fields]);
+
+  useEffect(() => {
+    if (!state.errors && !state.message) {
+      return;
+    }
+
+    submittedRef.current = false;
+    lastSavedSnapshotRef.current = JSON.stringify(fields);
+    saveBillDraft(fields);
+  }, [state, fields]);
+
+  function handleSubmit() {
+    submittedRef.current = true;
+    clearBillDraft();
+  }
+
+  function discardDraft() {
+    clearBillDraft();
+    setFields({ ...EMPTY_BILL_DRAFT_FIELDS });
+    setBannerDismissed(true);
+    lastSavedSnapshotRef.current = JSON.stringify(EMPTY_BILL_DRAFT_FIELDS);
+  }
 
   function updateField(name: keyof typeof fields, value: string) {
     setFields((current) => ({
@@ -48,7 +141,34 @@ export function BillForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-10">
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-10">
+      {restoredDraft && !bannerDismissed ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#c8c0ae] bg-[#fbfaf7] px-4 py-3">
+          <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
+            <History
+              size={16}
+              aria-hidden="true"
+              className="shrink-0 text-[#123c69]"
+            />
+            <span>
+              Restored your unsaved draft from{" "}
+              <span className="font-semibold">
+                {formatRelativeTime(new Date(restoredDraft.savedAt), "en")}
+              </span>
+              . Changes autosave on this device.
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={discardDraft}
+            className="flex h-8 items-center gap-1.5 rounded-md border border-[#c8c0ae] bg-white px-2.5 text-xs font-semibold text-[#2f2a22]"
+          >
+            <Trash2 size={14} aria-hidden="true" />
+            Discard draft
+          </button>
+        </div>
+      ) : null}
+
       <section aria-label="Step 1: Draft with AI">
         <StepHeading
           number={1}
@@ -190,7 +310,8 @@ export function BillForm() {
               </div>
               <p className="mt-3 text-xs leading-5 text-[#6d6658]">
                 Publishing requires a description, problem statement, proposed
-                solution, and draft bill text.
+                solution, and draft bill text. Unsaved changes are kept on this
+                device automatically.
               </p>
             </div>
 
