@@ -29,6 +29,7 @@ type MessageTree = {
     independence: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    heroHowLink: string;
     howHeading: string;
     howSupport: string;
     step1: string;
@@ -147,6 +148,7 @@ export const messages: Record<Locale, MessageTree> = {
         "Independent civic platform — not a government service. Published drafts are public proposals, not official legislation.",
       ctaPrimary: "Start a bill",
       ctaSecondary: "Browse bills",
+      heroHowLink: "See how it works",
       howHeading: "How it works",
       howSupport: "Four steps from a public problem to a shareable draft.",
       step1: "Describe the public problem",
@@ -276,6 +278,7 @@ export const messages: Record<Locale, MessageTree> = {
         "സ്വതന്ത്ര പൗര വേദി — സർക്കാർ സേവനമല്ല. പ്രസിദ്ധീകരിച്ച ഡ്രാഫ്റ്റുകൾ പൊതു നിർദേശങ്ങളാണ്; ഔദ്യോഗിക നിയമനിർമ്മാണമല്ല.",
       ctaPrimary: "ബിൽ ആരംഭിക്കുക",
       ctaSecondary: "ബില്ലുകൾ കാണുക",
+      heroHowLink: "എങ്ങനെ പ്രവർത്തിക്കുന്നു എന്ന് കാണുക",
       howHeading: "എങ്ങനെ പ്രവർത്തിക്കുന്നു",
       howSupport:
         "പൊതു പ്രശ്നത്തിൽ നിന്ന് പങ്കിടാവുന്ന ഡ്രാഫ്റ്റിലേക്ക് നാല് ഘട്ടങ്ങൾ.",

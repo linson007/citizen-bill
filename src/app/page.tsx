@@ -58,7 +58,10 @@ export default async function Home() {
             <h1 className="animate-fade-up-delay mt-6 text-xl font-medium leading-snug text-ink-soft sm:text-2xl">
               {t.home.headline}
             </h1>
-            <div className="animate-fade-up-delay-2 mt-6 flex flex-col gap-3 sm:flex-row">
+            <p className="animate-fade-up-delay mt-4 text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
+              {t.home.support}
+            </p>
+            <div className="animate-fade-up-delay-2 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/bills/new"
                 className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
@@ -73,10 +76,14 @@ export default async function Home() {
                 <FileText size={18} aria-hidden="true" />
                 {t.home.ctaSecondary}
               </Link>
+              <a
+                href="#draft"
+                className="flex h-12 items-center justify-center gap-1.5 px-2 text-sm font-semibold text-accent transition-colors hover:text-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              >
+                {t.home.heroHowLink}
+                <ArrowRight size={16} aria-hidden="true" />
+              </a>
             </div>
-            <p className="animate-fade-up-delay-2 mt-4 text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
-              {t.home.support}
-            </p>
             <p className="animate-fade-up-delay-2 mt-4 flex items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
               <CheckCircle2
                 className="mt-0.5 shrink-0 text-success"
