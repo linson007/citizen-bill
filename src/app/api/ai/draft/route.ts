@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { getOpenAiModel } from "@/lib/ai-config";
 import {
   parseAiTitleCategorySuggestion,
+  type AiDraftFields,
   type AiTitleCategorySuggestion,
 } from "@/lib/ai-draft-fields";
 import {
@@ -21,12 +22,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
 
-type StructuredDraft = {
-  description: string;
-  proposedSolution: string;
-  expectedImpact: string;
-  body: string;
-};
+type StructuredDraft = AiDraftFields;
 
 const modes = {
   draft:
@@ -240,8 +236,13 @@ function buildPrompt(title: string, prompt: string, mode: AiMode) {
       `Problem statement:\n${prompt}`,
       "",
       "Return only valid JSON with these string keys:",
-      "description, proposedSolution, expectedImpact, body.",
-      "Keep the description concise. The body should be a structured draft bill outline with clauses.",
+      "title, description, category, categoryOther, tags, problem, proposedSolution, expectedImpact, body, references.",
+      `Category must be exactly one of: ${billCategories
+        .map((category) =>
+          category === OTHER_BILL_CATEGORY ? "Other" : category,
+        )
+        .join(", ")}.`,
+      "Use an empty string for categoryOther unless Category is Other. Use an empty string for references when no reliable source can be named. Keep the description concise. The body should be a structured draft bill outline with clauses.",
     ].join("\n");
   }
 
@@ -309,19 +310,31 @@ function parseStructuredDraft(value: string): StructuredDraft | null {
     const parsed = JSON.parse(value) as Partial<StructuredDraft>;
 
     if (
+      typeof parsed.title !== "string" ||
       typeof parsed.description !== "string" ||
+      typeof parsed.category !== "string" ||
+      typeof parsed.categoryOther !== "string" ||
+      typeof parsed.tags !== "string" ||
+      typeof parsed.problem !== "string" ||
       typeof parsed.proposedSolution !== "string" ||
       typeof parsed.expectedImpact !== "string" ||
-      typeof parsed.body !== "string"
+      typeof parsed.body !== "string" ||
+      typeof parsed.references !== "string"
     ) {
       return null;
     }
 
     return {
+      title: parsed.title,
       description: parsed.description,
+      category: parsed.category,
+      categoryOther: parsed.categoryOther,
+      tags: parsed.tags,
+      problem: parsed.problem,
       proposedSolution: parsed.proposedSolution,
       expectedImpact: parsed.expectedImpact,
       body: parsed.body,
+      references: parsed.references,
     };
   } catch {
     return null;
@@ -339,7 +352,15 @@ function createFallbackFields(
       : "A public bill proposal to address the stated problem through clear duties, accountability, and citizen-facing implementation.";
 
   return {
+    title:
+      title === "Public Bill"
+        ? "Public Services Accountability Bill"
+        : title,
     description: legalPrefix,
+    category: createFallbackSuggestion(prompt).category,
+    categoryOther: "",
+    tags: "public accountability, citizen services",
+    problem: prompt,
     proposedSolution:
       "Create defined responsibilities for public authorities, require transparent reporting, provide a citizen access mechanism, and establish review duties for implementation.",
     expectedImpact:
@@ -368,6 +389,7 @@ function createFallbackFields(
       "7. Rule-making power",
       "The Government may make rules to carry out the provisions of this Act.",
     ].join("\n"),
+    references: "",
   };
 }
 
@@ -432,13 +454,25 @@ function formatDraftPreview(
   fields: StructuredDraft,
 ) {
   return [
-    `Title: ${title}`,
+    `Title: ${fields.title || title}`,
     "",
     "Problem Statement:",
-    prompt,
+    fields.problem || prompt,
     "",
     "Short Description:",
     fields.description,
+    "",
+    "Category:",
+    fields.category,
+    "",
+    "Other Category:",
+    fields.categoryOther,
+    "",
+    "Tags:",
+    fields.tags,
+    "",
+    "Problem Statement:",
+    fields.problem,
     "",
     "Proposed Solution:",
     fields.proposedSolution,
@@ -448,5 +482,8 @@ function formatDraftPreview(
     "",
     "Draft Bill Text:",
     fields.body,
+    "",
+    "References:",
+    fields.references,
   ].join("\n");
 }

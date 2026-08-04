@@ -30,7 +30,10 @@ import {
 } from "@/lib/draft-storage";
 import { formatRelativeTime } from "@/lib/relative-time";
 import type { MessageTree } from "@/lib/messages";
-import type { AiTitleCategorySuggestion } from "@/lib/ai-draft-fields";
+import {
+  normalizeSuggestedCategory,
+  type AiTitleCategorySuggestion,
+} from "@/lib/ai-draft-fields";
 import type { Locale } from "@/lib/locale";
 
 const initialState: BillFormState = {};
@@ -163,10 +166,16 @@ function BillFormEditor({
   function insertAiDraft(draft: AiDraftFields) {
     setFields((current) => ({
       ...current,
+      title: draft.title || current.title,
       description: draft.description || current.description,
+      category: normalizeSuggestedCategory(draft.category) ?? current.category,
+      categoryOther: draft.categoryOther || current.categoryOther,
+      tags: draft.tags || current.tags,
+      problem: draft.problem || current.problem,
       proposedSolution: draft.proposedSolution || current.proposedSolution,
       expectedImpact: draft.expectedImpact || current.expectedImpact,
       body: draft.body || current.body,
+      references: draft.references || current.references,
     }));
   }
 
