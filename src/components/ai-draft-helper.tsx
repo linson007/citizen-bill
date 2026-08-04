@@ -7,6 +7,7 @@ import {
   parseAiDraftFieldsFromText,
   type AiDraftFields,
 } from "@/lib/ai-draft-fields";
+import type { Locale } from "@/lib/locale";
 
 export type { AiDraftFields };
 
@@ -44,12 +45,18 @@ export function AiDraftHelper({
   problem,
   onInsert,
   billId,
+  locale = "en",
 }: {
   title: string;
   problem: string;
   onInsert?: (fields: AiDraftFields) => void;
   billId?: string;
+  locale?: Locale;
 }) {
+  const ml = locale === "ml";
+  const modeLabels: Record<AiMode, string> = ml
+    ? { draft: "ബിൽ ഡ്രാഫ്റ്റ്", legal: "നിയമ ഘടന", simplify: "ലളിതമാക്കുക", malayalam: "മലയാളം", summary: "സംഗ്രഹിക്കുക", arguments: "വാദങ്ങൾ" }
+    : Object.fromEntries(aiModes.map(({ value, label }) => [value, label])) as Record<AiMode, string>;
   const [prompt, setPrompt] = useState(problem);
   const [mode, setMode] = useState<AiMode>("draft");
   const [result, setResult] = useState("");
@@ -232,9 +239,9 @@ export function AiDraftHelper({
           <Bot size={20} aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-semibold">AI drafting assistant</h2>
+          <h2 className="font-semibold">{ml ? "AI ഡ്രാഫ്റ്റിംഗ് സഹായി" : "AI drafting assistant"}</h2>
           <p className="text-sm text-[#6d6658]">
-            Draft, revise, translate, summarize, or stress-test a bill idea.
+            {ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യുക, തിരുത്തുക, വിവർത്തനം ചെയ്യുക, സംഗ്രഹിക്കുക, അല്ലെങ്കിൽ പരിശോധിക്കുക." : "Draft, revise, translate, summarize, or stress-test a bill idea."}
           </p>
         </div>
       </div>
@@ -251,7 +258,7 @@ export function AiDraftHelper({
                 : "border-[#c8c0ae] bg-white text-[#2f2a22]"
             }`}
           >
-            {item.label}
+            {modeLabels[item.value]}
           </button>
         ))}
       </div>
@@ -268,10 +275,10 @@ export function AiDraftHelper({
               }`}
             >
               <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">
-                {message.role === "user" ? "You" : "Assistant"}
+                {message.role === "user" ? (ml ? "നിങ്ങൾ" : "You") : (ml ? "സഹായി" : "Assistant")}
               </p>
               <p className="whitespace-pre-wrap">
-                {message.content || "Writing..."}
+                {message.content || (ml ? "എഴുതുന്നു..." : "Writing...")}
               </p>
             </div>
           ))}
@@ -282,7 +289,7 @@ export function AiDraftHelper({
         value={prompt}
         onChange={(event) => setPrompt(event.target.value)}
         rows={5}
-        placeholder="Ask the assistant to draft, improve, summarize, translate, or review your bill idea."
+        placeholder={ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യാനോ മെച്ചപ്പെടുത്താനോ സംഗ്രഹിക്കാനോ വിവർത്തനം ചെയ്യാനോ പരിശോധിക്കാനോ സഹായിയോട് ചോദിക്കുക." : "Ask the assistant to draft, improve, summarize, translate, or review your bill idea."}
         className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
       />
       <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-[#6d6658]">
@@ -292,7 +299,7 @@ export function AiDraftHelper({
           onChange={(event) => setSaveHistory(event.target.checked)}
           className="mt-1"
         />
-        Save this AI conversation to my drafting history.
+        {ml ? "ഈ AI സംഭാഷണം എന്റെ ഡ്രാഫ്റ്റിംഗ് ചരിത്രത്തിൽ സേവ് ചെയ്യുക." : "Save this AI conversation to my drafting history."}
       </label>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <button
@@ -306,7 +313,7 @@ export function AiDraftHelper({
           ) : (
             <Send size={16} aria-hidden="true" />
           )}
-          {loading ? "Writing" : "Send chat"}
+          {loading ? (ml ? "എഴുതുന്നു" : "Writing") : (ml ? "ചാറ്റ് അയയ്ക്കുക" : "Send chat")}
         </button>
         <button
           type="button"
@@ -319,7 +326,7 @@ export function AiDraftHelper({
           ) : (
             <Bot size={16} aria-hidden="true" />
           )}
-          Structured draft
+          {ml ? "ഘടനയുള്ള ഡ്രാഫ്റ്റ്" : "Structured draft"}
         </button>
       </div>
 
@@ -327,7 +334,7 @@ export function AiDraftHelper({
         <div className="mt-4 rounded-md bg-[#fbfaf7] p-4">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[#3f3a32]">
-              Suggested draft
+              {ml ? "നിർദേശിച്ച ഡ്രാഫ്റ്റ്" : "Suggested draft"}
             </p>
             {fields && onInsert ? (
               <button
@@ -340,7 +347,7 @@ export function AiDraftHelper({
                 ) : (
                   <Save size={14} aria-hidden="true" />
                 )}
-                Insert into form
+                {ml ? "ഫോമിലേക്ക് ചേർക്കുക" : "Insert into form"}
               </button>
             ) : null}
           </div>

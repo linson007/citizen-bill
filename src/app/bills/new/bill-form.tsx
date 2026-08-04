@@ -31,6 +31,7 @@ import {
 import { formatRelativeTime } from "@/lib/relative-time";
 import type { MessageTree } from "@/lib/messages";
 import type { AiTitleCategorySuggestion } from "@/lib/ai-draft-fields";
+import type { Locale } from "@/lib/locale";
 
 const initialState: BillFormState = {};
 const AUTOSAVE_DELAY_MS = 600;
@@ -42,8 +43,10 @@ function subscribeToBillDraft() {
 type SuggestionLabels = MessageTree["draft"]["suggestions"];
 
 export function BillForm({
+  locale,
   suggestionLabels,
 }: {
+  locale: Locale;
   suggestionLabels: SuggestionLabels;
 }) {
   const snapshotRef = useRef<StoredBillDraft | null | undefined>(undefined);
@@ -64,6 +67,7 @@ export function BillForm({
     <BillFormEditor
       key={restoredDraft?.savedAt ?? "fresh"}
       restoredDraft={restoredDraft}
+      locale={locale}
       suggestionLabels={suggestionLabels}
     />
   );
@@ -71,11 +75,14 @@ export function BillForm({
 
 function BillFormEditor({
   restoredDraft,
+  locale,
   suggestionLabels,
 }: {
   restoredDraft: StoredBillDraft | null;
+  locale: Locale;
   suggestionLabels: SuggestionLabels;
 }) {
+  const ml = locale === "ml";
   const [state, formAction] = useActionState(createBillAction, initialState);
   const [fields, setFields] = useState<BillDraftFields>(() =>
     restoredDraft
@@ -216,9 +223,9 @@ function BillFormEditor({
             <span>
               Restored your unsaved draft from{" "}
               <span className="font-semibold">
-                {formatRelativeTime(new Date(restoredDraft.savedAt), "en")}
+                {formatRelativeTime(new Date(restoredDraft.savedAt), locale)}
               </span>
-              . Changes autosave on this device.
+              {ml ? ". മാറ്റങ്ങൾ ഈ ഉപകരണത്തിൽ സ്വയമേവ സേവ് ചെയ്യും." : ". Changes autosave on this device."}
             </span>
           </p>
           <button
@@ -227,33 +234,34 @@ function BillFormEditor({
             className="flex h-8 items-center gap-1.5 rounded-md border border-[#c8c0ae] bg-white px-2.5 text-xs font-semibold text-[#2f2a22]"
           >
             <Trash2 size={14} aria-hidden="true" />
-            Discard draft
+            {ml ? "ഡ്രാഫ്റ്റ് ഒഴിവാക്കുക" : "Discard draft"}
           </button>
         </div>
       ) : null}
 
-      <section aria-label="Step 1: Draft with AI">
+      <section aria-label={ml ? "ഘട്ടം 1: AI ഉപയോഗിച്ച് ഡ്രാഫ്റ്റ്" : "Step 1: Draft with AI"}>
         <StepHeading
           number={1}
-          title="Start with the problem"
-          subtitle="Describe the public problem in your own words. The AI assistant will draft a bill you can refine below."
+          title={ml ? "പ്രശ്നത്തിൽ നിന്ന് തുടങ്ങുക" : "Start with the problem"}
+          subtitle={ml ? "പൊതു പ്രശ്നം നിങ്ങളുടെ വാക്കുകളിൽ വിവരിക്കുക. താഴെ മെച്ചപ്പെടുത്താവുന്ന ഒരു ബിൽ AI സഹായി തയ്യാറാക്കും." : "Describe the public problem in your own words. The AI assistant will draft a bill you can refine below."}
         />
         <AiDraftHelper
-          title={fields.title || "New public bill"}
+          title={fields.title || (ml ? "പുതിയ പൊതു ബിൽ" : "New public bill")}
           problem={fields.problem}
           onInsert={insertAiDraft}
+          locale={locale}
         />
       </section>
 
-      <section aria-label="Step 2: Review and save">
+      <section aria-label={ml ? "ഘട്ടം 2: പരിശോധിച്ച് സേവ് ചെയ്യുക" : "Step 2: Review and save"}>
         <StepHeading
           number={2}
-          title="Review and refine"
-          subtitle="Edit the generated draft, add the required details, then save or publish."
+          title={ml ? "പരിശോധിച്ച് മെച്ചപ്പെടുത്തുക" : "Review and refine"}
+          subtitle={ml ? "തയ്യാറാക്കിയ ഡ്രാഫ്റ്റ് എഡിറ്റ് ചെയ്യുക, ആവശ്യമായ വിവരങ്ങൾ ചേർക്കുക, തുടർന്ന് സേവ് ചെയ്യുകയോ പ്രസിദ്ധീകരിക്കുകയോ ചെയ്യുക." : "Edit the generated draft, add the required details, then save or publish."}
         />
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
-            <FormSection title="Bill details">
+            <FormSection title={ml ? "ബിൽ വിവരങ്ങൾ" : "Bill details"}>
               <div className="rounded-md border border-[#c9d9e8] bg-[#f4f8fb] p-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
@@ -328,34 +336,34 @@ function BillFormEditor({
                 ) : null}
               </div>
               <Field
-                label="Title"
+                label={ml ? "തലക്കെട്ട്" : "Title"}
                 name="title"
-                placeholder="Kerala Public Health Data Transparency Bill"
+                placeholder={ml ? "കേരള പൊതു ആരോഗ്യ ഡാറ്റ സുതാര്യതാ ബിൽ" : "Kerala Public Health Data Transparency Bill"}
                 value={fields.title}
                 onChange={(value) => updateField("title", value)}
                 error={state.errors?.title?.[0]}
               />
               <TextArea
-                label="Short description"
+                label={ml ? "ഹ്രസ്വ വിവരണം" : "Short description"}
                 name="description"
                 rows={3}
-                placeholder="A short public summary of what this bill should do."
+                placeholder={ml ? "ഈ ബിൽ ചെയ്യേണ്ടതിന്റെ ഹ്രസ്വ പൊതു സംഗ്രഹം." : "A short public summary of what this bill should do."}
                 value={fields.description}
                 onChange={(value) => updateField("description", value)}
                 error={state.errors?.description?.[0]}
               />
               <div className="grid gap-4 sm:grid-cols-2">
                 <CategorySelect
-                  label="Category"
+                  label={ml ? "വിഭാഗം" : "Category"}
                   name="category"
                   value={fields.category}
                   onChange={(value) => updateField("category", value)}
                   error={state.errors?.category?.[0]}
                 />
                 <Field
-                  label="Tags"
+                  label={ml ? "ടാഗുകൾ" : "Tags"}
                   name="tags"
-                  placeholder="health, data, hospitals"
+                  placeholder={ml ? "ആരോഗ്യം, ഡാറ്റ, ആശുപത്രികൾ" : "health, data, hospitals"}
                   value={fields.tags}
                   onChange={(value) => updateField("tags", value)}
                   error={state.errors?.tags?.[0]}
@@ -363,9 +371,9 @@ function BillFormEditor({
               </div>
               {fields.category === OTHER_BILL_CATEGORY ? (
                 <Field
-                  label="Other category"
+                  label={ml ? "മറ്റു വിഭാഗം" : "Other category"}
                   name="categoryOther"
-                  placeholder="Enter the department or topic"
+                  placeholder={ml ? "വകുപ്പോ വിഷയമോ നൽകുക" : "Enter the department or topic"}
                   value={fields.categoryOther}
                   onChange={(value) => updateField("categoryOther", value)}
                   error={state.errors?.categoryOther?.[0]}
@@ -373,48 +381,48 @@ function BillFormEditor({
               ) : null}
             </FormSection>
 
-            <FormSection title="Policy content">
+            <FormSection title={ml ? "നയ ഉള്ളടക്കം" : "Policy content"}>
               <TextArea
-                label="Problem statement"
+                label={ml ? "പ്രശ്ന പ്രസ്താവന" : "Problem statement"}
                 name="problem"
                 rows={5}
-                placeholder="Describe the public problem, who is affected, and why this needs legislative attention."
+                placeholder={ml ? "പൊതു പ്രശ്നം, ബാധിക്കപ്പെടുന്നവർ, നിയമനിർമ്മാണ ശ്രദ്ധ ആവശ്യമായ കാരണം എന്നിവ വിവരിക്കുക." : "Describe the public problem, who is affected, and why this needs legislative attention."}
                 value={fields.problem}
                 onChange={(value) => updateField("problem", value)}
                 error={state.errors?.problem?.[0]}
               />
               <TextArea
-                label="Proposed solution"
+                label={ml ? "നിർദേശിക്കുന്ന പരിഹാരം" : "Proposed solution"}
                 name="proposedSolution"
                 rows={5}
-                placeholder="Describe the intervention, obligations, rights, duties, standards, or reporting requirements."
+                placeholder={ml ? "ഇടപെടൽ, ബാധ്യതകൾ, അവകാശങ്ങൾ, ചുമതലകൾ, മാനദണ്ഡങ്ങൾ, റിപ്പോർട്ടിംഗ് ആവശ്യകതകൾ എന്നിവ വിവരിക്കുക." : "Describe the intervention, obligations, rights, duties, standards, or reporting requirements."}
                 value={fields.proposedSolution}
                 onChange={(value) => updateField("proposedSolution", value)}
                 error={state.errors?.proposedSolution?.[0]}
               />
               <TextArea
-                label="Expected public impact"
+                label={ml ? "പ്രതീക്ഷിക്കുന്ന പൊതു പ്രഭാവം" : "Expected public impact"}
                 name="expectedImpact"
                 rows={4}
-                placeholder="Explain how people, institutions, or local bodies should benefit."
+                placeholder={ml ? "ജനങ്ങൾക്കും സ്ഥാപനങ്ങൾക്കും തദ്ദേശ സ്ഥാപനങ്ങൾക്കും ലഭിക്കേണ്ട ഗുണം വിശദീകരിക്കുക." : "Explain how people, institutions, or local bodies should benefit."}
                 value={fields.expectedImpact}
                 onChange={(value) => updateField("expectedImpact", value)}
                 error={state.errors?.expectedImpact?.[0]}
               />
               <TextArea
-                label="Draft bill text"
+                label={ml ? "ബിൽ ഡ്രാഫ്റ്റ് വാചകം" : "Draft bill text"}
                 name="body"
                 rows={10}
-                placeholder="Paste or draft clauses here. The AI assistant will later help structure this section."
+                placeholder={ml ? "വകുപ്പുകൾ ഇവിടെ ചേർക്കുക അല്ലെങ്കിൽ ഡ്രാഫ്റ്റ് ചെയ്യുക. ഈ ഭാഗം ഘടനയാക്കാൻ AI സഹായി പിന്നീട് സഹായിക്കും." : "Paste or draft clauses here. The AI assistant will later help structure this section."}
                 value={fields.body}
                 onChange={(value) => updateField("body", value)}
                 error={state.errors?.body?.[0]}
               />
               <TextArea
-                label="References and supporting links"
+                label={ml ? "അവലംബങ്ങളും അനുബന്ധ ലിങ്കുകളും" : "References and supporting links"}
                 name="references"
                 rows={4}
-                placeholder="Add source links, reports, news articles, government pages, or notes that support this bill."
+                placeholder={ml ? "ഈ ബില്ലിനെ പിന്തുണയ്ക്കുന്ന സ്രോതസ് ലിങ്കുകൾ, റിപ്പോർട്ടുകൾ, വാർത്തകൾ, സർക്കാർ പേജുകൾ, കുറിപ്പുകൾ എന്നിവ ചേർക്കുക." : "Add source links, reports, news articles, government pages, or notes that support this bill."}
                 value={fields.references}
                 onChange={(value) => updateField("references", value)}
                 error={state.errors?.references?.[0]}
@@ -429,9 +437,9 @@ function BillFormEditor({
                   <FileText size={20} aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className="font-semibold">Save bill</h2>
+                  <h2 className="font-semibold">{ml ? "ബിൽ സേവ് ചെയ്യുക" : "Save bill"}</h2>
                   <p className="text-sm text-[#6d6658]">
-                    Keep it private or publish immediately.
+                    {ml ? "സ്വകാര്യമായി സൂക്ഷിക്കുകയോ ഉടൻ പ്രസിദ്ധീകരിക്കുകയോ ചെയ്യുക." : "Keep it private or publish immediately."}
                   </p>
                 </div>
               </div>
@@ -441,17 +449,15 @@ function BillFormEditor({
                 </p>
               ) : null}
               <div className="space-y-2">
-                <SubmitButton intent="draft" />
-                <SubmitButton intent="publish" />
+                <SubmitButton intent="draft" locale={locale} />
+                <SubmitButton intent="publish" locale={locale} />
               </div>
               <p className="mt-3 text-xs leading-5 text-[#6d6658]">
-                Publishing requires a description, problem statement, proposed
-                solution, and draft bill text. Unsaved changes are kept on this
-                device automatically.
+                {ml ? "പ്രസിദ്ധീകരിക്കാൻ വിവരണം, പ്രശ്ന പ്രസ്താവന, നിർദേശിക്കുന്ന പരിഹാരം, ബിൽ ഡ്രാഫ്റ്റ് വാചകം എന്നിവ ആവശ്യമാണ്. സേവ് ചെയ്യാത്ത മാറ്റങ്ങൾ ഈ ഉപകരണത്തിൽ സ്വയമേവ സൂക്ഷിക്കും." : "Publishing requires a description, problem statement, proposed solution, and draft bill text. Unsaved changes are kept on this device automatically."}
               </p>
             </div>
 
-            <LegalDisclaimer compact />
+            <LegalDisclaimer compact locale={locale} />
           </aside>
         </div>
       </section>
@@ -483,7 +489,7 @@ function StepHeading({
   );
 }
 
-function SubmitButton({ intent }: { intent: "draft" | "publish" }) {
+function SubmitButton({ intent, locale }: { intent: "draft" | "publish"; locale: Locale }) {
   const { pending } = useFormStatus();
   const isPublish = intent === "publish";
 
@@ -506,11 +512,11 @@ function SubmitButton({ intent }: { intent: "draft" | "publish" }) {
       )}
       {pending
         ? isPublish
-          ? "Publishing"
-          : "Saving draft"
+          ? locale === "ml" ? "പ്രസിദ്ധീകരിക്കുന്നു" : "Publishing"
+          : locale === "ml" ? "ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുന്നു" : "Saving draft"
         : isPublish
-          ? "Save and publish"
-          : "Save draft"}
+          ? locale === "ml" ? "സേവ് ചെയ്ത് പ്രസിദ്ധീകരിക്കുക" : "Save and publish"
+          : locale === "ml" ? "ഡ്രാഫ്റ്റ് സേവ് ചെയ്യുക" : "Save draft"}
     </button>
   );
 }
