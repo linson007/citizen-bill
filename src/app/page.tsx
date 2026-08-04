@@ -13,7 +13,6 @@ import {
 import Link from "next/link";
 
 import { CivicHeroImage, HeroVisual } from "@/components/hero-visual";
-import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { formatDisplayTitle } from "@/lib/display-title";
@@ -280,9 +279,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
-        <LegalDisclaimer />
-      </section>
       <SiteFooter />
     </main>
   );
