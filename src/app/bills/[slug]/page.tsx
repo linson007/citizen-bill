@@ -40,8 +40,6 @@ import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
-import { getSavedBillButtonLabel } from "@/lib/bill-engagement";
-import { getBillFollowButtonLabel } from "@/lib/bill-follow";
 import { getBillDetailData } from "@/lib/bill-detail";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
@@ -623,16 +621,6 @@ export default async function BillDetailPage({
 
           <StatusWorkflow status={bill.status} />
 
-          {isAuthor ? (
-            <Link
-              href={`/bills/${bill.slug}/edit`}
-              className="flex h-11 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
-            >
-              <Pencil size={17} aria-hidden="true" />
-              Edit bill
-            </Link>
-          ) : null}
-
           <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
               <FileText size={17} aria-hidden="true" />
@@ -655,51 +643,42 @@ export default async function BillDetailPage({
           </div>
 
           {isPublicBill ? (
-            <form
-              action={toggleFollowBillAction}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
-            >
-              <input type="hidden" name="slug" value={bill.slug} />
-              <h2 className="font-semibold">Follow activity</h2>
+            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+              <h2 className="font-semibold">Stay updated</h2>
               <p className="mt-2 text-sm leading-6 text-[#6d6658]">
-                {bill._count.followers} people follow updates on this bill.
+                {bill._count.followers} following · {bill._count.savedBy} saved
               </p>
-              <button
-                type="submit"
-                className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm ${
-                  userFollow
-                    ? "border border-[#c8c0ae] bg-white text-[#2f2a22]"
-                    : "bg-[#123c69] text-white"
-                }`}
-              >
-                <Bell size={17} aria-hidden="true" />
-                {getBillFollowButtonLabel(Boolean(userFollow))}
-              </button>
-            </form>
-          ) : null}
-
-          {isPublicBill ? (
-            <form
-              action={toggleSavedBillAction}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
-            >
-              <input type="hidden" name="slug" value={bill.slug} />
-              <h2 className="font-semibold">Saved bill</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
-                {bill._count.savedBy} people saved this bill for later.
-              </p>
-              <button
-                type="submit"
-                className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm ${
-                  userSavedBill
-                    ? "border border-[#c8c0ae] bg-white text-[#2f2a22]"
-                    : "bg-[#123c69] text-white"
-                }`}
-              >
-                <Bookmark size={17} aria-hidden="true" />
-                {getSavedBillButtonLabel(Boolean(userSavedBill))}
-              </button>
-            </form>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <form action={toggleFollowBillAction}>
+                  <input type="hidden" name="slug" value={bill.slug} />
+                  <button
+                    type="submit"
+                    className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-2 text-sm font-semibold shadow-sm ${
+                      userFollow
+                        ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                        : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                    }`}
+                  >
+                    <Bell size={16} aria-hidden="true" />
+                    {userFollow ? "Following" : "Follow"}
+                  </button>
+                </form>
+                <form action={toggleSavedBillAction}>
+                  <input type="hidden" name="slug" value={bill.slug} />
+                  <button
+                    type="submit"
+                    className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-2 text-sm font-semibold shadow-sm ${
+                      userSavedBill
+                        ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                        : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                    }`}
+                  >
+                    <Bookmark size={16} aria-hidden="true" />
+                    {userSavedBill ? "Saved" : "Save"}
+                  </button>
+                </form>
+              </div>
+            </div>
           ) : null}
 
           {isPublicBill ? (
