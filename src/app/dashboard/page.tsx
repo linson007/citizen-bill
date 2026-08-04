@@ -13,6 +13,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
+import { ContinueDraftCard } from "@/components/continue-draft-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
@@ -316,6 +317,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+        <ContinueDraftCard />
         <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-7">
           {dashboardCards.map((card) => (
             <article
