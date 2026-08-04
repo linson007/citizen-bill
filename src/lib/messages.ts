@@ -72,12 +72,8 @@ export type MessageTree = {
     searchPlaceholder: string;
     allCategories: string;
     search: string;
-    statusFilter: string;
     sort: string;
-    allPublicStatuses: string;
     published: string;
-    underDiscussion: string;
-    readyForReview: string;
     newest: string;
     mostActive: string;
     mostSupported: string;
@@ -214,12 +210,8 @@ export const messages: Record<Locale, MessageTree> = {
       searchPlaceholder: "Search title, description, or problem",
       allCategories: "All categories",
       search: "Search",
-      statusFilter: "Filter by bill status",
       sort: "Sort bills",
-      allPublicStatuses: "All public statuses",
       published: "Published",
-      underDiscussion: "Under discussion",
-      readyForReview: "Ready for review",
       newest: "Newest",
       mostActive: "Most active",
       mostSupported: "Most supported",
@@ -362,12 +354,8 @@ export const messages: Record<Locale, MessageTree> = {
       searchPlaceholder: "തലക്കെട്ട്, വിവരണം, അല്ലെങ്കിൽ പ്രശ്നം തിരയുക",
       allCategories: "എല്ലാ വിഭാഗങ്ങളും",
       search: "തിരയുക",
-      statusFilter: "ബിൽ സ്റ്റാറ്റസ് പ്രകാരം ഫിൽട്ടർ ചെയ്യുക",
       sort: "ബില്ലുകൾ ക്രമീകരിക്കുക",
-      allPublicStatuses: "എല്ലാ പൊതു സ്റ്റാറ്റസുകളും",
       published: "പ്രസിദ്ധീകരിച്ചത്",
-      underDiscussion: "ചർച്ചയിലാണ്",
-      readyForReview: "അവലോകനത്തിന് തയ്യാറാണ്",
       newest: "ഏറ്റവും പുതിയത്",
       mostActive: "ഏറ്റവും സജീവം",
       mostSupported: "ഏറ്റവും പിന്തുണയുള്ളത്",

@@ -408,17 +408,9 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 function StatusBadge({ status }: { status: string }) {
   const label = status.replaceAll("_", " ").toLowerCase();
-  const tone =
-    status === "READY_FOR_REVIEW"
-      ? "bg-success-soft text-success"
-      : status === "UNDER_DISCUSSION"
-        ? "bg-warning-bg text-warning-ink"
-        : "bg-accent-soft text-accent";
 
   return (
-    <span
-      className={`rounded-md px-2.5 py-1 text-xs font-semibold capitalize ${tone}`}
-    >
+    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold capitalize text-accent">
       {label}
     </span>
   );

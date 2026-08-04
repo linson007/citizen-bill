@@ -1209,16 +1209,6 @@ function StatusWorkflow({ status }: { status: string }) {
       active: status === "PUBLISHED",
       done: status !== "DRAFT",
     },
-    {
-      label: "Under discussion",
-      active: status === "UNDER_DISCUSSION",
-      done: status === "UNDER_DISCUSSION" || status === "READY_FOR_REVIEW",
-    },
-    {
-      label: "Community supported",
-      active: status === "READY_FOR_REVIEW",
-      done: status === "READY_FOR_REVIEW",
-    },
   ];
 
   return (

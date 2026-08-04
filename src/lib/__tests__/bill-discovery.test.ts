@@ -2,42 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   BILL_DISCOVERY_SORT_OPTIONS,
-  PUBLIC_BILL_STATUS_FILTER_OPTIONS,
   getBillDiscoveryOrderBy,
-  getPublicBillStatusWhereValues,
   parseBillDiscoverySort,
-  parsePublicBillStatusFilter,
   sortBillsForDiscovery,
 } from "@/lib/bill-discovery";
 
 describe("bill discovery sorting", () => {
-  it("defaults unknown or missing status filters to all public statuses", () => {
-    expect(parsePublicBillStatusFilter(undefined)).toBe("all");
-    expect(parsePublicBillStatusFilter("")).toBe("all");
-    expect(parsePublicBillStatusFilter("DRAFT")).toBe("all");
-  });
-
-  it("accepts every configured status filter option", () => {
-    for (const option of PUBLIC_BILL_STATUS_FILTER_OPTIONS) {
-      expect(parsePublicBillStatusFilter(option.value)).toBe(option.value);
-    }
-  });
-
-  it("maps status filters to public bill statuses", () => {
-    expect(getPublicBillStatusWhereValues("all")).toEqual([
-      "PUBLISHED",
-      "UNDER_DISCUSSION",
-      "READY_FOR_REVIEW",
-    ]);
-    expect(getPublicBillStatusWhereValues("published")).toEqual(["PUBLISHED"]);
-    expect(getPublicBillStatusWhereValues("under-discussion")).toEqual([
-      "UNDER_DISCUSSION",
-    ]);
-    expect(getPublicBillStatusWhereValues("ready-for-review")).toEqual([
-      "READY_FOR_REVIEW",
-    ]);
-  });
-
   it("defaults unknown or missing sort values to newest", () => {
     expect(parseBillDiscoverySort(undefined)).toBe("newest");
     expect(parseBillDiscoverySort("")).toBe("newest");
