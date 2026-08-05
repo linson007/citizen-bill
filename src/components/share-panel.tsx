@@ -40,10 +40,12 @@ export function SharePanel({
   slug,
   url,
   text,
+  embedded = false,
 }: {
   slug: string;
   url: string;
   text: string;
+  embedded?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -65,7 +67,13 @@ export function SharePanel({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
+    <div
+      className={
+        embedded
+          ? ""
+          : "rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
+      }
+    >
       <div className="mb-4 flex items-center gap-2 font-semibold">
         <Share2 size={17} aria-hidden="true" />
         Share bill

@@ -19,7 +19,6 @@ import {
   Send,
   Share2,
   ShieldCheck,
-  Tag,
   ThumbsUp,
 } from "lucide-react";
 
@@ -37,12 +36,14 @@ import {
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
 import { BillTabs } from "@/components/bill-tabs";
+import { CharCount } from "@/components/char-count";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
 import { getBillDetailData } from "@/lib/bill-detail";
+import { formatRelativeTime } from "@/lib/relative-time";
 import {
   estimateReadingTimeMinutes,
   extractBillSections,
@@ -52,6 +53,7 @@ import {
 } from "@/lib/bill-text";
 import { formatDisplayTitle } from "@/lib/display-title";
 import { prisma } from "@/lib/prisma";
+import { getRequestLocale } from "@/lib/request-locale";
 import { calculateReputationScore, getReputationLevel } from "@/lib/reputation";
 
 const appUrl = getAppUrl();
@@ -108,10 +110,11 @@ export default async function BillDetailPage({
   searchParams: Promise<{ upload?: string }>;
 }) {
   const { slug } = await params;
-  const [session, { upload }, billData] = await Promise.all([
+  const [session, { upload }, billData, locale] = await Promise.all([
     getServerSession(authOptions),
     searchParams,
     getBillDetailData(slug),
+    getRequestLocale(),
   ]);
   if (!billData) {
     notFound();
@@ -266,7 +269,7 @@ export default async function BillDetailPage({
           </div>
         </div>
 
-        <div className="sticky top-0 z-20 border-t border-border bg-surface/95 backdrop-blur-sm">
+        <div className="sticky top-0 z-20 hidden border-t border-border bg-surface/95 backdrop-blur-sm lg:block">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-5 py-3 sm:px-8">
             {isPublicBill && !isAuthor ? (
               <form action={toggleVoteAction}>
@@ -364,6 +367,7 @@ export default async function BillDetailPage({
                     title="References and supporting links"
                     content={bill.references}
                     hideWhenEmpty
+                    linkify
                   />
                 </div>
               ),
@@ -388,11 +392,15 @@ export default async function BillDetailPage({
                     <form action={createCommentAction} className="mb-5">
                       <input type="hidden" name="slug" value={bill.slug} />
                       <label className="block">
-                        <span className="text-sm font-semibold text-ink-soft">
-                          Add a comment
+                        <span className="flex items-center justify-between gap-3">
+                          <span className="text-sm font-semibold text-ink-soft">
+                            Add a comment
+                          </span>
+                          <CharCount htmlFor="comment-body" max={2000} />
                         </span>
                         <textarea
                           name="body"
+                          id="comment-body"
                           rows={4}
                           minLength={3}
                           maxLength={2000}
@@ -428,16 +436,18 @@ export default async function BillDetailPage({
                                 comment.user.name ??
                                 "Citizen"}
                             </p>
-                            <span className="text-xs text-ink-muted">
-                              {comment.createdAt.toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </span>
+                            <time
+                              dateTime={comment.createdAt.toISOString()}
+                              className="text-xs text-ink-muted"
+                            >
+                              {formatRelativeTime(
+                                comment.createdAt,
+                                locale,
+                              )}
+                            </time>
                           </div>
                           <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
-                            {comment.body}
+                            <LinkifyText text={comment.body} />
                           </p>
                           {session?.user ? (
                             <form action={reportCommentAction} className="mt-2">
@@ -502,15 +512,24 @@ export default async function BillDetailPage({
                         placeholder="Section or clause, optional"
                         className="h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                       />
-                      <textarea
-                        name="body"
-                        rows={4}
-                        minLength={5}
-                        maxLength={3000}
-                        required
-                        placeholder="Write the amendment or improvement you suggest."
-                        className="w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
-                      />
+                      <label className="block">
+                        <span className="flex items-center justify-between gap-3">
+                          <span className="text-sm font-semibold text-ink-soft">
+                            Amendment
+                          </span>
+                          <CharCount htmlFor="suggestion-body" max={3000} />
+                        </span>
+                        <textarea
+                          name="body"
+                          id="suggestion-body"
+                          rows={4}
+                          minLength={5}
+                          maxLength={3000}
+                          required
+                          placeholder="Write the amendment or improvement you suggest."
+                          className="mt-1 w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
+                        />
+                      </label>
                       <button
                         type="submit"
                         className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
@@ -539,14 +558,23 @@ export default async function BillDetailPage({
                                 "Citizen"}
                             </p>
                             <Badge>{suggestion.status.toLowerCase()}</Badge>
+                            <time
+                              dateTime={suggestion.createdAt.toISOString()}
+                              className="text-xs text-ink-muted"
+                            >
+                              {formatRelativeTime(
+                                suggestion.createdAt,
+                                locale,
+                              )}
+                            </time>
                             {suggestion.section ? (
                               <span className="text-xs text-ink-muted">
-                                {suggestion.section}
+                                · {suggestion.section}
                               </span>
                             ) : null}
                           </div>
                           <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
-                            {suggestion.body}
+                            <LinkifyText text={suggestion.body} />
                           </p>
                           {isAuthor && suggestion.status === "OPEN" ? (
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -601,17 +629,27 @@ export default async function BillDetailPage({
                           Compare latest versions
                         </Link>
                       ) : null}
-                      {versions.map((version) => (
+                      {versions.map((version, index) => (
                         <Link
                           key={version.id}
                           href={`/bills/${bill.slug}/versions/${version.id}`}
-                          className="block rounded-md border border-border px-3 py-2 text-sm font-medium text-accent"
+                          className="block rounded-md border border-border px-3 py-2 text-sm"
                         >
-                          {version.createdAt.toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-accent">
+                              {formatRelativeTime(version.createdAt, locale)}
+                            </span>
+                            {index === 0 ? (
+                              <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-xs font-semibold text-accent">
+                                Latest
+                              </span>
+                            ) : null}
+                          </span>
+                          {version.summary ? (
+                            <span className="mt-1 line-clamp-2 block text-xs leading-5 text-ink-muted">
+                              {version.summary}
+                            </span>
+                          ) : null}
                         </Link>
                       ))}
                     </div>
@@ -674,31 +712,10 @@ export default async function BillDetailPage({
 
           <StatusWorkflow status={bill.status} />
 
-          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
-            <div className="mb-3 flex items-center gap-2 font-semibold">
-              <FileText size={17} aria-hidden="true" />
-              Export bill
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <a
-                href={`/api/bills/${bill.slug}/export?format=pdf`}
-                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
-              >
-                PDF
-              </a>
-              <a
-                href={`/api/bills/${bill.slug}/export?format=docx`}
-                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
-              >
-                DOCX
-              </a>
-            </div>
-          </div>
-
           {isPublicBill ? (
             <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
-              <h2 className="font-semibold">Stay updated</h2>
-              <p className="mt-2 text-sm leading-6 text-ink-muted">
+              <h2 className="font-semibold">Stay involved</h2>
+              <p className="mt-1 text-sm leading-5 text-ink-muted">
                 {bill._count.followers} following · {bill._count.savedBy} saved
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
@@ -731,12 +748,14 @@ export default async function BillDetailPage({
                   </button>
                 </form>
               </div>
-            </div>
-          ) : null}
-
-          {isPublicBill ? (
-            <div id="share">
-              <SharePanel slug={bill.slug} url={billUrl} text={shareText} />
+              <div className="mt-5 border-t border-border pt-4" id="share">
+                <SharePanel
+                  slug={bill.slug}
+                  url={billUrl}
+                  text={shareText}
+                  embedded
+                />
+              </div>
             </div>
           ) : null}
 
@@ -790,27 +809,43 @@ export default async function BillDetailPage({
 
           <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
-              <Tag size={17} aria-hidden="true" />
-              Tags
+              <FileText size={17} aria-hidden="true" />
+              Resources
             </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href={`/api/bills/${bill.slug}/export?format=pdf`}
+                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
+              >
+                PDF
+              </a>
+              <a
+                href={`/api/bills/${bill.slug}/export?format=docx`}
+                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
+              >
+                DOCX
+              </a>
+            </div>
+
+            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              Tags
+            </h3>
             {bill.tags.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {bill.tags.map(({ tag }) => (
                   <Badge key={tag.id}>{tag.name}</Badge>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-ink-muted">No tags added yet.</p>
+              <p className="mt-2 text-sm text-ink-muted">No tags added yet.</p>
             )}
-          </div>
 
-          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
-            <div className="mb-3 flex items-center gap-2 font-semibold">
-              <FileText size={17} aria-hidden="true" />
+            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
               Files
-            </div>
+            </h3>
             {bill.files.length > 0 ? (
-              <div className="space-y-2">
+              <div className="mt-2 space-y-2">
                 {bill.files.map((file) => (
                   <a
                     key={file.id}
@@ -824,7 +859,7 @@ export default async function BillDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-ink-muted">No files attached yet.</p>
+              <p className="mt-2 text-sm text-ink-muted">No files attached yet.</p>
             )}
 
             {isAuthor ? (
@@ -998,16 +1033,42 @@ function SuggestionButton({
   );
 }
 
+function LinkifyText({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/[^\s<]+)/g);
+
+  return (
+    <>
+      {parts.map((part, index) =>
+        /^https?:/.test(part) ? (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noreferrer"
+            className="break-all font-medium text-accent underline-offset-2 hover:underline"
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={index}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 function ContentBlock({
   title,
   content,
   hideWhenEmpty = false,
   formatted = false,
+  linkify = false,
 }: {
   title: string;
   content: string | null;
   hideWhenEmpty?: boolean;
   formatted?: boolean;
+  linkify?: boolean;
 }) {
   if (!content && hideWhenEmpty) {
     return null;
@@ -1021,7 +1082,7 @@ function ContentBlock({
           <FormattedBillText content={content} />
         ) : (
           <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
-            {content}
+            {linkify ? <LinkifyText text={content} /> : content}
           </p>
         )
       ) : (
