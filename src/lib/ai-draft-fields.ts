@@ -1,15 +1,33 @@
+import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
+
 export type AiDraftFields = {
+  title: string;
   description: string;
+  category: string;
+  categoryOther: string;
+  tags: string;
+  problem: string;
   proposedSolution: string;
   expectedImpact: string;
   body: string;
+  references: string;
+};
+
+export type AiTitleCategorySuggestion = {
+  title: string;
+  category: string;
 };
 
 const fieldHeadings = [
+  { key: "title", patterns: ["title", "bill title"] },
   {
     key: "description",
     patterns: ["short description", "description", "summary"],
   },
+  { key: "category", patterns: ["category"] },
+  { key: "categoryOther", patterns: ["other category"] },
+  { key: "tags", patterns: ["tags", "keywords"] },
+  { key: "problem", patterns: ["problem statement", "problem"] },
   {
     key: "proposedSolution",
     patterns: ["proposed solution", "solution"],
@@ -22,6 +40,7 @@ const fieldHeadings = [
     key: "body",
     patterns: ["draft bill text", "bill text", "draft bill", "clauses"],
   },
+  { key: "references", patterns: ["references", "supporting links"] },
 ] as const;
 
 type FieldKey = (typeof fieldHeadings)[number]["key"];
@@ -42,10 +61,16 @@ export function parseAiDraftFieldsFromText(
   }
 
   const fields: AiDraftFields = {
+    title: sections.get("title") ?? "",
     description: sections.get("description") ?? "",
+    category: sections.get("category") ?? "",
+    categoryOther: sections.get("categoryOther") ?? "",
+    tags: sections.get("tags") ?? "",
+    problem: sections.get("problem") ?? "",
     proposedSolution: sections.get("proposedSolution") ?? "",
     expectedImpact: sections.get("expectedImpact") ?? "",
     body: sections.get("body") ?? "",
+    references: sections.get("references") ?? "",
   };
 
   if (!fields.description && fields.body) {
@@ -53,6 +78,47 @@ export function parseAiDraftFieldsFromText(
   }
 
   return fields;
+}
+
+export function parseAiTitleCategorySuggestion(
+  value: string,
+): AiTitleCategorySuggestion | null {
+  try {
+    const parsed = JSON.parse(value) as {
+      title?: unknown;
+      category?: unknown;
+    };
+    const title = typeof parsed.title === "string" ? parsed.title.trim() : "";
+    const category = normalizeSuggestedCategory(parsed.category);
+
+    if (!title || !category) {
+      return null;
+    }
+
+    return { title: title.slice(0, 200), category };
+  } catch {
+    return null;
+  }
+}
+
+export function normalizeSuggestedCategory(value: unknown) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+
+  if (normalized.toLowerCase() === "other") {
+    return OTHER_BILL_CATEGORY;
+  }
+
+  return (
+    billCategories.find(
+      (category) =>
+        category !== OTHER_BILL_CATEGORY &&
+        category.toLowerCase() === normalized.toLowerCase(),
+    ) ?? null
+  );
 }
 
 function findSections(text: string) {

@@ -1,68 +1,12 @@
 import type { Prisma } from "@/generated/prisma/client";
-import { BillStatus } from "@/generated/prisma/enums";
-import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
-
-export const PUBLIC_BILL_STATUS_FILTER_OPTIONS = [
-  {
-    value: "all",
-    label: "All public statuses",
-  },
-  {
-    value: "published",
-    label: "Published",
-  },
-  {
-    value: "under-discussion",
-    label: "Under discussion",
-  },
-  {
-    value: "ready-for-review",
-    label: "Ready for review",
-  },
-] as const;
-
-export type PublicBillStatusFilter =
-  (typeof PUBLIC_BILL_STATUS_FILTER_OPTIONS)[number]["value"];
-
-const publicBillStatusFilterValues = new Set<string>(
-  PUBLIC_BILL_STATUS_FILTER_OPTIONS.map((option) => option.value),
-);
-
-export function parsePublicBillStatusFilter(
-  value: string | null | undefined,
-): PublicBillStatusFilter {
-  const trimmedValue = value?.trim();
-
-  if (trimmedValue && publicBillStatusFilterValues.has(trimmedValue)) {
-    return trimmedValue as PublicBillStatusFilter;
-  }
-
-  return "all";
-}
-
-export function getPublicBillStatusWhereValues(
-  filter: PublicBillStatusFilter,
-): BillStatus[] {
-  switch (filter) {
-    case "published":
-      return [BillStatus.PUBLISHED];
-    case "under-discussion":
-      return [BillStatus.UNDER_DISCUSSION];
-    case "ready-for-review":
-      return [BillStatus.READY_FOR_REVIEW];
-    case "all":
-      return [...PUBLIC_BILL_STATUSES];
-  }
-}
-
 export const BILL_DISCOVERY_SORT_OPTIONS = [
-  {
-    value: "trending",
-    label: "Trending",
-  },
   {
     value: "newest",
     label: "Newest",
+  },
+  {
+    value: "trending",
+    label: "Most active",
   },
   {
     value: "most-supported",
@@ -90,7 +34,7 @@ export function parseBillDiscoverySort(
     return trimmedValue as BillDiscoverySort;
   }
 
-  return "trending";
+  return "newest";
 }
 
 export function getBillDiscoveryOrderBy(

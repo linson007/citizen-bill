@@ -1,491 +1,293 @@
 import {
-  ArrowUpRight,
-  Bell,
-  Bot,
+  ArrowRight,
   CheckCircle2,
   FileText,
   Gavel,
   MessageSquare,
-  Share2,
+  PenLine,
   ShieldCheck,
   ThumbsUp,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { connection } from "next/server";
 
+import { CivicHeroImage, HeroVisual } from "@/components/hero-visual";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { LegalDisclaimer } from "@/components/legal-disclaimer";
-import { BillStatus } from "@/generated/prisma/enums";
-import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
-import { prisma } from "@/lib/prisma";
-
-const publicStatuses = [...PUBLIC_BILL_STATUSES];
-
-const draftSteps = [
-  "Describe the public problem",
-  "Generate a bill outline with AI",
-  "Review clauses and plain-language summary",
-  "Publish for voting and comments",
-];
-
-type HomeActivity = {
-  id: string;
-  message: string;
-  href: string;
-  createdAt: Date;
-};
+import { formatDisplayTitle } from "@/lib/display-title";
+import { hasEstablishedCommunity } from "@/lib/home-community";
+import { getHomepageData } from "@/lib/homepage";
+import { getRequestMessages } from "@/lib/request-locale";
 
 export default async function Home() {
-  await connection();
+  const { locale, t } = await getRequestMessages();
+  const copyClass = locale === "ml" ? "font-malayalam" : "";
 
-  const [
-    publicBillCount,
-    reviewBillCount,
-    voteCount,
-    commentCount,
-    trendingBills,
-    activity,
-  ] = await Promise.all([
-    prisma.bill.count({
-      where: {
-        status: {
-          in: publicStatuses,
-        },
-      },
-    }),
-    prisma.bill.count({
-      where: {
-        status: {
-          in: [BillStatus.READY_FOR_REVIEW, BillStatus.UNDER_DISCUSSION],
-        },
-      },
-    }),
-    prisma.vote.count(),
-    prisma.comment.count(),
-    getTrendingBills(),
-    getRecentActivity(),
-  ]);
+  const { commentCount, publicBillCount, trendingBills, voteCount } =
+    await getHomepageData();
+  const establishedCommunity = hasEstablishedCommunity({
+    publicBills: publicBillCount,
+    votes: voteCount,
+    comments: commentCount,
+  });
 
-  const stats = [
-    { label: "Public bills", value: formatCompactNumber(publicBillCount) },
-    { label: "Bills in review", value: formatCompactNumber(reviewBillCount) },
-    { label: "Community votes", value: formatCompactNumber(voteCount) },
-    { label: "Public comments", value: formatCompactNumber(commentCount) },
-  ];
+  const draftSteps = [t.home.step1, t.home.step2, t.home.step3, t.home.step4];
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
+    <main
+      id="main-content"
+      className={`flex min-h-screen flex-col bg-background text-foreground ${copyClass}`}
+    >
       <SiteHeader />
 
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:py-14">
-          <div className="flex flex-col justify-center">
-            <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 py-2 text-sm font-medium text-[#4f4a40]">
-              <Gavel size={16} aria-hidden="true" />
-              MattamUndo · മാറ്റം ഉണ്ടോ?
-            </div>
-            <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[#141414] sm:text-5xl lg:text-6xl">
-              Turn public problems into bills people can support.
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#4f4a40]">
-              MattamUndo helps people in Kerala draft, review, vote on, comment
-              on, and share public bill proposals with AI assistance and
-              community oversight.
+      <section className="relative isolate overflow-hidden border-b border-border">
+        <HeroVisual />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:min-h-[min(88vh,820px)] lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.9fr)] lg:items-center lg:gap-12 lg:py-20">
+          <div className="max-w-2xl">
+            <p className="animate-fade-up inline-flex w-fit items-center rounded-full border border-accent/15 bg-surface-raised/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent backdrop-blur-sm">
+              {t.home.eyebrow}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <p className="animate-fade-up font-display mt-4 text-5xl font-semibold tracking-tight text-hero-ink sm:text-6xl lg:text-7xl">
+              {t.home.brand}
+            </p>
+            <p className="animate-fade-up-delay font-malayalam mt-3 text-2xl font-medium tracking-wide text-accent sm:text-3xl">
+              {t.home.tagline}
+            </p>
+            <h1 className="animate-fade-up-delay mt-6 text-xl font-medium leading-snug text-ink-soft sm:text-2xl">
+              {t.home.headline}
+            </h1>
+            <p className="animate-fade-up-delay mt-4 text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
+              {t.home.support}
+            </p>
+            <div className="animate-fade-up-delay-2 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/bills/new"
-                className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#123c69] px-5 text-sm font-semibold text-white shadow-sm"
+                className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
               >
-                <Bot size={18} aria-hidden="true" />
-                Start with AI
+                <PenLine size={18} aria-hidden="true" />
+                {t.home.ctaPrimary}
               </Link>
               <Link
                 href="/bills"
-                className="flex h-12 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-5 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                className="flex h-12 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised/80 px-6 text-sm font-semibold text-ink-soft backdrop-blur-sm transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
               >
                 <FileText size={18} aria-hidden="true" />
-                Browse bills
+                {t.home.ctaSecondary}
               </Link>
+              <a
+                href="#draft"
+                className="flex h-12 items-center justify-center gap-1.5 px-2 text-sm font-semibold text-accent transition-colors hover:text-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              >
+                {t.home.heroHowLink}
+                <ArrowRight size={16} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="animate-fade-up-delay-2 mt-4 space-y-2 rounded-md border border-border bg-surface-raised/65 px-3 py-2.5 backdrop-blur-sm">
+              <p className="flex items-start gap-2 text-sm font-medium leading-6 text-ink-soft">
+                <CheckCircle2
+                  className="mt-0.5 shrink-0 text-success"
+                  size={17}
+                  aria-hidden="true"
+                />
+                {t.home.heroNote}
+              </p>
+              <p className="flex items-start gap-2 text-xs leading-5 text-ink-muted">
+                <ShieldCheck
+                  className="mt-0.5 shrink-0 text-accent"
+                  size={15}
+                  aria-hidden="true"
+                />
+                {t.home.independence}
+              </p>
             </div>
           </div>
-
-          <div
-            id="dashboard"
-            className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm"
-          >
-            <div className="flex items-center justify-between border-b border-[#e7e1d3] px-5 py-4">
-              <div>
-                <h2 className="text-base font-semibold">Civic dashboard</h2>
-                <p className="text-sm text-[#6d6658]">Live proposal snapshot</p>
-              </div>
-              <Link
-                href="/notifications"
-                className="grid size-10 place-items-center rounded-md border border-[#d8d2c4] text-[#4f4a40]"
-                aria-label="Notifications"
-              >
-                <Bell size={18} aria-hidden="true" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 border-b border-[#e7e1d3]">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="border-[#e7e1d3] p-5 odd:border-r"
-                >
-                  <p className="text-2xl font-semibold text-[#123c69]">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-sm text-[#6d6658]">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold">This week</h3>
-                <Link
-                  href="/bills"
-                  className="flex items-center gap-1 text-sm font-semibold text-[#123c69]"
-                >
-                  View bills
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </Link>
-              </div>
-              <div className="space-y-3">
-                {activity.length > 0 ? (
-                  activity.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      className="flex items-start gap-3 rounded-md bg-[#f7f6f2] px-3 py-3 text-sm text-[#3f3a32] transition-colors hover:bg-[#eee9dd]"
-                    >
-                      <CheckCircle2
-                        className="mt-0.5 shrink-0 text-[#2f7d62]"
-                        size={17}
-                        aria-hidden="true"
-                      />
-                      <span>{item.message}</span>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="rounded-md bg-[#f7f6f2] px-3 py-3 text-sm leading-6 text-[#6d6658]">
-                    No public activity yet. Published bills, votes, comments,
-                    and shares will appear here.
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="lg:order-2">
+            <CivicHeroImage locale={locale} />
           </div>
         </div>
       </section>
 
-      <section id="draft" className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
-                <Bot size={21} aria-hidden="true" />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold">AI bill assistant</h2>
-                <p className="text-sm text-[#6d6658]">
-                  Structured bill creation
-                </p>
-              </div>
-            </div>
+      <section
+        id="draft"
+        className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16"
+      >
+        <div className="max-w-2xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t.home.howHeading}
+          </h2>
+          <p className="mt-3 text-base leading-7 text-ink-muted">
+            {t.home.howSupport}
+          </p>
+        </div>
 
-            <div className="rounded-md border border-[#d8d2c4] bg-[#fbfaf7] p-4">
-              <p className="text-sm font-medium text-[#4f4a40]">
-                Problem statement
-              </p>
-              <p className="mt-3 text-lg font-semibold leading-7">
-                Public hospitals should publish monthly availability data for
-                essential medicines and diagnostic services.
-              </p>
-            </div>
-
-            <div className="mt-4 space-y-3">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
+          <div>
+            <p className="text-sm font-medium text-ink-muted">
+              {t.home.exampleProblemLabel}
+            </p>
+            <p className="font-display mt-3 text-xl font-medium leading-snug text-ink-soft sm:text-2xl">
+              {t.home.exampleProblem}
+            </p>
+          </div>
+          <div>
+            <ol className="space-y-0 border-t border-border">
               {draftSteps.map((step, index) => (
-                <div
+                <li
                   key={step}
-                  className="flex items-center gap-3 rounded-md border border-[#e7e1d3] px-3 py-3"
+                  className="flex items-baseline gap-4 border-b border-border py-4"
                 >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[#123c69] text-sm font-semibold text-white">
-                    {index + 1}
+                  <span className="font-display w-8 shrink-0 text-lg font-semibold text-accent">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm font-medium text-[#3f3a32]">
+                  <span className="text-base font-medium text-ink-soft">
                     {step}
                   </span>
-                </div>
+                </li>
               ))}
+            </ol>
+            <Link
+              href="/bills/new"
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            >
+              {t.home.howCta}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="bills"
+        className="border-y border-border bg-surface px-5 py-14 sm:px-8 sm:py-16"
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-2xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                {establishedCommunity
+                  ? t.home.trendingHeading
+                  : t.home.proposalsHeading}
+              </h2>
+              <p className="mt-3 text-base leading-7 text-ink-muted">
+                {establishedCommunity
+                  ? t.home.trendingSupport
+                  : t.home.proposalsSupport}
+              </p>
             </div>
+            <Link
+              href="/bills"
+              className="flex h-11 w-fit items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft transition-colors hover:border-accent hover:text-accent"
+            >
+              <FileText size={16} aria-hidden="true" />
+              {t.home.allProposals}
+            </Link>
           </div>
 
-          <div
-            id="bills"
-            className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm"
-          >
-            <div className="flex flex-col gap-3 border-b border-[#e7e1d3] p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">Trending bills</h2>
-                <p className="text-sm text-[#6d6658]">
-                  Ranked by votes, discussion, and recent activity
-                </p>
-              </div>
-              <Link
-                href="/bills"
-                className="flex h-10 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] px-3 text-sm font-semibold text-[#2f2a22]"
-              >
-                <FileText size={16} aria-hidden="true" />
-                All proposals
-              </Link>
-            </div>
-
-            <div className="divide-y divide-[#e7e1d3]">
-              {trendingBills.length > 0 ? (
-                trendingBills.map((bill) => (
-                  <article key={bill.id} className="p-5">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <div className="mb-3 flex flex-wrap gap-2">
-                          {bill.category ? (
-                            <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
-                              {bill.category.name}
-                            </span>
-                          ) : null}
-                          <span className="rounded-md bg-[#e6f1ec] px-2.5 py-1 text-xs font-semibold text-[#2f7d62]">
-                            {formatStatus(bill.status)}
+          <div className="mt-8 divide-y divide-border border-y border-border">
+            {trendingBills.length > 0 ? (
+              trendingBills.map((bill) => (
+                <article key={bill.id} className="py-6">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        {bill.category ? (
+                          <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
+                            {bill.category.name}
                           </span>
-                        </div>
-                        <Link
-                          href={`/bills/${bill.slug}`}
-                          className="text-lg font-semibold leading-7 transition-colors hover:text-[#123c69]"
-                        >
-                          {bill.title}
-                        </Link>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6d6658]">
-                          {bill.description}
-                        </p>
+                        ) : null}
+                        <span className="rounded-md bg-success-soft px-2.5 py-1 text-xs font-semibold text-success">
+                          {formatStatus(bill.status)}
+                        </span>
                       </div>
-
-                      <div className="flex shrink-0 gap-2">
-                        <Metric
-                          icon={ThumbsUp}
-                          value={bill._count.votes}
-                          label="votes"
-                        />
-                        <Metric
-                          icon={MessageSquare}
-                          value={bill._count.comments}
-                          label="comments"
-                        />
-                        <Link
-                          href={`/bills/${bill.slug}`}
-                          className="grid size-10 place-items-center rounded-md border border-[#d8d2c4] text-[#4f4a40] transition-colors hover:bg-[#fbfaf7]"
-                          aria-label={`View ${bill.title}`}
-                        >
-                          <Share2 size={17} aria-hidden="true" />
-                        </Link>
-                      </div>
+                      <Link
+                        href={`/bills/${bill.slug}`}
+                        className="font-display text-xl font-semibold leading-snug tracking-tight transition-colors hover:text-accent"
+                      >
+                        {formatDisplayTitle(bill.title)}
+                      </Link>
+                      <p className="mt-2 max-w-2xl line-clamp-3 text-sm leading-6 text-ink-muted">
+                        {bill.description}
+                      </p>
                     </div>
-                  </article>
-                ))
-              ) : (
-                <div className="p-5 text-sm leading-6 text-[#6d6658]">
-                  No public bills yet. Published proposals will appear here once
-                  people start sharing them.
-                </div>
-              )}
-            </div>
+
+                    <div className="flex shrink-0 gap-2">
+                      {establishedCommunity ? (
+                        <>
+                          <Metric
+                            icon={ThumbsUp}
+                            value={bill._count.votes}
+                            label="votes"
+                          />
+                          <Metric
+                            icon={MessageSquare}
+                            value={bill._count.comments}
+                            label="comments"
+                          />
+                        </>
+                      ) : null}
+                      <Link
+                        href={`/bills/${bill.slug}`}
+                        className="grid size-11 place-items-center rounded-md border border-border text-ink-soft transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+                        aria-label={`Open ${formatDisplayTitle(bill.title)}`}
+                      >
+                        <ArrowRight size={17} aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="py-8 text-sm leading-6 text-ink-muted">
+                {t.home.emptyBills}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       <section
         id="moderation"
-        className="border-y border-[#d8d2c4] bg-[#fbfaf7]"
+        className="border-y border-border bg-surface px-5 py-14 sm:px-8 sm:py-16"
       >
-        <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 sm:px-8 md:grid-cols-3">
-          <TrustItem
-            icon={ShieldCheck}
-            title="Moderation queue"
-            text="Reports, abuse flags, and policy risks are designed into the workflow."
-          />
-          <TrustItem
-            icon={Users}
-            title="Community review"
-            text="Votes and comments help strong public proposals move forward."
-          />
-          <TrustItem
-            icon={Gavel}
-            title="Public bill workflow"
-            text="Bills stay focused on public discussion, transparent versions, and community support."
-          />
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              {t.home.trustHeading}
+            </h2>
+            <p className="mt-3 text-base leading-7 text-ink-muted">
+              {t.home.trustSupport}
+            </p>
+          </div>
+          <div className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
+            <TrustItem
+              icon={ShieldCheck}
+              title={t.home.trustModeration}
+              text={t.home.trustModerationText}
+            />
+            <TrustItem
+              icon={Users}
+              title={t.home.trustCommunity}
+              text={t.home.trustCommunityText}
+            />
+            <TrustItem
+              icon={Gavel}
+              title={t.home.trustWorkflow}
+              text={t.home.trustWorkflowText}
+            />
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <LegalDisclaimer />
-      </section>
       <SiteFooter />
     </main>
   );
-}
-
-async function getTrendingBills() {
-  return prisma.bill.findMany({
-    where: {
-      status: {
-        in: publicStatuses,
-      },
-    },
-    include: {
-      category: true,
-      _count: {
-        select: {
-          votes: true,
-          comments: true,
-        },
-      },
-    },
-    orderBy: [
-      {
-        votes: {
-          _count: "desc",
-        },
-      },
-      {
-        comments: {
-          _count: "desc",
-        },
-      },
-      {
-        publishedAt: "desc",
-      },
-      {
-        updatedAt: "desc",
-      },
-    ],
-    take: 3,
-  });
-}
-
-async function getRecentActivity(): Promise<HomeActivity[]> {
-  const [votes, comments, shares] = await Promise.all([
-    prisma.vote.findMany({
-      where: {
-        bill: {
-          status: {
-            in: publicStatuses,
-          },
-        },
-      },
-      include: {
-        bill: {
-          select: {
-            slug: true,
-            title: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 4,
-    }),
-    prisma.comment.findMany({
-      where: {
-        bill: {
-          status: {
-            in: publicStatuses,
-          },
-        },
-      },
-      include: {
-        bill: {
-          select: {
-            slug: true,
-            title: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 4,
-    }),
-    prisma.billShare.findMany({
-      where: {
-        bill: {
-          status: {
-            in: publicStatuses,
-          },
-        },
-      },
-      include: {
-        bill: {
-          select: {
-            slug: true,
-            title: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 4,
-    }),
-  ]);
-
-  return [
-    ...votes.map((vote) => ({
-      id: `vote-${vote.id}`,
-      message: `New support for ${vote.bill.title}`,
-      href: `/bills/${vote.bill.slug}`,
-      createdAt: vote.createdAt,
-    })),
-    ...comments.map((comment) => ({
-      id: `comment-${comment.id}`,
-      message: `New comment on ${comment.bill.title}`,
-      href: `/bills/${comment.bill.slug}`,
-      createdAt: comment.createdAt,
-    })),
-    ...shares.map((share) => ({
-      id: `share-${share.id}`,
-      message: `${formatPlatform(share.platform)} share for ${share.bill.title}`,
-      href: `/bills/${share.bill.slug}`,
-      createdAt: share.createdAt,
-    })),
-  ]
-    .sort(
-      (first, second) => second.createdAt.getTime() - first.createdAt.getTime(),
-    )
-    .slice(0, 4);
-}
-
-function formatCompactNumber(value: number) {
-  return new Intl.NumberFormat("en", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
 }
 
 function formatStatus(status: string) {
   return status
     .toLowerCase()
     .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatPlatform(platform: string) {
-  return platform
-    .toLowerCase()
-    .replaceAll("-", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
@@ -499,7 +301,7 @@ function Metric({
   label: string;
 }) {
   return (
-    <div className="flex h-10 items-center gap-1.5 rounded-md border border-[#d8d2c4] px-2.5 text-sm font-semibold text-[#3f3a32]">
+    <div className="flex h-10 items-center gap-1.5 rounded-md border border-border px-2.5 text-sm font-semibold text-ink-soft">
       <Icon size={16} aria-hidden="true" />
       <span>{value.toLocaleString()}</span>
       <span className="sr-only">{label}</span>
@@ -517,14 +319,12 @@ function TrustItem({
   text: string;
 }) {
   return (
-    <div className="flex gap-3 rounded-lg border border-[#d8d2c4] bg-white p-5">
-      <span className="grid size-10 shrink-0 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+    <div>
+      <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent">
         <Icon size={20} aria-hidden="true" />
       </span>
-      <div>
-        <h3 className="font-semibold">{title}</h3>
-        <p className="mt-1 text-sm leading-6 text-[#6d6658]">{text}</p>
-      </div>
+      <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-ink-muted">{text}</p>
     </div>
   );
 }

@@ -5,6 +5,11 @@ import OpenAI from "openai";
 import { authOptions } from "@/lib/auth";
 import { getOpenAiModel } from "@/lib/ai-config";
 import {
+  parseAiTitleCategorySuggestion,
+  type AiDraftFields,
+  type AiTitleCategorySuggestion,
+} from "@/lib/ai-draft-fields";
+import {
   checkAiGuardrails,
   guardedSystemInstruction,
 } from "@/lib/ai-guardrails";
@@ -15,13 +20,9 @@ import {
   recordAiUsage,
 } from "@/lib/ai-usage-limit";
 import { prisma } from "@/lib/prisma";
+import { billCategories, OTHER_BILL_CATEGORY } from "@/lib/bill-categories";
 
-type StructuredDraft = {
-  description: string;
-  proposedSolution: string;
-  expectedImpact: string;
-  body: string;
-};
+type StructuredDraft = AiDraftFields;
 
 const modes = {
   draft:
@@ -36,6 +37,8 @@ const modes = {
     "Summarize the bill idea into purpose, affected people, key duties, and expected public impact.",
   arguments:
     "Generate practical supporting arguments and likely objections or risks for public discussion.",
+  suggest:
+    "Suggest a concise, specific public-bill title and the single best matching category for the problem statement. Return JSON for author review.",
 } as const;
 
 type AiMode = keyof typeof modes;
@@ -101,6 +104,16 @@ export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
     await recordAiUsage(session.user.id, "ai-draft");
 
+    if (mode === "suggest") {
+      const suggestion = createFallbackSuggestion(prompt);
+
+      return NextResponse.json({
+        text: formatSuggestionPreview(suggestion),
+        fields: null,
+        suggestion,
+      });
+    }
+
     if (mode !== "draft" && mode !== "legal") {
       return NextResponse.json({
         text: createFallbackText(title, prompt, mode),
@@ -131,7 +144,7 @@ export async function POST(request: Request) {
         },
       ],
       response_format:
-        mode === "draft" || mode === "legal"
+        mode === "draft" || mode === "legal" || mode === "suggest"
           ? { type: "json_object" }
           : { type: "text" },
     });
@@ -139,6 +152,17 @@ export async function POST(request: Request) {
     await recordAiUsage(session.user.id, "ai-draft");
 
     const raw = completion.choices[0]?.message.content ?? "{}";
+
+    if (mode === "suggest") {
+      const suggestion =
+        parseAiTitleCategorySuggestion(raw) ?? createFallbackSuggestion(prompt);
+
+      return NextResponse.json({
+        text: formatSuggestionPreview(suggestion),
+        fields: null,
+        suggestion,
+      });
+    }
 
     if (mode !== "draft" && mode !== "legal") {
       return NextResponse.json({
@@ -190,6 +214,21 @@ function isAiMode(value: string | undefined): value is AiMode {
 }
 
 function buildPrompt(title: string, prompt: string, mode: AiMode) {
+  if (mode === "suggest") {
+    return [
+      `Problem statement:\n${prompt}`,
+      "",
+      "Return only valid JSON with these string keys:",
+      "title, category.",
+      "The title must be concise, specific, and suitable for a public bill.",
+      `The category must be exactly one of: ${billCategories
+        .map((category) =>
+          category === OTHER_BILL_CATEGORY ? "Other" : category,
+        )
+        .join(", ")}.`,
+    ].join("\n");
+  }
+
   if (mode === "draft" || mode === "legal") {
     return [
       `Bill title: ${title}`,
@@ -197,8 +236,13 @@ function buildPrompt(title: string, prompt: string, mode: AiMode) {
       `Problem statement:\n${prompt}`,
       "",
       "Return only valid JSON with these string keys:",
-      "description, proposedSolution, expectedImpact, body.",
-      "Keep the description concise. The body should be a structured draft bill outline with clauses.",
+      "title, description, category, categoryOther, tags, problem, proposedSolution, expectedImpact, body, references.",
+      `Category must be exactly one of: ${billCategories
+        .map((category) =>
+          category === OTHER_BILL_CATEGORY ? "Other" : category,
+        )
+        .join(", ")}.`,
+      "Use an empty string for categoryOther unless Category is Other. Use an empty string for references when no reliable source can be named. Keep the description concise. The body should be a structured draft bill outline with clauses.",
     ].join("\n");
   }
 
@@ -211,24 +255,86 @@ function buildPrompt(title: string, prompt: string, mode: AiMode) {
   ].join("\n");
 }
 
+function createFallbackSuggestion(prompt: string): AiTitleCategorySuggestion {
+  const normalized = prompt.toLowerCase();
+  const category =
+    [
+      {
+        category: "Health",
+        keywords: ["hospital", "health", "medicine", "medical"],
+      },
+      {
+        category: "Education",
+        keywords: ["school", "education", "student", "college"],
+      },
+      {
+        category: "Environment",
+        keywords: ["water", "river", "waste", "pollution", "environment"],
+      },
+      {
+        category: "Transport",
+        keywords: ["road", "transport", "bus", "traffic"],
+      },
+      {
+        category: "Agriculture",
+        keywords: ["farm", "farmer", "agriculture", "crop"],
+      },
+    ].find(({ keywords }) =>
+      keywords.some((keyword) => normalized.includes(keyword)),
+    )?.category ?? OTHER_BILL_CATEGORY;
+  const topic = prompt
+    .replace(/\s+/g, " ")
+    .replace(/[.!?].*$/, "")
+    .trim()
+    .slice(0, 90);
+
+  return {
+    title: topic ? `${topic} Bill` : "Public Services Accountability Bill",
+    category:
+      category === OTHER_BILL_CATEGORY
+        ? OTHER_BILL_CATEGORY
+        : (billCategories.find(
+            (candidate) => candidate.toLowerCase() === category,
+          ) ?? OTHER_BILL_CATEGORY),
+  };
+}
+
+function formatSuggestionPreview(suggestion: AiTitleCategorySuggestion) {
+  return `Suggested title: ${suggestion.title}\nSuggested category: ${
+    suggestion.category === OTHER_BILL_CATEGORY ? "Other" : suggestion.category
+  }`;
+}
+
 function parseStructuredDraft(value: string): StructuredDraft | null {
   try {
     const parsed = JSON.parse(value) as Partial<StructuredDraft>;
 
     if (
+      typeof parsed.title !== "string" ||
       typeof parsed.description !== "string" ||
+      typeof parsed.category !== "string" ||
+      typeof parsed.categoryOther !== "string" ||
+      typeof parsed.tags !== "string" ||
+      typeof parsed.problem !== "string" ||
       typeof parsed.proposedSolution !== "string" ||
       typeof parsed.expectedImpact !== "string" ||
-      typeof parsed.body !== "string"
+      typeof parsed.body !== "string" ||
+      typeof parsed.references !== "string"
     ) {
       return null;
     }
 
     return {
+      title: parsed.title,
       description: parsed.description,
+      category: parsed.category,
+      categoryOther: parsed.categoryOther,
+      tags: parsed.tags,
+      problem: parsed.problem,
       proposedSolution: parsed.proposedSolution,
       expectedImpact: parsed.expectedImpact,
       body: parsed.body,
+      references: parsed.references,
     };
   } catch {
     return null;
@@ -246,7 +352,15 @@ function createFallbackFields(
       : "A public bill proposal to address the stated problem through clear duties, accountability, and citizen-facing implementation.";
 
   return {
+    title:
+      title === "Public Bill"
+        ? "Public Services Accountability Bill"
+        : title,
     description: legalPrefix,
+    category: createFallbackSuggestion(prompt).category,
+    categoryOther: "",
+    tags: "public accountability, citizen services",
+    problem: prompt,
     proposedSolution:
       "Create defined responsibilities for public authorities, require transparent reporting, provide a citizen access mechanism, and establish review duties for implementation.",
     expectedImpact:
@@ -275,6 +389,7 @@ function createFallbackFields(
       "7. Rule-making power",
       "The Government may make rules to carry out the provisions of this Act.",
     ].join("\n"),
+    references: "",
   };
 }
 
@@ -339,13 +454,25 @@ function formatDraftPreview(
   fields: StructuredDraft,
 ) {
   return [
-    `Title: ${title}`,
+    `Title: ${fields.title || title}`,
     "",
     "Problem Statement:",
-    prompt,
+    fields.problem || prompt,
     "",
     "Short Description:",
     fields.description,
+    "",
+    "Category:",
+    fields.category,
+    "",
+    "Other Category:",
+    fields.categoryOther,
+    "",
+    "Tags:",
+    fields.tags,
+    "",
+    "Problem Statement:",
+    fields.problem,
     "",
     "Proposed Solution:",
     fields.proposedSolution,
@@ -355,5 +482,8 @@ function formatDraftPreview(
     "",
     "Draft Bill Text:",
     fields.body,
+    "",
+    "References:",
+    fields.references,
   ].join("\n");
 }

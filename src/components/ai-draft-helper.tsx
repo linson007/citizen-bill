@@ -7,6 +7,7 @@ import {
   parseAiDraftFieldsFromText,
   type AiDraftFields,
 } from "@/lib/ai-draft-fields";
+import type { Locale } from "@/lib/locale";
 
 export type { AiDraftFields };
 
@@ -14,26 +15,38 @@ const aiModes = [
   {
     value: "draft",
     label: "Draft bill",
+    description: "Turn your problem statement into a complete first draft with a proposed solution, public impact, and bill text.",
+    malayalamDescription: "നിങ്ങളുടെ പ്രശ്നവിവരണം നിർദിഷ്ട പരിഹാരം, പൊതുഫലം, ബിൽ വാചകം എന്നിവയുള്ള ആദ്യ ഡ്രാഫ്റ്റാക്കി മാറ്റുക.",
   },
   {
     value: "legal",
     label: "Legal structure",
+    description: "Organize the idea into clear clauses, definitions, duties, oversight, and implementation details.",
+    malayalamDescription: "ആശയം വ്യക്തമായ വകുപ്പുകൾ, നിർവചനങ്ങൾ, ചുമതലകൾ, മേൽനോട്ടം, നടപ്പാക്കൽ വിശദാംശങ്ങൾ എന്നിവയായി ക്രമീകരിക്കുക.",
   },
   {
     value: "simplify",
     label: "Simplify",
+    description: "Rewrite complex policy or legal language in plain, easy-to-understand terms.",
+    malayalamDescription: "സങ്കീർണ്ണമായ നയ അല്ലെങ്കിൽ നിയമഭാഷ ലളിതവും എളുപ്പം മനസ്സിലാക്കാവുന്നതുമായ വാക്കുകളിലേക്ക് മാറ്റുക.",
   },
   {
     value: "malayalam",
     label: "Malayalam",
+    description: "Translate or adapt the draft into Malayalam while preserving its policy meaning.",
+    malayalamDescription: "നയപരമായ അർഥം നിലനിർത്തി ഡ്രാഫ്റ്റ് മലയാളത്തിലേക്ക് വിവർത്തനം ചെയ്യുകയോ രൂപപ്പെടുത്തുകയോ ചെയ്യുക.",
   },
   {
     value: "summary",
     label: "Summarize",
+    description: "Create a concise overview of the proposal's purpose, approach, and expected effect.",
+    malayalamDescription: "നിർദേശത്തിന്റെ ഉദ്ദേശ്യം, സമീപനം, പ്രതീക്ഷിക്കുന്ന ഫലം എന്നിവയുടെ ചുരുക്കം തയ്യാറാക്കുക.",
   },
   {
     value: "arguments",
     label: "Arguments",
+    description: "Explore balanced supporting points, concerns, and questions to help strengthen the proposal.",
+    malayalamDescription: "നിർദേശം കൂടുതൽ ശക്തമാക്കാൻ പിന്തുണയ്ക്കുന്ന വാദങ്ങൾ, ആശങ്കകൾ, ചോദ്യങ്ങൾ എന്നിവ സമതുലിതമായി പരിശോധിക്കുക.",
   },
 ] as const;
 
@@ -44,12 +57,18 @@ export function AiDraftHelper({
   problem,
   onInsert,
   billId,
+  locale = "en",
 }: {
   title: string;
   problem: string;
   onInsert?: (fields: AiDraftFields) => void;
   billId?: string;
+  locale?: Locale;
 }) {
+  const ml = locale === "ml";
+  const modeLabels: Record<AiMode, string> = ml
+    ? { draft: "ബിൽ ഡ്രാഫ്റ്റ്", legal: "നിയമ ഘടന", simplify: "ലളിതമാക്കുക", malayalam: "മലയാളം", summary: "സംഗ്രഹിക്കുക", arguments: "വാദങ്ങൾ" }
+    : Object.fromEntries(aiModes.map(({ value, label }) => [value, label])) as Record<AiMode, string>;
   const [prompt, setPrompt] = useState(problem);
   const [mode, setMode] = useState<AiMode>("draft");
   const [result, setResult] = useState("");
@@ -232,27 +251,36 @@ export function AiDraftHelper({
           <Bot size={20} aria-hidden="true" />
         </span>
         <div>
-          <h2 className="font-semibold">AI drafting assistant</h2>
+          <h2 className="font-semibold">{ml ? "AI ഡ്രാഫ്റ്റിംഗ് സഹായി" : "AI drafting assistant"}</h2>
           <p className="text-sm text-[#6d6658]">
-            Draft, revise, translate, summarize, or stress-test a bill idea.
+            {ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യുക, തിരുത്തുക, വിവർത്തനം ചെയ്യുക, സംഗ്രഹിക്കുക, അല്ലെങ്കിൽ പരിശോധിക്കുക." : "Draft, revise, translate, summarize, or stress-test a bill idea."}
           </p>
         </div>
       </div>
 
       <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {aiModes.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            onClick={() => setMode(item.value)}
-            className={`h-9 rounded-md border px-2 text-xs font-semibold ${
-              mode === item.value
-                ? "border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                : "border-[#c8c0ae] bg-white text-[#2f2a22]"
-            }`}
-          >
-            {item.label}
-          </button>
+          <span key={item.value} className="group relative">
+            <button
+              type="button"
+              onClick={() => setMode(item.value)}
+              aria-describedby={`ai-mode-${item.value}-description`}
+              className={`h-9 w-full rounded-md border px-2 text-xs font-semibold ${
+                mode === item.value
+                  ? "border-[#123c69] bg-[#e4eef6] text-[#123c69]"
+                  : "border-[#c8c0ae] bg-white text-[#2f2a22]"
+              }`}
+            >
+              {modeLabels[item.value]}
+            </button>
+            <span
+              id={`ai-mode-${item.value}-description`}
+              role="tooltip"
+              className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-md bg-[#2f2a22] px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+            >
+              {ml ? item.malayalamDescription : item.description}
+            </span>
+          </span>
         ))}
       </div>
 
@@ -268,10 +296,10 @@ export function AiDraftHelper({
               }`}
             >
               <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">
-                {message.role === "user" ? "You" : "Assistant"}
+                {message.role === "user" ? (ml ? "നിങ്ങൾ" : "You") : (ml ? "സഹായി" : "Assistant")}
               </p>
               <p className="whitespace-pre-wrap">
-                {message.content || "Writing..."}
+                {message.content || (ml ? "എഴുതുന്നു..." : "Writing...")}
               </p>
             </div>
           ))}
@@ -282,7 +310,7 @@ export function AiDraftHelper({
         value={prompt}
         onChange={(event) => setPrompt(event.target.value)}
         rows={5}
-        placeholder="Ask the assistant to draft, improve, summarize, translate, or review your bill idea."
+        placeholder={ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യാനോ മെച്ചപ്പെടുത്താനോ സംഗ്രഹിക്കാനോ വിവർത്തനം ചെയ്യാനോ പരിശോധിക്കാനോ സഹായിയോട് ചോദിക്കുക." : "Ask the assistant to draft, improve, summarize, translate, or review your bill idea."}
         className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
       />
       <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-[#6d6658]">
@@ -292,7 +320,7 @@ export function AiDraftHelper({
           onChange={(event) => setSaveHistory(event.target.checked)}
           className="mt-1"
         />
-        Save this AI conversation to my drafting history.
+        {ml ? "ഈ AI സംഭാഷണം എന്റെ ഡ്രാഫ്റ്റിംഗ് ചരിത്രത്തിൽ സേവ് ചെയ്യുക." : "Save this AI conversation to my drafting history."}
       </label>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <button
@@ -306,7 +334,7 @@ export function AiDraftHelper({
           ) : (
             <Send size={16} aria-hidden="true" />
           )}
-          {loading ? "Writing" : "Send chat"}
+          {loading ? (ml ? "എഴുതുന്നു" : "Writing") : (ml ? "ചാറ്റ് അയയ്ക്കുക" : "Send chat")}
         </button>
         <button
           type="button"
@@ -319,7 +347,7 @@ export function AiDraftHelper({
           ) : (
             <Bot size={16} aria-hidden="true" />
           )}
-          Structured draft
+          {ml ? "ഘടനയുള്ള ഡ്രാഫ്റ്റ്" : "Structured draft"}
         </button>
       </div>
 
@@ -327,7 +355,7 @@ export function AiDraftHelper({
         <div className="mt-4 rounded-md bg-[#fbfaf7] p-4">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[#3f3a32]">
-              Suggested draft
+              {ml ? "നിർദേശിച്ച ഡ്രാഫ്റ്റ്" : "Suggested draft"}
             </p>
             {fields && onInsert ? (
               <button
@@ -340,7 +368,7 @@ export function AiDraftHelper({
                 ) : (
                   <Save size={14} aria-hidden="true" />
                 )}
-                Insert into form
+                {ml ? "ഫോമിലേക്ക് ചേർക്കുക" : "Insert into form"}
               </button>
             ) : null}
           </div>
