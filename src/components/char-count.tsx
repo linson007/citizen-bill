@@ -27,11 +27,16 @@ export function CharCount({
 
   return (
     <span
+      aria-live="polite"
+      aria-atomic="true"
       className={`text-xs font-medium tabular-nums ${
         count >= max ? "text-danger" : "text-ink-muted"
       }`}
     >
-      {count.toLocaleString()} / {max.toLocaleString()}
+      {count.toLocaleString()} /
+      {`${max.toLocaleString()} characters`}
+      {count > max ? ` (${(count - max).toLocaleString()} over)` : null}
+      <span className="sr-only">, {max - count} characters remaining</span>
     </span>
   );
 }
