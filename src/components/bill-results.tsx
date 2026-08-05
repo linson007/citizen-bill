@@ -29,6 +29,7 @@ import {
 } from "@/lib/layout-preference";
 import type { Locale } from "@/lib/locale";
 import { formatRelativeTime } from "@/lib/relative-time";
+import { StatusBadge } from "@/components/status-badge";
 
 export type BillResultsLabels = {
   results: string;
@@ -404,16 +405,6 @@ function Badge({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-md border border-border bg-surface-raised px-2.5 py-1 text-xs font-semibold text-ink-soft">
       {children}
-    </span>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const label = status.replaceAll("_", " ").toLowerCase();
-
-  return (
-    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold capitalize text-accent">
-      {label}
     </span>
   );
 }

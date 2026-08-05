@@ -31,7 +31,6 @@ import {
   reviewSuggestionAction,
   toggleFollowBillAction,
   toggleSavedBillAction,
-  toggleVoteAction,
   uploadBillFileAction,
 } from "@/app/bills/[slug]/actions";
 import { SharePanel } from "@/components/share-panel";
@@ -39,6 +38,8 @@ import { BillTabs } from "@/components/bill-tabs";
 import { CharCount } from "@/components/char-count";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { StatusBadge } from "@/components/status-badge";
+import { SupportVote } from "@/components/support-vote";
 import { getAppUrl } from "@/lib/app-url";
 import { authOptions } from "@/lib/auth";
 import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
@@ -226,7 +227,7 @@ export default async function BillDetailPage({
       <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
           <div className="mb-4 flex flex-wrap gap-2">
-            <Badge>{bill.status.replaceAll("_", " ").toLowerCase()}</Badge>
+            <StatusBadge status={bill.status} />
             {bill.category ? <Badge>{bill.category.name}</Badge> : null}
           </div>
           <h1 className="font-display max-w-4xl text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
@@ -242,7 +243,7 @@ export default async function BillDetailPage({
             </span>
             <span className="flex items-center gap-2">
               <ThumbsUp size={16} aria-hidden="true" />
-              {bill._count.votes} supporters
+              <span aria-live="polite">{bill._count.votes} supporters</span>
             </span>
             <span className="flex items-center gap-2">
               <MessageSquare size={16} aria-hidden="true" />
@@ -272,22 +273,12 @@ export default async function BillDetailPage({
         <div className="sticky top-0 z-20 hidden border-t border-border bg-surface/95 backdrop-blur-sm lg:block">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-5 py-3 sm:px-8">
             {isPublicBill && !isAuthor ? (
-              <form action={toggleVoteAction}>
-                <input type="hidden" name="slug" value={bill.slug} />
-                <button
-                  type="submit"
-                  className={`flex h-11 items-center gap-2 rounded-md px-5 text-sm font-semibold shadow-sm transition-colors ${
-                    userVote
-                      ? "border border-accent bg-accent-soft text-accent"
-                      : "bg-accent text-white hover:bg-hero-ink"
-                  }`}
-                >
-                  <ThumbsUp size={17} aria-hidden="true" />
-                  {userVote
-                    ? `Supported · ${bill._count.votes}`
-                    : `Support this bill · ${bill._count.votes}`}
-                </button>
-              </form>
+              <SupportVote
+                slug={bill.slug}
+                supported={Boolean(userVote)}
+                count={bill._count.votes}
+                variant="primary"
+              />
             ) : null}
             {isAuthor ? (
               <Link
@@ -557,7 +548,7 @@ export default async function BillDetailPage({
                                 suggestion.user.name ??
                                 "Citizen"}
                             </p>
-                            <Badge>{suggestion.status.toLowerCase()}</Badge>
+                            <StatusBadge status={suggestion.status} />
                             <time
                               dateTime={suggestion.createdAt.toISOString()}
                               className="text-xs text-ink-muted"
@@ -935,20 +926,14 @@ export default async function BillDetailPage({
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface-raised/95 backdrop-blur-sm lg:hidden">
           <div className="flex items-center gap-2 px-4 py-3">
             {!isAuthor ? (
-              <form action={toggleVoteAction} className="flex-1">
-                <input type="hidden" name="slug" value={bill.slug} />
-                <button
-                  type="submit"
-                  className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
-                    userVote
-                      ? "border border-accent bg-accent-soft text-accent"
-                      : "bg-accent text-white"
-                  }`}
-                >
-                  <ThumbsUp size={16} aria-hidden="true" />
-                  {userVote ? "Supported" : "Support"}
-                </button>
-              </form>
+              <div className="flex-1">
+                <SupportVote
+                  slug={bill.slug}
+                  supported={Boolean(userVote)}
+                  count={bill._count.votes}
+                  variant="mobile"
+                />
+              </div>
             ) : (
               <Link
                 href={`/bills/${bill.slug}/edit`}
