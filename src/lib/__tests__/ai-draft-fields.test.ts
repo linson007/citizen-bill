@@ -23,11 +23,17 @@ Draft Bill Text:
 `);
 
     expect(fields).toEqual({
+      title: "",
       description: "Create a public reporting duty for medicine availability.",
+      category: "",
+      categoryOther: "",
+      tags: "",
+      problem: "",
       proposedSolution:
         "Hospitals should publish monthly stock and service data.",
       expectedImpact: "Citizens can plan care and identify shortages earlier.",
       body: "1. Short title\n2. Publication duty",
+      references: "",
     });
   });
 
@@ -62,10 +68,16 @@ Second clause about oversight.
 `);
 
     expect(fields).toEqual({
+      title: "",
       description: "First clause about water quality reporting.",
+      category: "",
+      categoryOther: "",
+      tags: "",
+      problem: "",
       proposedSolution: "",
       expectedImpact: "",
       body: "First clause about water quality reporting.\nSecond clause about oversight.",
+      references: "",
     });
   });
 
@@ -81,10 +93,43 @@ Better oversight for citizens.
 `);
 
     expect(fields).toEqual({
+      title: "",
       description: "Public water accountability draft.",
+      category: "",
+      categoryOther: "",
+      tags: "",
+      problem: "",
       proposedSolution: "",
       expectedImpact: "Better oversight for citizens.",
       body: "",
+      references: "",
+    });
+  });
+
+  it("maps every form-ready section from an AI chat response", () => {
+    const fields = parseAiDraftFieldsFromText(`
+Title: Clean Water Transparency Bill
+Category: Environment
+Tags: water, transparency
+Problem Statement: Residents cannot easily see water quality results.
+Short Description: Publish water quality data for public review.
+Proposed Solution: Require regular public reporting.
+Expected Public Impact: Residents can make informed decisions.
+Draft Bill Text: Clause 1: Public reporting duty.
+References: Kerala water quality reports.
+`);
+
+    expect(fields).toEqual({
+      title: "Clean Water Transparency Bill",
+      description: "Publish water quality data for public review.",
+      category: "Environment",
+      categoryOther: "",
+      tags: "water, transparency",
+      problem: "Residents cannot easily see water quality results.",
+      proposedSolution: "Require regular public reporting.",
+      expectedImpact: "Residents can make informed decisions.",
+      body: "Clause 1: Public reporting duty.",
+      references: "Kerala water quality reports.",
     });
   });
 });
