@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  color-scheme: light;
   --background: #f0eee6;
   --foreground: #141414;
   --surface: #f7f5ef;
@@ -15,27 +18,53 @@
   --success-soft: #e2efe8;
   --warning-bg: #f7f0e0;
   --warning-ink: #5c4718;
+  --danger: #a33a2a;
+  --danger-soft: #f6e4e0;
   --hero-ink: #0a2440;
   --hero-mist: #d9e4ef;
 }
 
-@theme inline {
-  --color-background: #f0eee6;
-  --color-foreground: #141414;
-  --color-surface: #f7f5ef;
-  --color-surface-raised: #ffffff;
-  --color-ink-muted: #5f584c;
-  --color-ink-soft: #3f3a32;
-  --color-border: #d2cbb8;
-  --color-border-strong: #bdb59f;
-  --color-accent: #0f355c;
-  --color-accent-soft: #dce8f2;
-  --color-success: #2a6f58;
-  --color-success-soft: #e2efe8;
-  --color-warning-bg: #f7f0e0;
-  --color-warning-ink: #5c4718;
-  --color-hero-ink: #0a2440;
-  --color-hero-mist: #d9e4ef;
+.dark {
+  color-scheme: dark;
+  --background: #171410;
+  --foreground: #f0ece2;
+  --surface: #1f1b15;
+  --surface-raised: #272219;
+  --ink-muted: #a39b8a;
+  --ink-soft: #d5cec0;
+  --border: #3a342a;
+  --border-strong: #4d4639;
+  --accent: #8fb1d4;
+  --accent-soft: #1e2b3a;
+  --success: #5fbf9d;
+  --success-soft: #16342c;
+  --warning-bg: #3a3016;
+  --warning-ink: #e0c58a;
+  --danger: #e08a7e;
+  --danger-soft: #3c1e1a;
+  --hero-ink: #c7d9ec;
+  --hero-mist: #23324a;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-soft: var(--ink-soft);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-hero-ink: var(--hero-ink);
+  --color-hero-mist: var(--hero-mist);
   --font-sans: var(--font-source-sans);
   --font-display: var(--font-fraunces);
   --font-malayalam: var(--font-manjari);

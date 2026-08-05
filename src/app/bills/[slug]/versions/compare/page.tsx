@@ -81,16 +81,16 @@ export default async function VersionComparePage({
   const diffRows = diffLines(fromVersion.body, toVersion.body);
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#6d6658]">
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-ink-muted">
             <GitCompare size={17} aria-hidden="true" />
             Version comparison
           </div>
           <h1 className="text-3xl font-semibold sm:text-4xl">{bill.title}</h1>
-          <p className="mt-2 text-sm text-[#6d6658]">
+          <p className="mt-2 text-sm text-ink-muted">
             Comparing {fromVersion.createdAt.toLocaleDateString("en-IN")} to{" "}
             {toVersion.createdAt.toLocaleDateString("en-IN")}
           </p>
@@ -98,11 +98,11 @@ export default async function VersionComparePage({
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <form className="mb-5 grid gap-3 rounded-lg border border-[#d8d2c4] bg-white p-4 shadow-sm md:grid-cols-[1fr_1fr_auto]">
+        <form className="mb-5 grid gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm md:grid-cols-[1fr_1fr_auto]">
           <select
             name="from"
             defaultValue={fromVersion.id}
-            className="h-10 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm"
+            className="h-10 rounded-md border border-border-strong bg-surface-raised px-3 text-sm"
           >
             {versions.map((version) => (
               <option key={version.id} value={version.id}>
@@ -113,7 +113,7 @@ export default async function VersionComparePage({
           <select
             name="to"
             defaultValue={toVersion.id}
-            className="h-10 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm"
+            className="h-10 rounded-md border border-border-strong bg-surface-raised px-3 text-sm"
           >
             {versions.map((version) => (
               <option key={version.id} value={version.id}>
@@ -123,28 +123,28 @@ export default async function VersionComparePage({
           </select>
           <button
             type="submit"
-            className="h-10 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white"
+            className="h-10 rounded-md bg-accent px-4 text-sm font-semibold text-white"
           >
             Compare
           </button>
         </form>
 
-        <div className="overflow-hidden rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border bg-surface-raised shadow-sm">
           {diffRows.map((row, index) => (
             <div
               key={`${row.kind}-${index}`}
-              className={`grid gap-3 border-b border-[#e7e1d3] px-4 py-3 text-sm md:grid-cols-[120px_1fr] ${
+              className={`grid gap-3 border-b border-border px-4 py-3 text-sm md:grid-cols-[120px_1fr] ${
                 row.kind === "added"
-                  ? "bg-[#e6f1ec]"
+                  ? "bg-success-soft"
                   : row.kind === "removed"
-                    ? "bg-[#fff3d7]"
-                    : "bg-white"
+                    ? "bg-warning-bg"
+                    : "bg-surface-raised"
               }`}
             >
-              <span className="font-semibold capitalize text-[#4f4a40]">
+              <span className="font-semibold capitalize text-ink-soft">
                 {row.kind}
               </span>
-              <span className="whitespace-pre-wrap text-[#2f2a22]">
+              <span className="whitespace-pre-wrap text-ink-soft">
                 {row.text || " "}
               </span>
             </div>
@@ -153,7 +153,7 @@ export default async function VersionComparePage({
 
         <Link
           href={`/bills/${bill.slug}`}
-          className="mt-5 inline-flex h-10 items-center rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#2f2a22]"
+          className="mt-5 inline-flex h-10 items-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft"
         >
           Back to bill
         </Link>

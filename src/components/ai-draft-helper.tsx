@@ -245,14 +245,14 @@ export function AiDraftHelper({
   }
 
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+        <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent">
           <Bot size={20} aria-hidden="true" />
         </span>
         <div>
           <h2 className="font-semibold">{ml ? "AI ഡ്രാഫ്റ്റിംഗ് സഹായി" : "AI drafting assistant"}</h2>
-          <p className="text-sm text-[#6d6658]">
+          <p className="text-sm text-ink-muted">
             {ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യുക, തിരുത്തുക, വിവർത്തനം ചെയ്യുക, സംഗ്രഹിക്കുക, അല്ലെങ്കിൽ പരിശോധിക്കുക." : "Draft, revise, translate, summarize, or stress-test a bill idea."}
           </p>
         </div>
@@ -267,8 +267,8 @@ export function AiDraftHelper({
               aria-describedby={`ai-mode-${item.value}-description`}
               className={`h-9 w-full rounded-md border px-2 text-xs font-semibold ${
                 mode === item.value
-                  ? "border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                  : "border-[#c8c0ae] bg-white text-[#2f2a22]"
+                  ? "border-accent bg-accent-soft text-accent"
+                  : "border-border-strong bg-surface-raised text-ink-soft"
               }`}
             >
               {modeLabels[item.value]}
@@ -276,7 +276,7 @@ export function AiDraftHelper({
             <span
               id={`ai-mode-${item.value}-description`}
               role="tooltip"
-              className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-md bg-[#2f2a22] px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+              className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-md bg-hero-ink px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
             >
               {ml ? item.malayalamDescription : item.description}
             </span>
@@ -285,14 +285,14 @@ export function AiDraftHelper({
       </div>
 
       {messages.length > 0 ? (
-        <div className="mb-3 max-h-80 space-y-3 overflow-y-auto rounded-md border border-[#e7e1d3] bg-[#fbfaf7] p-3">
+        <div className="mb-3 max-h-80 space-y-3 overflow-y-auto rounded-md border border-border bg-surface p-3">
           {messages.map((message, index) => (
             <div
               key={`${message.role}-${index}`}
               className={`rounded-md px-3 py-2 text-sm leading-6 ${
                 message.role === "user"
-                  ? "bg-white text-[#2f2a22]"
-                  : "bg-[#e4eef6] text-[#123c69]"
+                  ? "bg-surface-raised text-ink-soft"
+                  : "bg-accent-soft text-accent"
               }`}
             >
               <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">
@@ -311,9 +311,9 @@ export function AiDraftHelper({
         onChange={(event) => setPrompt(event.target.value)}
         rows={5}
         placeholder={ml ? "ബിൽ ആശയം ഡ്രാഫ്റ്റ് ചെയ്യാനോ മെച്ചപ്പെടുത്താനോ സംഗ്രഹിക്കാനോ വിവർത്തനം ചെയ്യാനോ പരിശോധിക്കാനോ സഹായിയോട് ചോദിക്കുക." : "Ask the assistant to draft, improve, summarize, translate, or review your bill idea."}
-        className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       />
-      <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-[#6d6658]">
+      <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-ink-muted">
         <input
           type="checkbox"
           checked={saveHistory}
@@ -327,7 +327,7 @@ export function AiDraftHelper({
           type="button"
           onClick={sendChatMessage}
           disabled={loading || prompt.trim().length < 5}
-          className="flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} aria-hidden="true" />
@@ -340,7 +340,7 @@ export function AiDraftHelper({
           type="button"
           onClick={runAssistant}
           disabled={loading || prompt.trim().length < 5}
-          className="flex h-10 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex h-10 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} aria-hidden="true" />
@@ -352,16 +352,16 @@ export function AiDraftHelper({
       </div>
 
       {result ? (
-        <div className="mt-4 rounded-md bg-[#fbfaf7] p-4">
+        <div className="mt-4 rounded-md bg-surface p-4">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <p className="text-sm font-semibold text-[#3f3a32]">
+            <p className="text-sm font-semibold text-ink-soft">
               {ml ? "നിർദേശിച്ച ഡ്രാഫ്റ്റ്" : "Suggested draft"}
             </p>
             {fields && onInsert ? (
               <button
                 type="button"
                 onClick={() => onInsert(fields)}
-                className="flex h-8 items-center gap-1.5 rounded-md bg-[#123c69] px-2.5 text-xs font-semibold text-white"
+                className="flex h-8 items-center gap-1.5 rounded-md bg-accent px-2.5 text-xs font-semibold text-white"
               >
                 {fields.proposedSolution || fields.expectedImpact ? (
                   <Wand2 size={14} aria-hidden="true" />
@@ -372,7 +372,7 @@ export function AiDraftHelper({
               </button>
             ) : null}
           </div>
-          <pre className="whitespace-pre-wrap text-sm leading-6 text-[#3f3a32]">
+          <pre className="whitespace-pre-wrap text-sm leading-6 text-ink-soft">
             {result}
           </pre>
         </div>

@@ -81,25 +81,25 @@ export default async function ModerationPage() {
   const usageRows = createUsageRows(todayUsageEvents, dailyLimit);
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
         <div className="mb-5 flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+          <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent">
             <ShieldCheck size={20} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
+            <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
               Moderation
             </p>
             <h1 className="text-3xl font-semibold">Reported content</h1>
           </div>
         </div>
 
-        <section className="mb-8 rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-          <div className="border-b border-[#e7e1d3] p-5">
+        <section className="mb-8 rounded-lg border border-border bg-surface-raised shadow-sm">
+          <div className="border-b border-border p-5">
             <h2 className="text-xl font-semibold">AI usage today</h2>
-            <p className="mt-1 text-sm leading-6 text-[#6d6658]">
+            <p className="mt-1 text-sm leading-6 text-ink-muted">
               Daily quota is {dailyLimit.toLocaleString()} requests per user.
               Usage resets automatically at{" "}
               {resetAt.toLocaleString("en-IN", {
@@ -111,7 +111,7 @@ export default async function ModerationPage() {
           </div>
 
           {usageRows.length > 0 ? (
-            <div className="divide-y divide-[#e7e1d3]">
+            <div className="divide-y divide-border">
               {usageRows.map((row) => (
                 <article key={row.userId} className="p-5">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -122,11 +122,11 @@ export default async function ModerationPage() {
                         <Badge>{row.role.toLowerCase()}</Badge>
                       </div>
                       <h3 className="font-semibold">{row.name}</h3>
-                      <p className="mt-1 text-sm text-[#6d6658]">{row.email}</p>
-                      <p className="mt-2 text-sm leading-6 text-[#4f4a40]">
+                      <p className="mt-1 text-sm text-ink-muted">{row.email}</p>
+                      <p className="mt-2 text-sm leading-6 text-ink-soft">
                         Routes: {row.routes}
                       </p>
-                      <p className="mt-1 text-xs text-[#8a8170]">
+                      <p className="mt-1 text-xs text-ink-muted">
                         Last used{" "}
                         {row.lastUsedAt.toLocaleString("en-IN", {
                           dateStyle: "medium",
@@ -137,7 +137,7 @@ export default async function ModerationPage() {
 
                     <form action={resetAiUsageAction}>
                       <input type="hidden" name="userId" value={row.userId} />
-                      <button className="h-10 rounded-md bg-[#123c69] px-3 text-sm font-semibold text-white">
+                      <button className="h-10 rounded-md bg-accent px-3 text-sm font-semibold text-white">
                         Reset today
                       </button>
                     </form>
@@ -146,21 +146,21 @@ export default async function ModerationPage() {
               ))}
             </div>
           ) : (
-            <p className="p-5 text-sm text-[#6d6658]">
+            <p className="p-5 text-sm text-ink-muted">
               No AI usage recorded today.
             </p>
           )}
         </section>
 
-        <section className="mb-8 rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-          <div className="border-b border-[#e7e1d3] p-5">
+        <section className="mb-8 rounded-lg border border-border bg-surface-raised shadow-sm">
+          <div className="border-b border-border p-5">
             <h2 className="text-xl font-semibold">AI guardrail events</h2>
-            <p className="mt-1 text-sm leading-6 text-[#6d6658]">
+            <p className="mt-1 text-sm leading-6 text-ink-muted">
               Recent blocked prompts help moderators spot abuse or confused use.
             </p>
           </div>
           {recentSafetyEvents.length > 0 ? (
-            <div className="divide-y divide-[#e7e1d3]">
+            <div className="divide-y divide-border">
               {recentSafetyEvents.map((event) => (
                 <article key={event.id} className="p-5">
                   <div className="mb-2 flex flex-wrap gap-2">
@@ -172,26 +172,26 @@ export default async function ModerationPage() {
                       })}
                     </Badge>
                   </div>
-                  <p className="text-sm font-semibold text-[#3f3a32]">
+                  <p className="text-sm font-semibold text-ink-soft">
                     {event.user?.displayName ??
                       event.user?.name ??
                       event.user?.email ??
                       "Anonymous request"}
                   </p>
-                  <p className="mt-2 max-w-4xl text-sm leading-6 text-[#6d6658]">
+                  <p className="mt-2 max-w-4xl text-sm leading-6 text-ink-muted">
                     {event.prompt}
                   </p>
                 </article>
               ))}
             </div>
           ) : (
-            <p className="p-5 text-sm text-[#6d6658]">
+            <p className="p-5 text-sm text-ink-muted">
               No AI guardrail events yet.
             </p>
           )}
         </section>
 
-        <div className="divide-y divide-[#e7e1d3] rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+        <div className="divide-y divide-border rounded-lg border border-border bg-surface-raised shadow-sm">
           {reports.length > 0 ? (
             reports.map((report) => (
               <article key={report.id} className="p-5">
@@ -204,7 +204,7 @@ export default async function ModerationPage() {
                     {report.bill ? (
                       <Link
                         href={`/bills/${report.bill.slug}`}
-                        className="font-semibold text-[#123c69]"
+                        className="font-semibold text-accent"
                       >
                         {report.bill.title}
                       </Link>
@@ -212,16 +212,16 @@ export default async function ModerationPage() {
                       <p className="font-semibold">Reported comment</p>
                     )}
                     {report.comment ? (
-                      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#4f4a40]">
+                      <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-soft">
                         {report.comment.body}
                       </p>
                     ) : null}
                     {report.details ? (
-                      <p className="mt-2 text-sm text-[#6d6658]">
+                      <p className="mt-2 text-sm text-ink-muted">
                         {report.details}
                       </p>
                     ) : null}
-                    <p className="mt-2 text-xs text-[#8a8170]">
+                    <p className="mt-2 text-xs text-ink-muted">
                       Reported by{" "}
                       {report.reporter.displayName ??
                         report.reporter.name ??
@@ -232,13 +232,13 @@ export default async function ModerationPage() {
                   <div className="flex flex-wrap gap-2">
                     <form action={dismissReportAction}>
                       <input type="hidden" name="reportId" value={report.id} />
-                      <button className="h-10 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold">
+                      <button className="h-10 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold">
                         Dismiss
                       </button>
                     </form>
                     <form action={resolveReportAction}>
                       <input type="hidden" name="reportId" value={report.id} />
-                      <button className="h-10 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold">
+                      <button className="h-10 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold">
                         Resolve
                       </button>
                     </form>
@@ -249,7 +249,7 @@ export default async function ModerationPage() {
                           name="billId"
                           value={report.bill.id}
                         />
-                        <button className="h-10 rounded-md bg-[#8a3a2f] px-3 text-sm font-semibold text-white">
+                        <button className="h-10 rounded-md bg-danger px-3 text-sm font-semibold text-white">
                           Remove bill
                         </button>
                       </form>
@@ -259,7 +259,7 @@ export default async function ModerationPage() {
               </article>
             ))
           ) : (
-            <p className="p-5 text-sm text-[#6d6658]">No reports yet.</p>
+            <p className="p-5 text-sm text-ink-muted">No reports yet.</p>
           )}
         </div>
       </section>
@@ -340,7 +340,7 @@ function createUsageRows(events: UsageEvent[], dailyLimit: number) {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
       {children}
     </span>
   );

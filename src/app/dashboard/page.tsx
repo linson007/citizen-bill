@@ -307,12 +307,12 @@ export default async function DashboardPage() {
   return (
     <main
       id="main-content"
-      className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]"
+      className="flex min-h-screen flex-col bg-background text-foreground"
     >
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
             Dashboard
           </p>
           <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -320,14 +320,14 @@ export default async function DashboardPage() {
               <h1 className="text-3xl font-semibold sm:text-4xl">
                 Welcome, {session.user.name ?? "citizen"}
               </h1>
-              <p className="mt-2 max-w-2xl text-[#4f4a40]">
+              <p className="mt-2 max-w-2xl text-ink-soft">
                 Your personal workspace for drafts, votes, comments, and bill
                 activity.
               </p>
             </div>
             <Link
               href="/bills/new"
-              className="flex h-11 w-fit items-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
             >
               <Plus size={17} aria-hidden="true" />
               New bill
@@ -341,16 +341,16 @@ export default async function DashboardPage() {
         {completedOnboardingSteps < onboardingSteps.length ? (
           <section
             aria-label="Get started"
-            className="mb-6 rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+            className="mb-6 rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-md bg-[#123c69] text-white">
+                <span className="grid size-10 place-items-center rounded-md bg-accent text-white">
                   <Rocket size={20} aria-hidden="true" />
                 </span>
                 <div>
                   <h2 className="font-semibold">Get started</h2>
-                  <p className="text-sm text-[#6d6658]">
+                  <p className="text-sm text-ink-muted">
                     {completedOnboardingSteps} of {onboardingSteps.length} steps
                     complete
                   </p>
@@ -363,10 +363,10 @@ export default async function DashboardPage() {
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label="Onboarding progress"
-              className="mt-4 h-2 overflow-hidden rounded-full bg-[#e7e1d3]"
+              className="mt-4 h-2 overflow-hidden rounded-full bg-border"
             >
               <div
-                className="h-full rounded-full bg-[#123c69] transition-all"
+                className="h-full rounded-full bg-accent transition-all"
                 style={{ width: `${onboardingProgress}%` }}
               />
             </div>
@@ -375,18 +375,18 @@ export default async function DashboardPage() {
                 step.completed ? (
                   <li
                     key={step.id}
-                    className="flex items-start gap-3 rounded-md border border-[#e7e1d3] bg-[#fbfaf7] px-3 py-3"
+                    className="flex items-start gap-3 rounded-md border border-border bg-surface px-3 py-3"
                   >
                     <CheckCircle2
                       size={18}
                       aria-hidden="true"
-                      className="mt-0.5 shrink-0 text-[#2a6f58]"
+                      className="mt-0.5 shrink-0 text-success"
                     />
                     <div>
-                      <p className="text-sm font-semibold text-[#6d6658] line-through">
+                      <p className="text-sm font-semibold text-ink-muted line-through">
                         {step.title}
                       </p>
-                      <p className="mt-0.5 text-xs leading-5 text-[#8a8170]">
+                      <p className="mt-0.5 text-xs leading-5 text-ink-muted">
                         {step.description}
                       </p>
                     </div>
@@ -395,23 +395,23 @@ export default async function DashboardPage() {
                   <li key={step.id}>
                     <Link
                       href={step.href}
-                      className="flex items-start gap-3 rounded-md border border-[#e7e1d3] px-3 py-3 transition-colors hover:border-[#123c69]/40 hover:bg-[#fbfaf7]"
+                      className="flex items-start gap-3 rounded-md border border-border px-3 py-3 transition-colors hover:border-accent/40 hover:bg-surface"
                     >
-                      <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-[#e4eef6] text-xs font-semibold text-[#123c69]">
+                      <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">
                         {index + 1}
                       </span>
                       <span className="flex-1">
                         <span className="block text-sm font-semibold">
                           {step.title}
                         </span>
-                        <span className="mt-0.5 block text-xs leading-5 text-[#6d6658]">
+                        <span className="mt-0.5 block text-xs leading-5 text-ink-muted">
                           {step.description}
                         </span>
                       </span>
                       <ChevronRight
                         size={16}
                         aria-hidden="true"
-                        className="mt-1 shrink-0 text-[#8a8170]"
+                        className="mt-1 shrink-0 text-ink-muted"
                       />
                     </Link>
                   </li>
@@ -424,35 +424,35 @@ export default async function DashboardPage() {
           {dashboardCards.map((card) => (
             <article
               key={card.title}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+              className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold">{card.title}</h2>
-                <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+                <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent">
                   <card.icon size={20} aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-4 text-3xl font-semibold text-[#123c69]">
+              <p className="mt-4 text-3xl font-semibold text-accent">
                 {card.value}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+              <p className="mt-2 text-sm leading-6 text-ink-muted">
                 {card.detail}
               </p>
             </article>
           ))}
         </div>
 
-        <div className="mt-6 rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-[#e7e1d3] p-5">
+        <div className="mt-6 rounded-lg border border-border bg-surface-raised shadow-sm">
+          <div className="flex items-center justify-between border-b border-border p-5">
             <div>
               <h2 className="text-lg font-semibold">Recent bills</h2>
-              <p className="text-sm text-[#6d6658]">
+              <p className="text-sm text-ink-muted">
                 Drafts and published proposals you created.
               </p>
             </div>
             <Link
               href="/bills/new"
-              className="flex h-10 items-center gap-2 rounded-md border border-[#c8c0ae] px-3 text-sm font-semibold text-[#2f2a22]"
+              className="flex h-10 items-center gap-2 rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
             >
               <Plus size={16} aria-hidden="true" />
               New
@@ -460,26 +460,26 @@ export default async function DashboardPage() {
           </div>
 
           {recentBills.length > 0 ? (
-            <div className="divide-y divide-[#e7e1d3]">
+            <div className="divide-y divide-border">
               {recentBills.map((bill) => (
                 <Link
                   key={bill.id}
                   href={`/bills/${bill.slug}`}
-                  className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                  className="block p-5 transition-colors hover:bg-surface"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <h3 className="font-semibold">{bill.title}</h3>
-                      <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                      <p className="mt-1 max-w-3xl text-sm leading-6 text-ink-muted">
                         {bill.description}
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
-                      <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold capitalize text-[#123c69]">
+                      <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold capitalize text-accent">
                         {bill.status.replaceAll("_", " ").toLowerCase()}
                       </span>
                       {bill.category ? (
-                        <span className="rounded-md bg-[#f0e8d8] px-2.5 py-1 text-xs font-semibold text-[#6b4e16]">
+                        <span className="rounded-md bg-warning-bg px-2.5 py-1 text-xs font-semibold text-warning-ink">
                           {bill.category.name}
                         </span>
                       ) : null}
@@ -489,7 +489,7 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="p-5 text-sm leading-6 text-[#6d6658]">
+            <div className="p-5 text-sm leading-6 text-ink-muted">
               No bills yet. Create your first bill from a problem statement.
             </div>
           )}
@@ -497,10 +497,10 @@ export default async function DashboardPage() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
-            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-              <div className="border-b border-[#e7e1d3] p-5">
+            <section className="rounded-lg border border-border bg-surface-raised shadow-sm">
+              <div className="border-b border-border p-5">
                 <h2 className="text-lg font-semibold">Public discovery</h2>
-                <p className="text-sm text-[#6d6658]">
+                <p className="text-sm text-ink-muted">
                   Trending, most supported, and newly published bills.
                 </p>
               </div>
@@ -514,30 +514,30 @@ export default async function DashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-              <div className="flex items-center gap-2 border-b border-[#e7e1d3] p-5">
+            <section className="rounded-lg border border-border bg-surface-raised shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border p-5">
                 <Bookmark size={18} aria-hidden="true" />
                 <div>
                   <h2 className="text-lg font-semibold">Saved bills</h2>
-                  <p className="text-sm text-[#6d6658]">
+                  <p className="text-sm text-ink-muted">
                     Public proposals you bookmarked for later.
                   </p>
                 </div>
               </div>
               {savedBills.length > 0 ? (
-                <div className="divide-y divide-[#e7e1d3]">
+                <div className="divide-y divide-border">
                   {savedBills.map((savedBill) => (
                     <Link
                       key={savedBill.id}
                       href={`/bills/${savedBill.bill.slug}`}
-                      className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                      className="block p-5 transition-colors hover:bg-surface"
                     >
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <h3 className="font-semibold">
                             {savedBill.bill.title}
                           </h3>
-                          <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                          <p className="mt-1 max-w-3xl text-sm leading-6 text-ink-muted">
                             {savedBill.bill.description}
                           </p>
                         </div>
@@ -556,34 +556,34 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="p-5 text-sm leading-6 text-[#6d6658]">
+                <p className="p-5 text-sm leading-6 text-ink-muted">
                   {getSavedBillEmptyMessage()}
                 </p>
               )}
             </section>
 
-            <section className="rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-              <div className="flex items-center gap-2 border-b border-[#e7e1d3] p-5">
+            <section className="rounded-lg border border-border bg-surface-raised shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border p-5">
                 <Bell size={18} aria-hidden="true" />
                 <div>
                   <h2 className="text-lg font-semibold">Followed bills</h2>
-                  <p className="text-sm text-[#6d6658]">
+                  <p className="text-sm text-ink-muted">
                     Bills where you receive comment and suggestion updates.
                   </p>
                 </div>
               </div>
               {followedBills.length > 0 ? (
-                <div className="divide-y divide-[#e7e1d3]">
+                <div className="divide-y divide-border">
                   {followedBills.map((follow) => (
                     <Link
                       key={follow.id}
                       href={`/bills/${follow.bill.slug}`}
-                      className="block p-5 transition-colors hover:bg-[#fbfaf7]"
+                      className="block p-5 transition-colors hover:bg-surface"
                     >
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <h3 className="font-semibold">{follow.bill.title}</h3>
-                          <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6d6658]">
+                          <p className="mt-1 max-w-3xl text-sm leading-6 text-ink-muted">
                             {follow.bill.description}
                           </p>
                         </div>
@@ -602,7 +602,7 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="p-5 text-sm leading-6 text-[#6d6658]">
+                <p className="p-5 text-sm leading-6 text-ink-muted">
                   {getBillFollowEmptyMessage()}
                 </p>
               )}
@@ -610,7 +610,7 @@ export default async function DashboardPage() {
           </div>
 
           <aside className="space-y-6">
-            <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+            <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
                 <Search size={18} aria-hidden="true" />
                 <h2 className="font-semibold">Find bills</h2>
@@ -619,11 +619,11 @@ export default async function DashboardPage() {
                 <input
                   name="q"
                   placeholder="Search public bills"
-                  className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                  className="h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                 />
                 <select
                   name="category"
-                  className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                  className="h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                 >
                   <option value="">All categories</option>
                   {categories.map((category) => (
@@ -634,26 +634,26 @@ export default async function DashboardPage() {
                 </select>
                 <button
                   type="submit"
-                  className="flex h-10 w-full items-center justify-center rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                  className="flex h-10 w-full items-center justify-center rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
                 >
                   Search bills
                 </button>
               </form>
             </section>
 
-            <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+            <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
               <h2 className="font-semibold">Recent comments on my bills</h2>
               <div className="mt-4 space-y-3">
                 {recentCommentsOnMyBills.map((comment) => (
                   <Link
                     key={comment.id}
                     href={`/bills/${comment.bill.slug}#comments`}
-                    className="block rounded-md border border-[#e7e1d3] px-3 py-2"
+                    className="block rounded-md border border-border px-3 py-2"
                   >
-                    <p className="text-sm font-semibold text-[#123c69]">
+                    <p className="text-sm font-semibold text-accent">
                       {comment.bill.title}
                     </p>
-                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#6d6658]">
+                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-ink-muted">
                       {comment.user.displayName ??
                         comment.user.name ??
                         "Citizen"}
@@ -662,7 +662,7 @@ export default async function DashboardPage() {
                   </Link>
                 ))}
                 {recentCommentsOnMyBills.length === 0 ? (
-                  <p className="text-sm text-[#6d6658]">
+                  <p className="text-sm text-ink-muted">
                     No comments on your bills yet.
                   </p>
                 ) : null}
@@ -699,16 +699,16 @@ function BillList({ title, bills }: { title: string; bills: DashboardBill[] }) {
           <Link
             key={bill.id}
             href={`/bills/${bill.slug}`}
-            className="block rounded-md border border-[#e7e1d3] px-3 py-3"
+            className="block rounded-md border border-border px-3 py-3"
           >
             <div className="mb-2 flex flex-wrap gap-2">
               {bill.category ? <Badge>{bill.category.name}</Badge> : null}
               <Badge>{bill.status.replaceAll("_", " ").toLowerCase()}</Badge>
             </div>
-            <p className="line-clamp-2 text-sm font-semibold leading-6 text-[#161616]">
+            <p className="line-clamp-2 text-sm font-semibold leading-6 text-foreground">
               {bill.title}
             </p>
-            <div className="mt-3 flex gap-2 text-xs font-semibold text-[#4f4a40]">
+            <div className="mt-3 flex gap-2 text-xs font-semibold text-ink-soft">
               <span className="flex items-center gap-1">
                 <ThumbsUp size={14} aria-hidden="true" />
                 {bill._count.votes}
@@ -725,7 +725,7 @@ function BillList({ title, bills }: { title: string; bills: DashboardBill[] }) {
           </Link>
         ))}
         {bills.length === 0 ? (
-          <p className="text-sm text-[#6d6658]">No public bills yet.</p>
+          <p className="text-sm text-ink-muted">No public bills yet.</p>
         ) : null}
       </div>
     </div>
@@ -734,7 +734,7 @@ function BillList({ title, bills }: { title: string; bills: DashboardBill[] }) {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md bg-[#e4eef6] px-2 py-1 text-xs font-semibold capitalize text-[#123c69]">
+    <span className="rounded-md bg-accent-soft px-2 py-1 text-xs font-semibold capitalize text-accent">
       {children}
     </span>
   );

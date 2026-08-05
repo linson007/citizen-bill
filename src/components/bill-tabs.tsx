@@ -83,8 +83,8 @@ export function BillTabs({
               onClick={() => setActive(tab.id)}
               className={`flex h-10 items-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
                 isActive
-                  ? "bg-[#123c69] text-white"
-                  : "border border-[#c8c0ae] bg-white text-[#2f2a22] hover:border-[#123c69] hover:text-[#123c69]"
+                  ? "bg-accent text-white"
+                  : "border border-border-strong bg-surface-raised text-ink-soft hover:border-accent hover:text-accent"
               }`}
             >
               {tab.label}
@@ -92,8 +92,8 @@ export function BillTabs({
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                     isActive
-                      ? "bg-white/20 text-white"
-                      : "bg-[#e4eef6] text-[#123c69]"
+                      ? "bg-hero-ink/20 text-white"
+                      : "bg-accent-soft text-accent"
                   }`}
                 >
                   {count}

@@ -42,24 +42,24 @@ export default async function AiSessionPage({
   const messages = parseMessages(aiSession.messages);
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
             AI session
           </p>
           <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">
             {aiSession.title ?? "AI drafting session"}
           </h1>
-          <p className="mt-2 text-sm text-[#6d6658]">
+          <p className="mt-2 text-sm text-ink-muted">
             Saved {aiSession.createdAt.toLocaleDateString("en-IN")}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {aiSession.bill ? (
               <Link
                 href={`/bills/${aiSession.bill.slug}/edit`}
-                className="flex h-10 items-center gap-2 rounded-md bg-[#123c69] px-3 text-sm font-semibold text-white"
+                className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white"
               >
                 <FileText size={16} aria-hidden="true" />
                 Continue on bill
@@ -67,7 +67,7 @@ export default async function AiSessionPage({
             ) : (
               <Link
                 href="/bills/new"
-                className="flex h-10 items-center gap-2 rounded-md bg-[#123c69] px-3 text-sm font-semibold text-white"
+                className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white"
               >
                 <FileText size={16} aria-hidden="true" />
                 Start new bill
@@ -77,7 +77,7 @@ export default async function AiSessionPage({
               <input type="hidden" name="sessionId" value={aiSession.id} />
               <button
                 type="submit"
-                className="h-10 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#8a3a2f]"
+                className="h-10 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-danger"
               >
                 Delete session
               </button>
@@ -93,15 +93,15 @@ export default async function AiSessionPage({
               key={`${message.role}-${index}`}
               className={`rounded-lg border p-5 shadow-sm ${
                 message.role === "assistant"
-                  ? "border-[#c8d8e5] bg-[#eaf3fa]"
-                  : "border-[#d8d2c4] bg-white"
+                  ? "border-accent/30 bg-accent-soft"
+                  : "border-border bg-surface-raised"
               }`}
             >
               <div className="mb-3 flex items-center gap-2 font-semibold">
                 <Bot size={17} aria-hidden="true" />
                 {message.role === "assistant" ? "Assistant" : "You"}
               </div>
-              <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+              <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
                 {message.content}
               </p>
             </article>

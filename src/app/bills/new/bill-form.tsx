@@ -241,12 +241,12 @@ function BillFormEditor({
   return (
     <form action={formAction} onSubmit={handleSubmit} className="space-y-8">
       {restoredDraft && !bannerDismissed ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#c8c0ae] bg-[#fbfaf7] px-4 py-3">
-          <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border-strong bg-surface px-4 py-3">
+          <p className="flex items-center gap-2 text-sm text-ink-soft">
             <History
               size={16}
               aria-hidden="true"
-              className="shrink-0 text-[#123c69]"
+              className="shrink-0 text-accent"
             />
             <span>
               Restored your unsaved draft from{" "}
@@ -259,7 +259,7 @@ function BillFormEditor({
           <button
             type="button"
             onClick={discardDraft}
-            className="flex h-8 items-center gap-1.5 rounded-md border border-[#c8c0ae] bg-white px-2.5 text-xs font-semibold text-[#2f2a22]"
+            className="flex h-8 items-center gap-1.5 rounded-md border border-border-strong bg-surface-raised px-2.5 text-xs font-semibold text-ink-soft"
           >
             <Trash2 size={14} aria-hidden="true" />
             {ml ? "ഡ്രാഫ്റ്റ് ഒഴിവാക്കുക" : "Discard draft"}
@@ -331,13 +331,13 @@ function BillFormEditor({
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
             <FormSection title={ml ? "ബിൽ വിവരങ്ങൾ" : "Bill details"}>
-              <div className="rounded-md border border-[#c9d9e8] bg-[#f4f8fb] p-3">
+              <div className="rounded-md border border-accent/25 bg-accent-soft p-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
+                  <p className="flex items-center gap-2 text-sm text-ink-soft">
                     <Lightbulb
                       size={16}
                       aria-hidden="true"
-                      className="shrink-0 text-[#123c69]"
+                      className="shrink-0 text-accent"
                     />
                     {suggestionLabels.help}
                   </p>
@@ -345,7 +345,7 @@ function BillFormEditor({
                     type="button"
                     onClick={suggestTitleAndCategory}
                     disabled={suggestionLoading}
-                    className="flex h-9 items-center gap-1.5 rounded-md bg-[#123c69] px-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                    className="flex h-9 items-center gap-1.5 rounded-md bg-accent px-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {suggestionLoading ? (
                       <Loader2
@@ -360,7 +360,7 @@ function BillFormEditor({
                   </button>
                 </div>
                 {suggestionError ? (
-                  <p className="mt-3 text-sm text-[#8a3b12]" role="status">
+                  <p className="mt-3 text-sm text-danger" role="status">
                     {suggestionError}
                   </p>
                 ) : null}
@@ -369,17 +369,17 @@ function BillFormEditor({
                     className="mt-3 flex flex-wrap items-center gap-2"
                     role="status"
                   >
-                    <span className="text-xs font-semibold text-[#3f3a32]">
+                    <span className="text-xs font-semibold text-ink-soft">
                       {suggestionLabels.title}
                     </span>
                     <button
                       type="button"
                       onClick={() => updateField("title", suggestion.title)}
-                      className="rounded-full border border-[#123c69] bg-white px-3 py-1.5 text-xs font-semibold text-[#123c69]"
+                      className="rounded-full border border-accent bg-surface-raised px-3 py-1.5 text-xs font-semibold text-accent"
                     >
                       {suggestion.title} · {suggestionLabels.useTitle}
                     </button>
-                    <span className="text-xs font-semibold text-[#3f3a32]">
+                    <span className="text-xs font-semibold text-ink-soft">
                       {suggestionLabels.category}
                     </span>
                     <button
@@ -387,7 +387,7 @@ function BillFormEditor({
                       onClick={() =>
                         updateField("category", suggestion.category)
                       }
-                      className="rounded-full border border-[#123c69] bg-white px-3 py-1.5 text-xs font-semibold text-[#123c69]"
+                      className="rounded-full border border-accent bg-surface-raised px-3 py-1.5 text-xs font-semibold text-accent"
                     >
                       {suggestion.category === OTHER_BILL_CATEGORY
                         ? "Other"
@@ -397,7 +397,7 @@ function BillFormEditor({
                     <button
                       type="button"
                       onClick={() => setSuggestion(null)}
-                      className="px-1 text-xs font-semibold text-[#6d6658] underline underline-offset-2"
+                      className="px-1 text-xs font-semibold text-ink-muted underline underline-offset-2"
                     >
                       {suggestionLabels.dismiss}
                     </button>
@@ -500,20 +500,20 @@ function BillFormEditor({
           </div>
 
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+            <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
+                <span className="grid size-10 place-items-center rounded-md bg-accent-soft text-accent">
                   <FileText size={20} aria-hidden="true" />
                 </span>
                 <div>
                   <h2 className="font-semibold">{ml ? "ബിൽ സേവ് ചെയ്യുക" : "Save bill"}</h2>
-                  <p className="text-sm text-[#6d6658]">
+                  <p className="text-sm text-ink-muted">
                     {ml ? "സ്വകാര്യമായി സൂക്ഷിക്കുകയോ ഉടൻ പ്രസിദ്ധീകരിക്കുകയോ ചെയ്യുക." : "Keep it private or publish immediately."}
                   </p>
                 </div>
               </div>
               {state.message ? (
-                <p className="mb-4 rounded-md bg-[#fff3d7] px-3 py-2 text-sm font-medium text-[#6b4e16]">
+                <p className="mb-4 rounded-md bg-warning-bg px-3 py-2 text-sm font-medium text-warning-ink">
                   {state.message}
                 </p>
               ) : null}
@@ -521,7 +521,7 @@ function BillFormEditor({
                 <SubmitButton intent="draft" locale={locale} />
                 <SubmitButton intent="publish" locale={locale} />
               </div>
-              <p className="mt-3 text-xs leading-5 text-[#6d6658]">
+              <p className="mt-3 text-xs leading-5 text-ink-muted">
                 {ml ? "പ്രസിദ്ധീകരിക്കാൻ വിവരണം, പ്രശ്ന പ്രസ്താവന, നിർദേശിക്കുന്ന പരിഹാരം, ബിൽ ഡ്രാഫ്റ്റ് വാചകം എന്നിവ ആവശ്യമാണ്. സേവ് ചെയ്യാത്ത മാറ്റങ്ങൾ ഈ ഉപകരണത്തിൽ സ്വയമേവ സൂക്ഷിക്കും." : "Publishing requires a description, problem statement, proposed solution, and draft bill text. Unsaved changes are kept on this device automatically."}
               </p>
             </div>
@@ -545,12 +545,12 @@ function StepHeading({
 }) {
   return (
     <div className="mb-4 flex items-start gap-3">
-      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#123c69] text-sm font-semibold text-white">
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-white">
         {number}
       </span>
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="mt-0.5 max-w-2xl text-sm leading-6 text-[#6d6658]">
+        <p className="mt-0.5 max-w-2xl text-sm leading-6 text-ink-muted">
           {subtitle}
         </p>
       </div>
@@ -569,8 +569,8 @@ function SubmitButton({ intent, locale }: { intent: "draft" | "publish"; locale:
       value={intent}
       className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-70 ${
         isPublish
-          ? "bg-[#123c69] text-white"
-          : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+          ? "bg-accent text-white"
+          : "border border-border-strong bg-surface-raised text-ink-soft"
       }`}
       disabled={pending}
     >
@@ -598,7 +598,7 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <h2 className="mb-5 text-lg font-semibold">{title}</h2>
       <div className="space-y-4">{children}</div>
     </section>
@@ -620,12 +620,12 @@ function CategorySelect({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <span className="text-sm font-semibold text-ink-soft">{label}</span>
       <select
         name={name}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 h-11 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       >
         <option value="">Select category</option>
         {billCategories.map((category) => (
@@ -656,13 +656,13 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <span className="text-sm font-semibold text-ink-soft">{label}</span>
       <input
         name={name}
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange?.(event.target.value)}
-        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 h-11 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       />
       {error ? <ErrorText>{error}</ErrorText> : null}
     </label>
@@ -707,7 +707,7 @@ function TextArea({
   return (
     <div className="block">
       <span className="flex items-center justify-between gap-3">
-        <label htmlFor={name} className="text-sm font-semibold text-[#3f3a32]">
+        <label htmlFor={name} className="text-sm font-semibold text-ink-soft">
           {label}
         </label>
         {snippets.length > 0 ? (
@@ -717,7 +717,7 @@ function TextArea({
                 key={snippet.label}
                 type="button"
                 onClick={() => onChange?.(`${value}${snippet.value}`)}
-                className="rounded-md border border-[#c8c0ae] bg-white px-2 py-1 text-xs font-semibold text-[#2f2a22]"
+                className="rounded-md border border-border-strong bg-surface-raised px-2 py-1 text-xs font-semibold text-ink-soft"
               >
                 {snippet.label}
               </button>
@@ -732,7 +732,7 @@ function TextArea({
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange?.(event.target.value)}
-        className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       />
       {error ? <ErrorText>{error}</ErrorText> : null}
     </div>
@@ -740,5 +740,5 @@ function TextArea({
 }
 
 function ErrorText({ children }: { children: React.ReactNode }) {
-  return <p className="mt-2 text-sm font-medium text-[#a33a2a]">{children}</p>;
+  return <p className="mt-2 text-sm font-medium text-danger">{children}</p>;
 }

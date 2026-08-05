@@ -16,7 +16,7 @@ export function CopyLinkButton({ url }: { url: string }) {
     <button
       type="button"
       onClick={copyLink}
-      className="flex h-10 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#2f2a22] shadow-sm"
+      className="flex h-10 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft shadow-sm"
     >
       {copied ? (
         <Check size={16} aria-hidden="true" />

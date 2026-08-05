@@ -42,25 +42,25 @@ export default async function BillVersionPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
         <Link
           href={`/bills/${slug}`}
-          className="mb-5 flex w-fit items-center gap-2 text-sm font-semibold text-[#123c69]"
+          className="mb-5 flex w-fit items-center gap-2 text-sm font-semibold text-accent"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           Back to bill
         </Link>
-        <article className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-          <p className="text-sm text-[#6d6658]">
+        <article className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
+          <p className="text-sm text-ink-muted">
             Snapshot from {version.createdAt.toLocaleString("en-IN")}
           </p>
           <h1 className="mt-2 text-2xl font-semibold">{version.title}</h1>
           {version.summary ? (
-            <p className="mt-4 text-[#4f4a40]">{version.summary}</p>
+            <p className="mt-4 text-ink-soft">{version.summary}</p>
           ) : null}
-          <pre className="mt-5 whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+          <pre className="mt-5 whitespace-pre-wrap text-sm leading-7 text-ink-soft">
             {version.body || "No body was saved in this version."}
           </pre>
         </article>
