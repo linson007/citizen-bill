@@ -217,10 +217,10 @@ export default async function BillDetailPage({
   return (
     <main
       id="main-content"
-      className="flex min-h-screen flex-col bg-[#f7f6f2] pb-20 text-[#161616] lg:pb-0"
+      className="flex min-h-screen flex-col bg-background pb-20 text-foreground lg:pb-0"
     >
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
           <div className="mb-4 flex flex-wrap gap-2">
             <Badge>{bill.status.replaceAll("_", " ").toLowerCase()}</Badge>
@@ -229,10 +229,10 @@ export default async function BillDetailPage({
           <h1 className="font-display max-w-4xl text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
             {formatDisplayTitle(bill.title)}
           </h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-[#4f4a40]">
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-ink-soft">
             {bill.description}
           </p>
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#6d6658]">
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-muted">
             <span className="flex items-center gap-2">
               <Calendar size={16} aria-hidden="true" />
               Created {bill.createdAt.toLocaleDateString("en-IN")}
@@ -256,7 +256,7 @@ export default async function BillDetailPage({
               </span>
             ) : null}
             {hasEstablishedActivity && categoryRank >= 0 ? (
-              <span className="flex items-center gap-2 font-semibold text-[#123c69]">
+              <span className="flex items-center gap-2 font-semibold text-accent">
                 <ChartNoAxesColumn size={16} aria-hidden="true" />#
                 {categoryRank + 1} in {bill.category?.name ?? "category"}
               </span>
@@ -266,7 +266,7 @@ export default async function BillDetailPage({
           </div>
         </div>
 
-        <div className="sticky top-0 z-20 border-t border-[#d8d2c4] bg-[#fbfaf7]/95 backdrop-blur-sm">
+        <div className="sticky top-0 z-20 border-t border-border bg-surface/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-5 py-3 sm:px-8">
             {isPublicBill && !isAuthor ? (
               <form action={toggleVoteAction}>
@@ -275,8 +275,8 @@ export default async function BillDetailPage({
                   type="submit"
                   className={`flex h-11 items-center gap-2 rounded-md px-5 text-sm font-semibold shadow-sm transition-colors ${
                     userVote
-                      ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                      : "bg-[#123c69] text-white hover:bg-[#0d2f54]"
+                      ? "border border-accent bg-accent-soft text-accent"
+                      : "bg-accent text-white hover:bg-hero-ink"
                   }`}
                 >
                   <ThumbsUp size={17} aria-hidden="true" />
@@ -289,7 +289,7 @@ export default async function BillDetailPage({
             {isAuthor ? (
               <Link
                 href={`/bills/${bill.slug}/edit`}
-                className="flex h-11 items-center gap-2 rounded-md bg-[#123c69] px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#0d2f54]"
+                className="flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-hero-ink"
               >
                 <Pencil size={17} aria-hidden="true" />
                 Edit bill
@@ -299,21 +299,21 @@ export default async function BillDetailPage({
               <>
                 <a
                   href="#comments"
-                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                  className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent"
                 >
                   <MessageSquare size={17} aria-hidden="true" />
                   Discuss
                 </a>
                 <a
                   href="#suggestions"
-                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                  className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent"
                 >
                   <PenLine size={17} aria-hidden="true" />
                   Suggest amendment
                 </a>
                 <a
                   href="#share"
-                  className="flex h-11 items-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm transition-colors hover:border-[#123c69] hover:text-[#123c69]"
+                  className="flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent"
                 >
                   <Share2 size={17} aria-hidden="true" />
                   Share
@@ -370,16 +370,16 @@ export default async function BillDetailPage({
               comments: isPublicBill ? (
                 <section
                   id="comments"
-                  className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
                 >
                   <div className="mb-5 flex items-center justify-between gap-4">
                     <div>
                       <h2 className="text-lg font-semibold">Comments</h2>
-                      <p className="text-sm text-[#6d6658]">
+                      <p className="text-sm text-ink-muted">
                         Discuss public impact, gaps, and improvements.
                       </p>
                     </div>
-                    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+                    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
                       {comments.length}
                     </span>
                   </div>
@@ -388,7 +388,7 @@ export default async function BillDetailPage({
                     <form action={createCommentAction} className="mb-5">
                       <input type="hidden" name="slug" value={bill.slug} />
                       <label className="block">
-                        <span className="text-sm font-semibold text-[#3f3a32]">
+                        <span className="text-sm font-semibold text-ink-soft">
                           Add a comment
                         </span>
                         <textarea
@@ -398,12 +398,12 @@ export default async function BillDetailPage({
                           maxLength={2000}
                           required
                           placeholder="Share a question, concern, or suggestion for improving this bill."
-                          className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                          className="mt-2 w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                         />
                       </label>
                       <button
                         type="submit"
-                        className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                        className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
                       >
                         <SendHorizontal size={16} aria-hidden="true" />
                         Post comment
@@ -412,14 +412,14 @@ export default async function BillDetailPage({
                   ) : (
                     <Link
                       href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#comments`)}`}
-                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm"
                     >
                       Sign in to comment
                     </Link>
                   )}
 
                   {comments.length > 0 ? (
-                    <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
+                    <div className="divide-y divide-border border-t border-border">
                       {comments.map((comment) => (
                         <article key={comment.id} className="py-4">
                           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -428,7 +428,7 @@ export default async function BillDetailPage({
                                 comment.user.name ??
                                 "Citizen"}
                             </p>
-                            <span className="text-xs text-[#8a8170]">
+                            <span className="text-xs text-ink-muted">
                               {comment.createdAt.toLocaleDateString("en-IN", {
                                 day: "numeric",
                                 month: "short",
@@ -436,7 +436,7 @@ export default async function BillDetailPage({
                               })}
                             </span>
                           </div>
-                          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+                          <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
                             {comment.body}
                           </p>
                           {session?.user ? (
@@ -453,7 +453,7 @@ export default async function BillDetailPage({
                               />
                               <button
                                 type="submit"
-                                className="text-xs font-semibold text-[#8a3a2f]"
+                                className="text-xs font-semibold text-danger"
                               >
                                 Report comment
                               </button>
@@ -463,7 +463,7 @@ export default async function BillDetailPage({
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
+                    <p className="rounded-md bg-surface px-3 py-3 text-sm text-ink-muted">
                       No comments yet. Start the discussion with a practical
                       suggestion.
                     </p>
@@ -475,18 +475,18 @@ export default async function BillDetailPage({
               suggestions: isPublicBill ? (
                 <section
                   id="suggestions"
-                  className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
                 >
                   <div className="mb-5 flex items-center justify-between gap-4">
                     <div>
                       <h2 className="text-lg font-semibold">
                         Amendment suggestions
                       </h2>
-                      <p className="text-sm text-[#6d6658]">
+                      <p className="text-sm text-ink-muted">
                         Suggest changes without editing the author&apos;s bill.
                       </p>
                     </div>
-                    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold text-[#123c69]">
+                    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent">
                       {suggestions.length}
                     </span>
                   </div>
@@ -500,7 +500,7 @@ export default async function BillDetailPage({
                       <input
                         name="section"
                         placeholder="Section or clause, optional"
-                        className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                        className="h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                       />
                       <textarea
                         name="body"
@@ -509,11 +509,11 @@ export default async function BillDetailPage({
                         maxLength={3000}
                         required
                         placeholder="Write the amendment or improvement you suggest."
-                        className="w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+                        className="w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                       />
                       <button
                         type="submit"
-                        className="flex h-10 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                        className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
                       >
                         <SendHorizontal size={16} aria-hidden="true" />
                         Suggest amendment
@@ -522,14 +522,14 @@ export default async function BillDetailPage({
                   ) : (
                     <Link
                       href={`/login?callbackUrl=${encodeURIComponent(`/bills/${bill.slug}#suggestions`)}`}
-                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                      className="mb-5 flex h-10 w-fit items-center justify-center rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm"
                     >
                       Sign in to suggest
                     </Link>
                   )}
 
                   {suggestions.length > 0 ? (
-                    <div className="divide-y divide-[#e7e1d3] border-t border-[#e7e1d3]">
+                    <div className="divide-y divide-border border-t border-border">
                       {suggestions.map((suggestion) => (
                         <article key={suggestion.id} className="py-4">
                           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -540,12 +540,12 @@ export default async function BillDetailPage({
                             </p>
                             <Badge>{suggestion.status.toLowerCase()}</Badge>
                             {suggestion.section ? (
-                              <span className="text-xs text-[#8a8170]">
+                              <span className="text-xs text-ink-muted">
                                 {suggestion.section}
                               </span>
                             ) : null}
                           </div>
-                          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+                          <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
                             {suggestion.body}
                           </p>
                           {isAuthor && suggestion.status === "OPEN" ? (
@@ -577,7 +577,7 @@ export default async function BillDetailPage({
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm text-[#6d6658]">
+                    <p className="rounded-md bg-surface px-3 py-3 text-sm text-ink-muted">
                       No amendment suggestions yet.
                     </p>
                   )}
@@ -586,7 +586,7 @@ export default async function BillDetailPage({
                 <UnavailableSection message="Amendment suggestions open when this bill is published." />
               ),
               versions: (
-                <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+                <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
                   <div className="mb-3 flex items-center gap-2 font-semibold">
                     <History size={17} aria-hidden="true" />
                     Version history
@@ -596,7 +596,7 @@ export default async function BillDetailPage({
                       {versions.length >= 2 ? (
                         <Link
                           href={`/bills/${bill.slug}/versions/compare?from=${versions[1].id}&to=${versions[0].id}`}
-                          className="block rounded-md bg-[#123c69] px-3 py-2 text-sm font-semibold text-white"
+                          className="block rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white"
                         >
                           Compare latest versions
                         </Link>
@@ -605,7 +605,7 @@ export default async function BillDetailPage({
                         <Link
                           key={version.id}
                           href={`/bills/${bill.slug}/versions/${version.id}`}
-                          className="block rounded-md border border-[#e7e1d3] px-3 py-2 text-sm font-medium text-[#123c69]"
+                          className="block rounded-md border border-border px-3 py-2 text-sm font-medium text-accent"
                         >
                           {version.createdAt.toLocaleDateString("en-IN", {
                             day: "numeric",
@@ -616,7 +616,7 @@ export default async function BillDetailPage({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#6d6658]">
+                    <p className="text-sm text-ink-muted">
                       No previous versions yet.
                     </p>
                   )}
@@ -630,7 +630,7 @@ export default async function BillDetailPage({
           {bodySections.length >= 2 ? (
             <nav
               aria-label="Bill sections"
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+              className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
             >
               <h2 className="mb-3 flex items-center gap-2 font-semibold">
                 <ListTree size={17} aria-hidden="true" />
@@ -641,9 +641,9 @@ export default async function BillDetailPage({
                   <li key={section.id}>
                     <a
                       href={`#${section.id}`}
-                      className="flex gap-2 text-sm leading-6 text-[#4f4a40] transition-colors hover:text-[#123c69]"
+                      className="flex gap-2 text-sm leading-6 text-ink-soft transition-colors hover:text-accent"
                     >
-                      <span className="shrink-0 font-semibold text-[#123c69]">
+                      <span className="shrink-0 font-semibold text-accent">
                         {index + 1}.
                       </span>
                       <span>{section.title}</span>
@@ -674,7 +674,7 @@ export default async function BillDetailPage({
 
           <StatusWorkflow status={bill.status} />
 
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
               <FileText size={17} aria-hidden="true" />
               Export bill
@@ -682,13 +682,13 @@ export default async function BillDetailPage({
             <div className="grid grid-cols-2 gap-2">
               <a
                 href={`/api/bills/${bill.slug}/export?format=pdf`}
-                className="flex h-10 items-center justify-center rounded-md border border-[#c8c0ae] px-3 text-sm font-semibold text-[#2f2a22]"
+                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
               >
                 PDF
               </a>
               <a
                 href={`/api/bills/${bill.slug}/export?format=docx`}
-                className="flex h-10 items-center justify-center rounded-md border border-[#c8c0ae] px-3 text-sm font-semibold text-[#2f2a22]"
+                className="flex h-10 items-center justify-center rounded-md border border-border-strong px-3 text-sm font-semibold text-ink-soft"
               >
                 DOCX
               </a>
@@ -696,9 +696,9 @@ export default async function BillDetailPage({
           </div>
 
           {isPublicBill ? (
-            <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+            <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
               <h2 className="font-semibold">Stay updated</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+              <p className="mt-2 text-sm leading-6 text-ink-muted">
                 {bill._count.followers} following · {bill._count.savedBy} saved
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
@@ -708,8 +708,8 @@ export default async function BillDetailPage({
                     type="submit"
                     className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-2 text-sm font-semibold shadow-sm ${
                       userFollow
-                        ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                        : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                        ? "border border-accent bg-accent-soft text-accent"
+                        : "border border-border-strong bg-surface-raised text-ink-soft"
                     }`}
                   >
                     <Bell size={16} aria-hidden="true" />
@@ -722,8 +722,8 @@ export default async function BillDetailPage({
                     type="submit"
                     className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-2 text-sm font-semibold shadow-sm ${
                       userSavedBill
-                        ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                        : "border border-[#c8c0ae] bg-white text-[#2f2a22]"
+                        ? "border border-accent bg-accent-soft text-accent"
+                        : "border border-border-strong bg-surface-raised text-ink-soft"
                     }`}
                   >
                     <Bookmark size={16} aria-hidden="true" />
@@ -740,21 +740,21 @@ export default async function BillDetailPage({
             </div>
           ) : null}
 
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
               <ShieldCheck size={17} aria-hidden="true" />
               Author reputation
             </div>
-            <p className="mt-2 text-sm text-[#4f4a40]">
+            <p className="mt-2 text-sm text-ink-soft">
               {bill.author.displayName ?? bill.author.name ?? "Citizen"}
             </p>
-            <p className="mt-3 text-2xl font-semibold text-[#123c69]">
+            <p className="mt-3 text-2xl font-semibold text-accent">
               {reputationScore}
             </p>
-            <p className="text-sm font-medium text-[#3f3a32]">
+            <p className="text-sm font-medium text-ink-soft">
               {reputationLevel}
             </p>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#6d6658]">
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink-muted">
               <StatLabel label="Published" value={authorStats.publishedBills} />
               <StatLabel
                 label="Votes received"
@@ -771,16 +771,16 @@ export default async function BillDetailPage({
           {isAuthor && bill.status === "DRAFT" ? (
             <form
               action={publishBillAction}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+              className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
             >
               <input type="hidden" name="slug" value={bill.slug} />
               <h2 className="font-semibold">Publish draft</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6d6658]">
+              <p className="mt-2 text-sm leading-6 text-ink-muted">
                 Publishing makes this bill visible in the public bills list.
               </p>
               <button
                 type="submit"
-                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Send size={17} aria-hidden="true" />
                 Publish bill
@@ -788,7 +788,7 @@ export default async function BillDetailPage({
             </form>
           ) : null}
 
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
               <Tag size={17} aria-hidden="true" />
               Tags
@@ -800,11 +800,11 @@ export default async function BillDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#6d6658]">No tags added yet.</p>
+              <p className="text-sm text-ink-muted">No tags added yet.</p>
             )}
           </div>
 
-          <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+          <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
             <div className="mb-3 flex items-center gap-2 font-semibold">
               <FileText size={17} aria-hidden="true" />
               Files
@@ -817,14 +817,14 @@ export default async function BillDetailPage({
                     href={file.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="block rounded-md border border-[#e7e1d3] px-3 py-2 text-sm font-medium text-[#123c69]"
+                    className="block rounded-md border border-border px-3 py-2 text-sm font-medium text-accent"
                   >
                     {file.fileName}
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#6d6658]">No files attached yet.</p>
+              <p className="text-sm text-ink-muted">No files attached yet.</p>
             )}
 
             {isAuthor ? (
@@ -839,11 +839,11 @@ export default async function BillDetailPage({
                 />
                 <button
                   type="submit"
-                  className="flex h-10 w-full items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#2f2a22] shadow-sm"
+                  className="flex h-10 w-full items-center justify-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft shadow-sm"
                 >
                   Upload PDF/DOCX
                 </button>
-                <p className="text-xs leading-5 text-[#6d6658]">
+                <p className="text-xs leading-5 text-ink-muted">
                   PDF or DOCX only. Maximum file size is 10 MB. Requires
                   `BLOB_READ_WRITE_TOKEN` for Vercel Blob uploads.
                 </p>
@@ -855,7 +855,7 @@ export default async function BillDetailPage({
           {isPublicBill && session?.user ? (
             <form
               action={reportBillAction}
-              className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+              className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm"
             >
               <input type="hidden" name="slug" value={bill.slug} />
               <div className="mb-3 flex items-center gap-2 font-semibold">
@@ -864,7 +864,7 @@ export default async function BillDetailPage({
               </div>
               <select
                 name="reason"
-                className="h-10 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm"
+                className="h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm"
               >
                 <option>Spam or misleading</option>
                 <option>Abusive or hateful</option>
@@ -875,11 +875,11 @@ export default async function BillDetailPage({
                 name="details"
                 rows={3}
                 placeholder="Optional details"
-                className="mt-3 w-full rounded-md border border-[#c8c0ae] bg-white px-3 py-2 text-sm"
+                className="mt-3 w-full rounded-md border border-border-strong bg-surface-raised px-3 py-2 text-sm"
               />
               <button
                 type="submit"
-                className="mt-3 flex h-10 w-full items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#8a3a2f] shadow-sm"
+                className="mt-3 flex h-10 w-full items-center justify-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-danger shadow-sm"
               >
                 Submit report
               </button>
@@ -888,7 +888,7 @@ export default async function BillDetailPage({
 
           <Link
             href={isAuthor ? "/dashboard" : "/bills"}
-            className="flex h-11 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-4 text-sm font-semibold text-[#2f2a22] shadow-sm"
+            className="flex h-11 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm"
           >
             <FileText size={17} aria-hidden="true" />
             {isAuthor ? "Back to dashboard" : "Back to bills"}
@@ -897,7 +897,7 @@ export default async function BillDetailPage({
       </section>
 
       {isPublicBill ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#d8d2c4] bg-white/95 backdrop-blur-sm lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface-raised/95 backdrop-blur-sm lg:hidden">
           <div className="flex items-center gap-2 px-4 py-3">
             {!isAuthor ? (
               <form action={toggleVoteAction} className="flex-1">
@@ -906,8 +906,8 @@ export default async function BillDetailPage({
                   type="submit"
                   className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
                     userVote
-                      ? "border border-[#123c69] bg-[#e4eef6] text-[#123c69]"
-                      : "bg-[#123c69] text-white"
+                      ? "border border-accent bg-accent-soft text-accent"
+                      : "bg-accent text-white"
                   }`}
                 >
                   <ThumbsUp size={16} aria-hidden="true" />
@@ -917,7 +917,7 @@ export default async function BillDetailPage({
             ) : (
               <Link
                 href={`/bills/${bill.slug}/edit`}
-                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Pencil size={16} aria-hidden="true" />
                 Edit bill
@@ -926,14 +926,14 @@ export default async function BillDetailPage({
             <a
               href="#comments"
               aria-label="Discuss"
-              className="flex h-11 w-11 items-center justify-center rounded-md border border-[#c8c0ae] bg-white text-[#2f2a22] shadow-sm"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-border-strong bg-surface-raised text-ink-soft shadow-sm"
             >
               <MessageSquare size={17} aria-hidden="true" />
             </a>
             <a
               href="#suggestions"
               aria-label="Suggest amendment"
-              className="flex h-11 w-11 items-center justify-center rounded-md border border-[#c8c0ae] bg-white text-[#2f2a22] shadow-sm"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-border-strong bg-surface-raised text-ink-soft shadow-sm"
             >
               <PenLine size={17} aria-hidden="true" />
             </a>
@@ -958,8 +958,8 @@ function UploadMessage({ code }: { code: string }) {
     <p
       className={`rounded-md px-3 py-2 text-xs font-medium ${
         code === "ok"
-          ? "bg-[#e6f1ec] text-[#2f7d62]"
-          : "bg-[#fff3d7] text-[#6b4e16]"
+          ? "bg-success-soft text-success"
+          : "bg-warning-bg text-warning-ink"
       }`}
     >
       {messages[code] ?? "Upload could not be completed."}
@@ -988,8 +988,8 @@ function SuggestionButton({
         value={intent}
         className={`h-8 rounded-md border px-2.5 text-xs font-semibold ${
           intent === "reject"
-            ? "border-[#c8c0ae] text-[#8a3a2f]"
-            : "border-[#123c69] bg-[#123c69] text-white"
+            ? "border-border-strong text-danger"
+            : "border-accent bg-accent text-white"
         }`}
       >
         {children}
@@ -1014,18 +1014,18 @@ function ContentBlock({
   }
 
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <h2 className="mb-3 text-lg font-semibold">{title}</h2>
       {content ? (
         formatted ? (
           <FormattedBillText content={content} />
         ) : (
-          <p className="whitespace-pre-wrap text-sm leading-7 text-[#3f3a32]">
+          <p className="whitespace-pre-wrap text-sm leading-7 text-ink-soft">
             {content}
           </p>
         )
       ) : (
-        <p className="text-sm text-[#6d6658]">Not added yet.</p>
+        <p className="text-sm text-ink-muted">Not added yet.</p>
       )}
     </section>
   );
@@ -1056,14 +1056,14 @@ function FormattedBillText({ content }: { content: string }) {
   }, []);
 
   return (
-    <div className="space-y-4 text-sm leading-7 text-[#3f3a32]">
+    <div className="space-y-4 text-sm leading-7 text-ink-soft">
       {blocks.map((block, index) => {
         if (block.heading) {
           return (
             <h3
               key={`${block.heading}-${index}`}
               id={block.id ?? undefined}
-              className="scroll-mt-24 font-semibold text-[#161616]"
+              className="scroll-mt-24 font-semibold text-foreground"
             >
               {block.heading}
             </h3>
@@ -1109,17 +1109,17 @@ function BillEngagementPrompt({
     : `/login?callbackUrl=${encodeURIComponent(`/bills/${slug}#comments`)}`;
 
   return (
-    <section className="rounded-lg border border-[#b8cadb] bg-[#edf4fa] p-5">
-      <h2 className="text-lg font-semibold text-[#123c69]">
+    <section className="rounded-lg border border-accent/30 bg-accent-soft p-5">
+      <h2 className="text-lg font-semibold text-accent">
         Help start the public discussion
       </h2>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#3f4f60]">
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-soft">
         This proposal is new. Add a practical comment, suggest an amendment, or
         support it if it addresses a public need.
       </p>
       <Link
         href={href}
-        className="mt-4 inline-flex h-11 items-center rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+        className="mt-4 inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
       >
         Join the discussion
       </Link>
@@ -1153,7 +1153,7 @@ function BillAnalytics({
   hasEstablishedActivity: boolean;
 }) {
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-2 font-semibold">
         <ChartNoAxesColumn size={17} aria-hidden="true" />
         Public analytics
@@ -1168,25 +1168,25 @@ function BillAnalytics({
           <StatLabel label="Suggestions" value={suggestions} />
         </div>
       ) : (
-        <p className="rounded-md bg-[#fbfaf7] px-3 py-3 text-sm leading-6 text-[#4f4a40]">
+        <p className="rounded-md bg-surface px-3 py-3 text-sm leading-6 text-ink-soft">
           This proposal is gathering its first public responses. Activity will
           appear here once people begin participating.
         </p>
       )}
       {hasEstablishedActivity && categoryName && categoryRank ? (
-        <p className="mt-4 rounded-md bg-[#fbfaf7] px-3 py-2 text-sm text-[#4f4a40]">
+        <p className="mt-4 rounded-md bg-surface px-3 py-2 text-sm text-ink-soft">
           Ranked #{categoryRank} of {categoryTotal} in {categoryName}
         </p>
       ) : null}
-      <div className="mt-4 border-t border-[#e7e1d3] pt-4">
-        <p className="mb-2 text-sm font-semibold text-[#3f3a32]">
+      <div className="mt-4 border-t border-border pt-4">
+        <p className="mb-2 text-sm font-semibold text-ink-soft">
           Recent activity
         </p>
         <div className="space-y-2">
           {activityItems.slice(0, 3).map((item) => (
             <p
               key={`${item.label}-${item.date.toISOString()}`}
-              className="text-sm text-[#6d6658]"
+              className="text-sm text-ink-muted"
             >
               {item.label} on {item.date.toLocaleDateString("en-IN")}
             </p>
@@ -1212,19 +1212,19 @@ function StatusWorkflow({ status }: { status: string }) {
   ];
 
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <h2 className="font-semibold">Public status</h2>
       <div className="mt-4 space-y-3">
         {steps.map((step) => (
           <div key={step.label} className="flex items-center gap-3">
             <span
               className={`size-3 rounded-full ${
-                step.active || step.done ? "bg-[#123c69]" : "bg-[#d8d2c4]"
+                step.active || step.done ? "bg-accent" : "bg-border"
               }`}
             />
             <span
               className={`text-sm font-medium ${
-                step.active ? "text-[#123c69]" : "text-[#4f4a40]"
+                step.active ? "text-accent" : "text-ink-soft"
               }`}
             >
               {step.label}
@@ -1232,7 +1232,7 @@ function StatusWorkflow({ status }: { status: string }) {
           </div>
         ))}
       </div>
-      <p className="mt-4 text-xs leading-5 text-[#6d6658]">
+      <p className="mt-4 text-xs leading-5 text-ink-muted">
         Community supported is persisted when a bill reaches 25 public votes.
       </p>
     </section>
@@ -1241,18 +1241,18 @@ function StatusWorkflow({ status }: { status: string }) {
 
 function StatLabel({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md border border-[#e7e1d3] px-3 py-2">
-      <p className="text-lg font-semibold text-[#123c69]">
+    <div className="rounded-md border border-border px-3 py-2">
+      <p className="text-lg font-semibold text-accent">
         {value.toLocaleString()}
       </p>
-      <p className="text-xs font-medium text-[#6d6658]">{label}</p>
+      <p className="text-xs font-medium text-ink-muted">{label}</p>
     </div>
   );
 }
 
 function UnavailableSection({ message }: { message: string }) {
   return (
-    <p className="rounded-lg border border-[#d8d2c4] bg-white px-4 py-4 text-sm leading-6 text-[#6d6658] shadow-sm">
+    <p className="rounded-lg border border-border bg-surface-raised px-4 py-4 text-sm leading-6 text-ink-muted shadow-sm">
       {message}
     </p>
   );
@@ -1260,7 +1260,7 @@ function UnavailableSection({ message }: { message: string }) {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md bg-[#e4eef6] px-2.5 py-1 text-xs font-semibold capitalize text-[#123c69]">
+    <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold capitalize text-accent">
       {children}
     </span>
   );

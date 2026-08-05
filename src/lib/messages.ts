@@ -18,6 +18,7 @@ export type MessageTree = {
     language: string;
     english: string;
     malayalam: string;
+    toggleTheme: string;
   };
   home: {
     brand: string;
@@ -146,6 +147,7 @@ export const messages: Record<Locale, MessageTree> = {
       language: "Language",
       english: "English",
       malayalam: "Malayalam",
+      toggleTheme: "Toggle theme",
     },
     home: {
       brand: "MattamUndo",
@@ -287,6 +289,7 @@ export const messages: Record<Locale, MessageTree> = {
       language: "ഭാഷ",
       english: "English",
       malayalam: "മലയാളം",
+      toggleTheme: "തീം മാറ്റുക",
     },
     home: {
       brand: "MattamUndo",

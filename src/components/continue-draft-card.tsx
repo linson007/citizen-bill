@@ -50,18 +50,18 @@ export function ContinueDraftCard() {
   return (
     <section
       aria-label="Continue your saved draft"
-      className="mb-6 rounded-lg border border-[#123c69]/30 bg-[#e4eef6] p-5 shadow-sm"
+      className="mb-6 rounded-lg border border-accent/30 bg-accent-soft p-5 shadow-sm"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-[#123c69] text-white">
+          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-accent text-white">
             <PenLine size={20} aria-hidden="true" />
           </span>
           <div>
-            <h2 className="font-semibold text-[#123c69]">
+            <h2 className="font-semibold text-accent">
               Continue your saved draft
             </h2>
-            <p className="mt-1 text-sm leading-6 text-[#3f3a32]">
+            <p className="mt-1 text-sm leading-6 text-ink-soft">
               <span className="font-semibold">
                 {getBillDraftDisplayTitle(draft.fields)}
               </span>{" "}
@@ -74,14 +74,14 @@ export function ContinueDraftCard() {
           <button
             type="button"
             onClick={discardDraft}
-            className="flex h-10 items-center gap-2 rounded-md border border-[#123c69]/30 bg-white px-3 text-sm font-semibold text-[#123c69]"
+            className="flex h-10 items-center gap-2 rounded-md border border-accent/30 bg-surface-raised px-3 text-sm font-semibold text-accent"
           >
             <Trash2 size={16} aria-hidden="true" />
             Discard
           </button>
           <Link
             href="/bills/new"
-            className="flex h-10 items-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+            className="flex h-10 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
           >
             <PenLine size={16} aria-hidden="true" />
             Continue drafting

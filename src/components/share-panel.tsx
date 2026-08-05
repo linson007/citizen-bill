@@ -65,7 +65,7 @@ export function SharePanel({
   }
 
   return (
-    <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-2 font-semibold">
         <Share2 size={17} aria-hidden="true" />
         Share bill
@@ -78,7 +78,7 @@ export function SharePanel({
             target="_blank"
             rel="noreferrer"
             onClick={() => void recordShare(target.platform)}
-            className="flex h-10 items-center justify-center rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#2f2a22] shadow-sm"
+            className="flex h-10 items-center justify-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft shadow-sm"
           >
             {target.label}
           </a>
@@ -86,7 +86,7 @@ export function SharePanel({
         <button
           type="button"
           onClick={copyLink}
-          className="flex h-10 items-center justify-center gap-2 rounded-md border border-[#c8c0ae] bg-white px-3 text-sm font-semibold text-[#2f2a22] shadow-sm"
+          className="flex h-10 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft shadow-sm"
         >
           {copied ? (
             <Check size={16} aria-hidden="true" />

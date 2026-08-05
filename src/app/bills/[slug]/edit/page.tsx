@@ -65,22 +65,22 @@ export default async function EditBillPage({
         : null;
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
             Edit bill
           </p>
           <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">
             Refine your bill draft
           </h1>
-          <p className="mt-2 max-w-2xl text-[#4f4a40]">
+          <p className="mt-2 max-w-2xl text-ink-soft">
             Update the structured content and use the AI helper for drafting
             support.
           </p>
           {errorMessage ? (
-            <p className="mt-4 rounded-md border border-[#e2b35a] bg-[#fff7e8] px-3 py-2 text-sm text-[#6a4b10]">
+            <p className="mt-4 rounded-md border border-warning-ink/40 bg-warning-bg px-3 py-2 text-sm text-warning-ink">
               {errorMessage}
             </p>
           ) : null}
@@ -148,7 +148,7 @@ export default async function EditBillPage({
 
           <button
             type="submit"
-            className="flex h-11 items-center justify-center gap-2 rounded-md bg-[#123c69] px-4 text-sm font-semibold text-white shadow-sm"
+            className="flex h-11 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
           >
             <Save size={17} aria-hidden="true" />
             Save changes
@@ -173,7 +173,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
       <h2 className="mb-5 text-lg font-semibold">{title}</h2>
       <div className="space-y-4">{children}</div>
     </section>
@@ -191,11 +191,11 @@ function CategorySelect({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <span className="text-sm font-semibold text-ink-soft">{label}</span>
       <select
         name={name}
         defaultValue={defaultValue}
-        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 h-11 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       >
         <option value="">Select category</option>
         {billCategories.map((category) => (
@@ -219,11 +219,11 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <span className="text-sm font-semibold text-ink-soft">{label}</span>
       <input
         name={name}
         defaultValue={defaultValue}
-        className="mt-2 h-11 w-full rounded-md border border-[#c8c0ae] bg-white px-3 text-sm outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 h-11 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       />
     </label>
   );
@@ -242,12 +242,12 @@ function TextArea({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+      <span className="text-sm font-semibold text-ink-soft">{label}</span>
       <textarea
         name={name}
         rows={rows}
         defaultValue={defaultValue}
-        className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
+        className="mt-2 w-full resize-y rounded-md border border-border-strong bg-surface-raised px-3 py-3 text-sm leading-6 outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
       />
     </label>
   );

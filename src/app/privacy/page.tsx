@@ -11,23 +11,23 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteHeader />
-      <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
             Legal
           </p>
           <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">
             Privacy policy
           </h1>
-          <p className="mt-2 text-sm text-[#6d6658]">
+          <p className="mt-2 text-sm text-ink-muted">
             Last updated: August 2, 2026
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl flex-1 space-y-5 px-5 py-8 text-sm leading-7 text-[#3f3a32] sm:px-8">
+      <section className="mx-auto max-w-4xl flex-1 space-y-5 px-5 py-8 text-sm leading-7 text-ink-soft sm:px-8">
         <PolicySection title="Information collected">
           MattamUndo stores account information from Google login (name, email,
           and profile image when provided), bill drafts, uploaded file metadata,
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
           source code. To request deletion or correction of your account or
           content, email{" "}
           <a
-            className="font-semibold text-[#123c69]"
+            className="font-semibold text-accent"
             href="mailto:linsonkurian007@gmail.com"
           >
             linsonkurian007@gmail.com
@@ -87,8 +87,8 @@ function PolicySection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
-      <h2 className="mb-2 text-lg font-semibold text-[#161616]">{title}</h2>
+    <section className="rounded-lg border border-border bg-surface-raised p-5 shadow-sm">
+      <h2 className="mb-2 text-lg font-semibold text-foreground">{title}</h2>
       <p>{children}</p>
     </section>
   );

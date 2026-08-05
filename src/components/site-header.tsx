@@ -6,6 +6,7 @@ import { AccountMenu } from "@/components/account-menu";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { MobileNav } from "@/components/mobile-nav";
 import { NavLink } from "@/components/nav-link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRequestMessages } from "@/lib/request-locale";
@@ -60,6 +61,7 @@ export async function SiteHeader() {
               language: t.nav.language,
               english: t.nav.english,
               malayalam: t.nav.malayalam,
+              toggleTheme: t.nav.toggleTheme,
               newBill: t.nav.newBill,
               signIn: t.nav.signIn,
               signOut: t.nav.signOut,
@@ -75,6 +77,7 @@ export async function SiteHeader() {
               }}
             />
           </div>
+          <ThemeToggle label={t.nav.toggleTheme} />
           <NavLink
             href="/bills"
             className="hidden h-11 items-center rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 md:inline-flex"

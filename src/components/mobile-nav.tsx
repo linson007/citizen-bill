@@ -7,6 +7,7 @@ import { useEffect, useId, useState } from "react";
 
 import { LocaleToggle } from "@/components/locale-toggle";
 import { NavLink } from "@/components/nav-link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import type { Locale } from "@/lib/locale";
 
 type MobileNavLink = {
@@ -25,6 +26,7 @@ type MobileNavProps = {
     language: string;
     english: string;
     malayalam: string;
+    toggleTheme: string;
     newBill: string;
     signIn: string;
     signOut: string;
@@ -126,7 +128,7 @@ export function MobileNav({
               <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 {labels.language}
               </p>
-              <div className="px-3">
+              <div className="flex items-center gap-2 px-3">
                 <LocaleToggle
                   locale={locale}
                   labels={{
@@ -135,6 +137,7 @@ export function MobileNav({
                     malayalam: labels.malayalam,
                   }}
                 />
+                <ThemeToggle label={labels.toggleTheme} />
               </div>
             </div>
 
