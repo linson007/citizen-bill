@@ -49,11 +49,13 @@ export function BillResults({
   locale,
   labels,
   hasActiveFilters,
+  total,
 }: {
   bills: BillResultItem[];
   locale: Locale;
   labels: BillResultsLabels;
   hasActiveFilters: boolean;
+  total?: number;
 }) {
   const layout = useSyncExternalStore(
     subscribeToBillLayout,
@@ -139,7 +141,7 @@ export function BillResults({
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm">
         <p className="font-medium text-ink-soft" aria-live="polite">
-          {bills.length.toLocaleString()} {labels.results}
+          {(total ?? bills.length).toLocaleString()} {labels.results}
         </p>
         <div className="flex flex-wrap items-center gap-3">
           {hasActiveFilters ? (

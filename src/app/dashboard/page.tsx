@@ -246,6 +246,29 @@ export default async function DashboardPage() {
     }),
   ]);
 
+  const discoverySeenIds = new Set<string>();
+  const trendingForDisplay = trendingBills.filter((bill) => {
+    if (discoverySeenIds.has(bill.id)) {
+      return false;
+    }
+    discoverySeenIds.add(bill.id);
+    return true;
+  });
+  const mostSupportedForDisplay = mostSupportedBills.filter((bill) => {
+    if (discoverySeenIds.has(bill.id)) {
+      return false;
+    }
+    discoverySeenIds.add(bill.id);
+    return true;
+  });
+  const recentlyPublishedForDisplay = recentlyPublishedBills.filter((bill) => {
+    if (discoverySeenIds.has(bill.id)) {
+      return false;
+    }
+    discoverySeenIds.add(bill.id);
+    return true;
+  });
+
   const dashboardCards = [
     {
       title: "My bills",
@@ -420,7 +443,7 @@ export default async function DashboardPage() {
             </ol>
           </section>
         ) : null}
-        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-7">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {dashboardCards.map((card) => (
             <article
               key={card.title}
@@ -505,11 +528,20 @@ export default async function DashboardPage() {
                 </p>
               </div>
               <div className="grid gap-5 p-5 xl:grid-cols-3">
-                <BillList title="Trending" bills={trendingBills} />
-                <BillList title="Most supported" bills={mostSupportedBills} />
+                <BillList
+                  title="Trending"
+                  bills={trendingForDisplay}
+                  viewAllHref="/bills?sort=trending"
+                />
+                <BillList
+                  title="Most supported"
+                  bills={mostSupportedForDisplay}
+                  viewAllHref="/bills?sort=most-supported"
+                />
                 <BillList
                   title="Recently published"
-                  bills={recentlyPublishedBills}
+                  bills={recentlyPublishedForDisplay}
+                  viewAllHref="/bills"
                 />
               </div>
             </section>
@@ -690,10 +722,28 @@ type DashboardBill = {
   };
 };
 
-function BillList({ title, bills }: { title: string; bills: DashboardBill[] }) {
+function BillList({
+  title,
+  bills,
+  viewAllHref,
+}: {
+  title: string;
+  bills: DashboardBill[];
+  viewAllHref?: string;
+}) {
   return (
     <div>
-      <h3 className="mb-3 font-semibold">{title}</h3>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="font-semibold">{title}</h3>
+        {viewAllHref ? (
+          <Link
+            href={viewAllHref}
+            className="text-xs font-semibold text-accent transition-colors hover:text-hero-ink"
+          >
+            View all
+          </Link>
+        ) : null}
+      </div>
       <div className="space-y-3">
         {bills.map((bill) => (
           <Link

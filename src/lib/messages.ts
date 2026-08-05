@@ -92,6 +92,10 @@ export type MessageTree = {
     layoutList: string;
     layoutGrid: string;
     keyboardHint: string;
+    previous: string;
+    next: string;
+    pageOf: string;
+    pagination: string;
   };
   draft: {
     eyebrow: string;
@@ -233,6 +237,10 @@ export const messages: Record<Locale, MessageTree> = {
       layoutGrid: "Grid view",
       keyboardHint:
         "Keyboard: arrow keys move between bills; Enter or Space opens one. G = grid, L = list, / = search.",
+      previous: "Previous",
+      next: "Next",
+      pageOf: "Page {current} of {total}",
+      pagination: "Pagination",
     },
     draft: {
       eyebrow: "New bill draft",
@@ -378,6 +386,10 @@ export const messages: Record<Locale, MessageTree> = {
       layoutGrid: "ഗ്രിഡ് കാഴ്ച",
       keyboardHint:
         "കീബോർഡ്: അമ്പടയാള കീകൾ ബില്ലുകൾക്കിടയിൽ നീങ്ങും; Enter അല്ലെങ്കിൽ Space തുറക്കും. G = ഗ്രിഡ്, L = ലിസ്റ്റ്, / = തിരയൽ.",
+      previous: "മുമ്പ്",
+      next: "അടുത്തത്",
+      pageOf: "പേജ് {current} / {total}",
+      pagination: "പേജുകൾ",
     },
     draft: {
       eyebrow: "പുതിയ ബിൽ ഡ്രാഫ്റ്റ്",
