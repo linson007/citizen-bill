@@ -19,6 +19,7 @@ import {
 import { ContinueDraftCard } from "@/components/continue-draft-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { StatusBadge } from "@/components/status-badge";
 import { authOptions } from "@/lib/auth";
 import { getSavedBillEmptyMessage } from "@/lib/bill-engagement";
 import { getBillFollowEmptyMessage } from "@/lib/bill-follow";
@@ -498,9 +499,7 @@ export default async function DashboardPage() {
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
-                      <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold capitalize text-accent">
-                        {bill.status.replaceAll("_", " ").toLowerCase()}
-                      </span>
+                      <StatusBadge status={bill.status} />
                       {bill.category ? (
                         <span className="rounded-md bg-warning-bg px-2.5 py-1 text-xs font-semibold text-warning-ink">
                           {bill.category.name}
@@ -574,11 +573,7 @@ export default async function DashboardPage() {
                           </p>
                         </div>
                         <div className="flex shrink-0 flex-wrap gap-2">
-                          <Badge>
-                            {savedBill.bill.status
-                              .replaceAll("_", " ")
-                              .toLowerCase()}
-                          </Badge>
+                          <StatusBadge status={savedBill.bill.status} />
                           {savedBill.bill.category ? (
                             <Badge>{savedBill.bill.category.name}</Badge>
                           ) : null}
@@ -620,11 +615,7 @@ export default async function DashboardPage() {
                           </p>
                         </div>
                         <div className="flex shrink-0 flex-wrap gap-2">
-                          <Badge>
-                            {follow.bill.status
-                              .replaceAll("_", " ")
-                              .toLowerCase()}
-                          </Badge>
+                          <StatusBadge status={follow.bill.status} />
                           {follow.bill.category ? (
                             <Badge>{follow.bill.category.name}</Badge>
                           ) : null}
@@ -753,7 +744,7 @@ function BillList({
           >
             <div className="mb-2 flex flex-wrap gap-2">
               {bill.category ? <Badge>{bill.category.name}</Badge> : null}
-              <Badge>{bill.status.replaceAll("_", " ").toLowerCase()}</Badge>
+              <StatusBadge status={bill.status} />
             </div>
             <p className="line-clamp-2 text-sm font-semibold leading-6 text-foreground">
               {bill.title}

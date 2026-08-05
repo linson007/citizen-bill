@@ -181,17 +181,13 @@ async function notifyBillFollowers({
   );
 }
 
-export async function toggleVoteAction(formData: FormData) {
+export async function toggleVoteAction(
+  slug: string,
+): Promise<{ supported: boolean }> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirectToBillLogin(formData);
-  }
-
-  const slug = formData.get("slug")?.toString();
-
-  if (!slug) {
-    redirect("/bills");
+    redirect(`/login?callbackUrl=${encodeURIComponent(`/bills/${slug}`)}`);
   }
 
   const bill = await prisma.bill.findUnique({
@@ -224,6 +220,8 @@ export async function toggleVoteAction(formData: FormData) {
     },
   });
 
+  const supported = !existingVote;
+
   if (existingVote) {
     await prisma.vote.delete({
       where: {
@@ -238,21 +236,20 @@ export async function toggleVoteAction(formData: FormData) {
       },
     });
 
-    if (bill.authorId !== session.user.id) {
-      await notifyUser({
-        userId: bill.authorId,
-        billId: bill.id,
-        type: "vote",
-        message: `Someone supported your bill "${bill.title}".`,
-      });
-    }
+    await notifyUser({
+      userId: bill.authorId,
+      billId: bill.id,
+      type: "vote",
+      message: `Someone supported your bill "${bill.title}".`,
+    });
   }
 
   revalidatePath("/bills");
   revalidateHomepageData();
   revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
-  redirect(`/bills/${slug}`);
+
+  return { supported };
 }
 
 export async function toggleSavedBillAction(formData: FormData) {
