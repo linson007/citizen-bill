@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { FileText, Search } from "lucide-react";
+import { redirect } from "next/navigation";
+import { ChevronLeft, ChevronRight, FileText, Search } from "lucide-react";
 
 import { BillResults, type BillResultsLabels } from "@/components/bill-results";
 import { SiteFooter } from "@/components/site-footer";
@@ -17,6 +18,8 @@ import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
 import { getRequestMessages } from "@/lib/request-locale";
 
+export const BILLS_PER_PAGE = 20;
+
 export default async function BillsPage({
   searchParams,
 }: {
@@ -24,23 +27,27 @@ export default async function BillsPage({
     q?: string;
     category?: string;
     sort?: string;
+    page?: string;
   }>;
 }) {
-  const { q, category, sort } = await searchParams;
+  const { q, category, sort, page } = await searchParams;
   const { locale, t } = await getRequestMessages();
   const copyClass = locale === "ml" ? "font-malayalam" : "";
   const query = q?.trim();
   const selectedCategory = category?.trim();
   const selectedSort = parseBillDiscoverySort(sort);
+  const pageNumber = Math.max(parseInt(page ?? "1", 10) || 1, 1);
   const hasActiveFilters = Boolean(
     query || selectedCategory || selectedSort !== "newest",
   );
 
-  const [bills, categories] = await Promise.all([
+  const [result, categories] = await Promise.all([
     findPublicBills({
       query,
       selectedCategory,
       sort: selectedSort,
+      page: pageNumber,
+      perPage: BILLS_PER_PAGE,
     }),
     prisma.category.findMany({
       where: {
@@ -57,6 +64,14 @@ export default async function BillsPage({
       },
     }),
   ]);
+  const { bills, total } = result;
+  const totalPages = Math.max(Math.ceil(total / BILLS_PER_PAGE), 1);
+
+  if (pageNumber > totalPages && total > 0) {
+    redirect(
+      buildBillsPageHref(totalPages, query, selectedCategory, selectedSort),
+    );
+  }
 
   const labels: BillResultsLabels = {
     results: t.bills.results,
@@ -166,12 +181,59 @@ export default async function BillsPage({
         </form>
 
         {bills.length > 0 ? (
-          <BillResults
-            bills={serializeBillResults(bills)}
-            locale={locale}
-            labels={labels}
-            hasActiveFilters={hasActiveFilters}
-          />
+          <>
+            <BillResults
+              bills={serializeBillResults(bills)}
+              locale={locale}
+              labels={labels}
+              hasActiveFilters={hasActiveFilters}
+              total={total}
+            />
+            {totalPages > 1 ? (
+              <nav
+                aria-label={t.bills.pagination}
+                className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6"
+              >
+                {pageNumber > 1 ? (
+                  <Link
+                    href={buildBillsPageHref(
+                      pageNumber - 1,
+                      query,
+                      selectedCategory,
+                      selectedSort,
+                    )}
+                    className="flex h-10 items-center gap-1.5 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent"
+                  >
+                    <ChevronLeft size={16} aria-hidden="true" />
+                    {t.bills.previous}
+                  </Link>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                <p className="text-sm font-medium text-ink-muted">
+                  {t.bills.pageOf
+                    .replace("{current}", String(pageNumber))
+                    .replace("{total}", String(totalPages))}
+                </p>
+                {pageNumber < totalPages ? (
+                  <Link
+                    href={buildBillsPageHref(
+                      pageNumber + 1,
+                      query,
+                      selectedCategory,
+                      selectedSort,
+                    )}
+                    className="flex h-10 items-center gap-1.5 rounded-md border border-border-strong bg-surface-raised px-4 text-sm font-semibold text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent"
+                  >
+                    {t.bills.next}
+                    <ChevronRight size={16} aria-hidden="true" />
+                  </Link>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+              </nav>
+            ) : null}
+          </>
         ) : (
           <div className="border border-border bg-surface px-6 py-10 text-center">
             <h2 className="font-display text-lg font-semibold">
@@ -199,12 +261,17 @@ async function findPublicBills({
   query,
   selectedCategory,
   sort,
+  page,
+  perPage,
 }: {
   query?: string;
   selectedCategory?: string;
   sort: BillDiscoverySort;
+  page: number;
+  perPage: number;
 }) {
   const statusWhereValues = [...PUBLIC_BILL_STATUSES];
+  const skip = (page - 1) * perPage;
   const include = {
     author: true,
     category: true,
@@ -218,29 +285,38 @@ async function findPublicBills({
   };
 
   if (!query) {
-    return prisma.bill.findMany({
-      where: {
-        status: {
-          in: statusWhereValues,
-        },
-        ...(selectedCategory
-          ? {
-              category: {
-                slug: selectedCategory,
-              },
-            }
-          : {}),
+    const where = {
+      status: {
+        in: statusWhereValues,
       },
-      orderBy: getBillDiscoveryOrderBy(sort),
-      include,
-    });
+      ...(selectedCategory
+        ? {
+            category: {
+              slug: selectedCategory,
+            },
+          }
+        : {}),
+    };
+    const [bills, total] = await Promise.all([
+      prisma.bill.findMany({
+        where,
+        orderBy: getBillDiscoveryOrderBy(sort),
+        include,
+        skip,
+        take: perPage,
+      }),
+      prisma.bill.count({ where }),
+    ]);
+
+    return { bills, total };
   }
 
+  const searchQueryClause = Prisma.sql`websearch_to_tsquery('english', ${query})`;
   const rows = await prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
     SELECT b.id
     FROM "Bill" b
     LEFT JOIN "Category" c ON c.id = b."categoryId"
-    CROSS JOIN websearch_to_tsquery('english', ${query}) search_query
+    CROSS JOIN ${searchQueryClause} search_query
     CROSS JOIN LATERAL (
       SELECT
         setweight(to_tsvector('english', coalesce(b.title, '')), 'A') ||
@@ -256,14 +332,29 @@ async function findPublicBills({
     ORDER BY ts_rank_cd(search_document.document, search_query) DESC,
       b."publishedAt" DESC NULLS LAST,
       b."updatedAt" DESC
-    LIMIT 100
+    LIMIT ${perPage} OFFSET ${skip}
   `);
   const ids = rows.map((row) => row.id);
 
-  if (ids.length === 0) {
-    return [];
-  }
-
+  const countRows = await prisma.$queryRaw<{ count: number }[]>(Prisma.sql`
+    SELECT count(*)::int AS count
+    FROM "Bill" b
+    LEFT JOIN "Category" c ON c.id = b."categoryId"
+    CROSS JOIN ${searchQueryClause} search_query
+    CROSS JOIN LATERAL (
+      SELECT
+        setweight(to_tsvector('english', coalesce(b.title, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(b.description, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(b.problem, '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(b."proposedSolution", '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(b.body, '')), 'D') ||
+        setweight(to_tsvector('english', coalesce(b."references", '')), 'D') AS document
+    ) search_document
+    WHERE b.status::text IN (${Prisma.join(statusWhereValues)})
+      ${selectedCategory ? Prisma.sql`AND c.slug = ${selectedCategory}` : Prisma.empty}
+      AND search_document.document @@ search_query
+  `);
+  const total = Number(countRows[0]?.count ?? 0);
   const bills = await prisma.bill.findMany({
     where: {
       id: {
@@ -278,5 +369,34 @@ async function findPublicBills({
     return (order.get(first.id) ?? 0) - (order.get(second.id) ?? 0);
   });
 
-  return sortBillsForDiscovery(relevanceSortedBills, sort);
+  return {
+    bills: sortBillsForDiscovery(relevanceSortedBills, sort),
+    total,
+  };
+}
+
+function buildBillsPageHref(
+  page: number,
+  query?: string,
+  category?: string,
+  sort?: BillDiscoverySort,
+) {
+  const params = new URLSearchParams();
+
+  if (query) {
+    params.set("q", query);
+  }
+  if (category) {
+    params.set("category", category);
+  }
+  if (sort && sort !== "newest") {
+    params.set("sort", sort);
+  }
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/bills?${queryString}` : "/bills";
 }
