@@ -20,9 +20,7 @@ enum UserRole {
 
 enum BillStatus {
   DRAFT
-  READY_FOR_REVIEW
   PUBLISHED
-  UNDER_DISCUSSION
   ARCHIVED
   REPORTED
   REMOVED
@@ -144,6 +142,7 @@ model Bill {
 
   @@index([authorId])
   @@index([status])
+  @@index([status, publishedAt, updatedAt])
   @@index([categoryId])
 }
 
@@ -239,6 +238,7 @@ model Comment {
   updatedAt DateTime  @updatedAt
 
   @@index([billId])
+  @@index([billId, createdAt(sort: Desc)])
   @@index([userId])
   @@index([parentId])
 }
@@ -355,6 +355,7 @@ model AmendmentSuggestion {
   updatedAt DateTime         @updatedAt
 
   @@index([billId])
+  @@index([billId, createdAt(sort: Desc)])
   @@index([userId])
   @@index([status])
 }

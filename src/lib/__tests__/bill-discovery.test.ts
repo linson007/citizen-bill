@@ -2,46 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import {
   BILL_DISCOVERY_SORT_OPTIONS,
-  PUBLIC_BILL_STATUS_FILTER_OPTIONS,
   getBillDiscoveryOrderBy,
-  getPublicBillStatusWhereValues,
   parseBillDiscoverySort,
-  parsePublicBillStatusFilter,
   sortBillsForDiscovery,
 } from "@/lib/bill-discovery";
 
 describe("bill discovery sorting", () => {
-  it("defaults unknown or missing status filters to all public statuses", () => {
-    expect(parsePublicBillStatusFilter(undefined)).toBe("all");
-    expect(parsePublicBillStatusFilter("")).toBe("all");
-    expect(parsePublicBillStatusFilter("DRAFT")).toBe("all");
-  });
-
-  it("accepts every configured status filter option", () => {
-    for (const option of PUBLIC_BILL_STATUS_FILTER_OPTIONS) {
-      expect(parsePublicBillStatusFilter(option.value)).toBe(option.value);
-    }
-  });
-
-  it("maps status filters to public bill statuses", () => {
-    expect(getPublicBillStatusWhereValues("all")).toEqual([
-      "PUBLISHED",
-      "UNDER_DISCUSSION",
-      "READY_FOR_REVIEW",
-    ]);
-    expect(getPublicBillStatusWhereValues("published")).toEqual(["PUBLISHED"]);
-    expect(getPublicBillStatusWhereValues("under-discussion")).toEqual([
-      "UNDER_DISCUSSION",
-    ]);
-    expect(getPublicBillStatusWhereValues("ready-for-review")).toEqual([
-      "READY_FOR_REVIEW",
-    ]);
-  });
-
-  it("defaults unknown or missing sort values to trending", () => {
-    expect(parseBillDiscoverySort(undefined)).toBe("trending");
-    expect(parseBillDiscoverySort("")).toBe("trending");
-    expect(parseBillDiscoverySort("invalid")).toBe("trending");
+  it("defaults unknown or missing sort values to newest", () => {
+    expect(parseBillDiscoverySort(undefined)).toBe("newest");
+    expect(parseBillDiscoverySort("")).toBe("newest");
+    expect(parseBillDiscoverySort("invalid")).toBe("newest");
   });
 
   it("accepts every configured sort option", () => {
@@ -111,6 +81,94 @@ describe("bill discovery sorting", () => {
     expect(
       sortBillsForDiscovery(bills, "newest").map((bill) => bill.id),
     ).toEqual(["b", "c", "a"]);
+    expect(
+      sortBillsForDiscovery(bills, "trending").map((bill) => bill.id),
+    ).toEqual(["c", "b", "a"]);
+  });
+
+  it("breaks most-supported and most-discussed ties across secondary counts", () => {
+    const older = new Date("2026-01-01T00:00:00Z");
+    const newer = new Date("2026-02-01T00:00:00Z");
+    const bills = [
+      {
+        id: "shares-older",
+        publishedAt: older,
+        updatedAt: older,
+        _count: { votes: 5, comments: 2, shares: 9 },
+      },
+      {
+        id: "shares-newer",
+        publishedAt: newer,
+        updatedAt: newer,
+        _count: { votes: 5, comments: 2, shares: 9 },
+      },
+      {
+        id: "comments-lead",
+        publishedAt: older,
+        updatedAt: older,
+        _count: { votes: 5, comments: 8, shares: 1 },
+      },
+      {
+        id: "low-shares",
+        publishedAt: newer,
+        updatedAt: newer,
+        _count: { votes: 5, comments: 2, shares: 1 },
+      },
+      {
+        id: "vote-lead",
+        publishedAt: older,
+        updatedAt: older,
+        _count: { votes: 9, comments: 2, shares: 1 },
+      },
+    ];
+
+    expect(
+      sortBillsForDiscovery(bills, "most-supported").map((bill) => bill.id),
+    ).toEqual([
+      "vote-lead",
+      "comments-lead",
+      "shares-newer",
+      "shares-older",
+      "low-shares",
+    ]);
+    expect(
+      sortBillsForDiscovery(bills, "most-discussed").map((bill) => bill.id),
+    ).toEqual([
+      "comments-lead",
+      "vote-lead",
+      "shares-newer",
+      "shares-older",
+      "low-shares",
+    ]);
+  });
+
+  it("breaks trending ties with published and updated timestamps", () => {
+    const older = new Date("2026-01-01T00:00:00Z");
+    const newer = new Date("2026-02-01T00:00:00Z");
+    const bills = [
+      {
+        id: "draft-old",
+        publishedAt: null,
+        updatedAt: older,
+        _count: { votes: 1, comments: 1, shares: 1 },
+      },
+      {
+        id: "published-new",
+        publishedAt: newer,
+        updatedAt: older,
+        _count: { votes: 1, comments: 1, shares: 1 },
+      },
+      {
+        id: "published-updated",
+        publishedAt: newer,
+        updatedAt: newer,
+        _count: { votes: 1, comments: 1, shares: 1 },
+      },
+    ];
+
+    expect(
+      sortBillsForDiscovery(bills, "trending").map((bill) => bill.id),
+    ).toEqual(["published-updated", "published-new", "draft-old"]);
   });
 
   it("does not mutate the fetched result array", () => {

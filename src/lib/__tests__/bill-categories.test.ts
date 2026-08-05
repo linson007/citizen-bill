@@ -25,6 +25,15 @@ describe("resolveBillCategory", () => {
     ).toBe("Disaster Management");
   });
 
+  it("returns undefined when Other is selected without a custom label", () => {
+    expect(
+      resolveBillCategory({
+        category: OTHER_BILL_CATEGORY,
+        categoryOther: "   ",
+      }),
+    ).toBeUndefined();
+  });
+
   it("returns undefined for blank category input", () => {
     expect(
       resolveBillCategory({ category: "", categoryOther: "" }),
@@ -36,5 +45,9 @@ describe("isKnownBillCategory", () => {
   it("recognizes configured categories", () => {
     expect(isKnownBillCategory("Health")).toBe(true);
     expect(isKnownBillCategory("Custom")).toBe(false);
+    expect(isKnownBillCategory(OTHER_BILL_CATEGORY)).toBe(false);
+    expect(isKnownBillCategory(null)).toBe(false);
+    expect(isKnownBillCategory(undefined)).toBe(false);
+    expect(isKnownBillCategory("")).toBe(false);
   });
 });

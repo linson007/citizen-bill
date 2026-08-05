@@ -1,15 +1,45 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Bell, Check, CheckCircle2 } from "lucide-react";
 
-import { markNotificationsReadAction } from "@/app/notifications/actions";
+import {
+  markNotificationReadAction,
+  markNotificationsReadAction,
+} from "@/app/notifications/actions";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
+import {
+  formatNotificationDay,
+  groupNotificationsByDayAndBill,
+  matchesNotificationFilter,
+  parseNotificationFilter,
+  type NotificationFilter,
+} from "@/lib/notification-groups";
 import { prisma } from "@/lib/prisma";
+import { formatRelativeTime } from "@/lib/relative-time";
+import { getRequestMessages } from "@/lib/request-locale";
 
-export default async function NotificationsPage() {
+const notificationFilterTabs: { value: NotificationFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "unread", label: "Unread" },
+  { value: "comments", label: "Comments" },
+  { value: "amendments", label: "Amendments" },
+  { value: "votes", label: "Votes" },
+  { value: "follows", label: "Follows" },
+];
+
+export default async function NotificationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
   const session = await getServerSession(authOptions);
+  const [{ filter }, { locale }] = await Promise.all([
+    searchParams,
+    getRequestMessages(),
+  ]);
 
   if (!session?.user?.id) {
     redirect("/login");
@@ -21,11 +51,16 @@ export default async function NotificationsPage() {
     take: 50,
     include: { bill: true },
   });
+  const selectedFilter = parseNotificationFilter(filter);
+  const filteredNotifications = notifications.filter((notification) =>
+    matchesNotificationFilter(notification, selectedFilter),
+  );
+  const groups = groupNotificationsByDayAndBill(filteredNotifications);
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]">
       <SiteHeader />
-      <section className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+      <section className="mx-auto max-w-4xl flex-1 px-5 py-8 sm:px-8">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#6d6658]">
@@ -41,38 +76,117 @@ export default async function NotificationsPage() {
           </form>
         </div>
 
-        <div className="divide-y divide-[#e7e1d3] rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
-          {notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <Link
-                key={notification.id}
-                href={
-                  notification.bill
-                    ? `/bills/${notification.bill.slug}`
-                    : "/dashboard"
-                }
-                className="flex gap-3 p-5 hover:bg-[#fbfaf7]"
+        <nav
+          aria-label="Notification filters"
+          className="mb-5 flex flex-wrap gap-2"
+        >
+          {notificationFilterTabs.map((tab) => (
+            <Link
+              key={tab.value}
+              href={
+                tab.value === "all"
+                  ? "/notifications"
+                  : `/notifications?filter=${tab.value}`
+              }
+              aria-current={selectedFilter === tab.value ? "page" : undefined}
+              className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${
+                selectedFilter === tab.value
+                  ? "border-[#123c69] bg-[#123c69] text-white"
+                  : "border-[#c8c0ae] bg-white text-[#3f3a32] hover:border-[#123c69]"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="space-y-6">
+          {groups.length > 0 ? (
+            groups.map((dayGroup) => (
+              <section
+                key={dayGroup.day}
+                aria-labelledby={`day-${dayGroup.day}`}
               >
-                <Bell
-                  className={
-                    notification.readAt ? "text-[#8a8170]" : "text-[#123c69]"
-                  }
-                  size={18}
-                  aria-hidden="true"
-                />
-                <div>
-                  <p className="text-sm font-medium">{notification.message}</p>
-                  <p className="mt-1 text-xs text-[#8a8170]">
-                    {notification.createdAt.toLocaleString("en-IN")}
-                  </p>
+                <h2
+                  id={`day-${dayGroup.day}`}
+                  className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-[#6d6658]"
+                >
+                  {formatNotificationDay(dayGroup.day, locale)}
+                </h2>
+                <div className="overflow-hidden rounded-lg border border-[#d8d2c4] bg-white shadow-sm">
+                  {dayGroup.bills.map((billGroup) => (
+                    <section
+                      key={billGroup.billId ?? "platform"}
+                      className="border-b border-[#e7e1d3] last:border-b-0"
+                    >
+                      <h3 className="border-b border-[#e7e1d3] bg-[#fbfaf7] px-5 py-3 text-sm font-semibold text-[#3f3a32]">
+                        {billGroup.billTitle}
+                      </h3>
+                      <div className="divide-y divide-[#e7e1d3]">
+                        {billGroup.items.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className="flex items-start gap-3 p-5"
+                          >
+                            <Bell
+                              className={
+                                notification.readAt
+                                  ? "mt-0.5 text-[#8a8170]"
+                                  : "mt-0.5 text-[#123c69]"
+                              }
+                              size={18}
+                              aria-hidden="true"
+                            />
+                            <Link
+                              href={
+                                notification.bill
+                                  ? `/bills/${notification.bill.slug}`
+                                  : "/dashboard"
+                              }
+                              className="min-w-0 flex-1 rounded-sm text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123c69]/30"
+                            >
+                              <p className="font-medium">
+                                {notification.message}
+                              </p>
+                              <p className="mt-1 text-xs text-[#8a8170]">
+                                {formatRelativeTime(
+                                  notification.createdAt,
+                                  locale,
+                                )}
+                              </p>
+                            </Link>
+                            {!notification.readAt ? (
+                              <form action={markNotificationReadAction}>
+                                <input
+                                  type="hidden"
+                                  name="notificationId"
+                                  value={notification.id}
+                                />
+                                <button
+                                  type="submit"
+                                  className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-[#c8c0ae] bg-white px-2 text-xs font-semibold text-[#3f3a32] hover:border-[#123c69]"
+                                >
+                                  <Check size={14} aria-hidden="true" />
+                                  Mark read
+                                </button>
+                              </form>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  ))}
                 </div>
-              </Link>
+              </section>
             ))
           ) : (
-            <p className="p-5 text-sm text-[#6d6658]">No notifications yet.</p>
+            <p className="rounded-lg border border-[#d8d2c4] bg-white p-5 text-sm text-[#6d6658]">
+              No notifications match this filter.
+            </p>
           )}
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

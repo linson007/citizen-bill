@@ -23,9 +23,9 @@ type ChatMessage = {
 
 const modeInstructions = {
   draft:
-    "Create a structured public bill draft from the user's problem statement. Use the exact section headings Short Description, Proposed Solution, Expected Public Impact, and Draft Bill Text.",
+    "Create a structured public bill draft from the user's problem statement. Use the exact section headings Title, Short Description, Category, Other Category, Tags, Problem Statement, Proposed Solution, Expected Public Impact, Draft Bill Text, and References.",
   legal:
-    "Improve legislative structure with clauses, definitions, duties, oversight, and implementation details. Use the exact section headings Short Description, Proposed Solution, Expected Public Impact, and Draft Bill Text.",
+    "Improve legislative structure with clauses, definitions, duties, oversight, and implementation details. Use the exact section headings Title, Short Description, Category, Other Category, Tags, Problem Statement, Proposed Solution, Expected Public Impact, Draft Bill Text, and References.",
   simplify: "Rewrite in plain public-facing language while preserving meaning.",
   malayalam:
     "Translate and adapt the content into clear Malayalam for public readers in Kerala.",
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
                 content: [
                   "You help draft public legislative proposals for Kerala.",
                   guardedSystemInstruction(modeInstructions[mode]),
-                  "For draft or legal mode, write each form-ready section under its exact heading. Do not put the whole response under Draft Bill Text.",
+                  "For draft or legal mode, write each form-ready section under its exact heading. Do not put the whole response under Draft Bill Text. Leave References blank when no reliable source can be named.",
                 ].join(" "),
               },
               ...messages.map((message) => ({

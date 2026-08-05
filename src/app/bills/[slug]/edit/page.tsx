@@ -59,7 +59,7 @@ export default async function EditBillPage({
     selectedCategory === OTHER_BILL_CATEGORY ? categoryName : "";
   const errorMessage =
     error === "publish"
-      ? "Complete description, problem, proposed solution, and draft text before publishing."
+      ? "Add a clear title and complete description, problem, proposed solution, and draft text before publishing."
       : error === "title"
         ? "Add a bill title with at least 3 characters."
         : null;

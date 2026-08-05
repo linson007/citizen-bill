@@ -4,6 +4,7 @@ import {
   createBillUploadKey,
   hasAllowedBillUploadSignature,
   isAllowedBillUploadMetadata,
+  MAX_BILL_UPLOAD_BYTES,
   sanitizeUploadFileName,
 } from "@/lib/bill-uploads";
 
@@ -40,6 +41,20 @@ describe("bill upload helpers", () => {
         size: 100,
       }),
     ).toBe(false);
+    expect(
+      isAllowedBillUploadMetadata({
+        name: "draft.pdf",
+        type: "application/pdf",
+        size: 0,
+      }),
+    ).toBe(false);
+    expect(
+      isAllowedBillUploadMetadata({
+        name: "draft.pdf",
+        type: "application/pdf",
+        size: MAX_BILL_UPLOAD_BYTES + 1,
+      }),
+    ).toBe(false);
   });
 
   it("checks PDF and DOCX signatures", async () => {
@@ -57,5 +72,24 @@ describe("bill upload helpers", () => {
         }),
       ),
     ).resolves.toBe(true);
+    await expect(
+      hasAllowedBillUploadSignature(
+        new File([new Uint8Array([0x00, 0x01])], "a.bin", {
+          type: "application/octet-stream",
+        }),
+      ),
+    ).resolves.toBe(false);
+    await expect(
+      hasAllowedBillUploadSignature(
+        new File([new Uint8Array([0x25, 0x50, 0x44, 0x46])], "a.pdf", {
+          type: "application/pdf",
+        }),
+      ),
+    ).resolves.toBe(false);
+  });
+
+  it("sanitizes extensionless and empty base names", () => {
+    expect(sanitizeUploadFileName("!!!")).toBe("attachment");
+    expect(sanitizeUploadFileName("Report")).toBe("report");
   });
 });

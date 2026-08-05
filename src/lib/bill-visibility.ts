@@ -1,10 +1,6 @@
 import { BillStatus } from "@/generated/prisma/enums";
 
-export const PUBLIC_BILL_STATUSES = [
-  BillStatus.PUBLISHED,
-  BillStatus.UNDER_DISCUSSION,
-  BillStatus.READY_FOR_REVIEW,
-] as const;
+export const PUBLIC_BILL_STATUSES = [BillStatus.PUBLISHED] as const;
 
 export type BillVisibilityInput = {
   authorId: string;

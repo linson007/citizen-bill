@@ -4,10 +4,8 @@ import { BillStatus } from "@/generated/prisma/enums";
 import { canViewBill, isPublicBillStatus } from "@/lib/bill-visibility";
 
 describe("bill visibility", () => {
-  it("treats published discussion statuses as public", () => {
+  it("treats published bills as public", () => {
     expect(isPublicBillStatus(BillStatus.PUBLISHED)).toBe(true);
-    expect(isPublicBillStatus(BillStatus.UNDER_DISCUSSION)).toBe(true);
-    expect(isPublicBillStatus(BillStatus.READY_FOR_REVIEW)).toBe(true);
   });
 
   it("does not treat private or moderated statuses as public", () => {

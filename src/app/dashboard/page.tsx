@@ -6,18 +6,27 @@ import {
   FileText,
   Bookmark,
   Bell,
+  CheckCircle2,
+  ChevronRight,
   MessageSquare,
   Plus,
+  Rocket,
   Search,
   Share2,
   ThumbsUp,
 } from "lucide-react";
 
+import { ContinueDraftCard } from "@/components/continue-draft-card";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { authOptions } from "@/lib/auth";
 import { getSavedBillEmptyMessage } from "@/lib/bill-engagement";
 import { getBillFollowEmptyMessage } from "@/lib/bill-follow";
 import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
+import {
+  countCompletedOnboardingSteps,
+  getOnboardingSteps,
+} from "@/lib/onboarding";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -282,8 +291,24 @@ export default async function DashboardPage() {
     },
   ];
 
+  const onboardingSteps = getOnboardingSteps({
+    billCount: totalBillCount,
+    publishedCount,
+    voteCount,
+    commentCount,
+    followedCount: followedBillCount,
+  });
+  const completedOnboardingSteps =
+    countCompletedOnboardingSteps(onboardingSteps);
+  const onboardingProgress = Math.round(
+    (completedOnboardingSteps / onboardingSteps.length) * 100,
+  );
+
   return (
-    <main className="min-h-screen bg-[#f7f6f2] text-[#161616]">
+    <main
+      id="main-content"
+      className="flex min-h-screen flex-col bg-[#f7f6f2] text-[#161616]"
+    >
       <SiteHeader />
       <section className="border-b border-[#d8d2c4] bg-[#fbfaf7]">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
@@ -312,6 +337,89 @@ export default async function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+        <ContinueDraftCard />
+        {completedOnboardingSteps < onboardingSteps.length ? (
+          <section
+            aria-label="Get started"
+            className="mb-6 rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-md bg-[#123c69] text-white">
+                  <Rocket size={20} aria-hidden="true" />
+                </span>
+                <div>
+                  <h2 className="font-semibold">Get started</h2>
+                  <p className="text-sm text-[#6d6658]">
+                    {completedOnboardingSteps} of {onboardingSteps.length} steps
+                    complete
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div
+              role="progressbar"
+              aria-valuenow={onboardingProgress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Onboarding progress"
+              className="mt-4 h-2 overflow-hidden rounded-full bg-[#e7e1d3]"
+            >
+              <div
+                className="h-full rounded-full bg-[#123c69] transition-all"
+                style={{ width: `${onboardingProgress}%` }}
+              />
+            </div>
+            <ol className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              {onboardingSteps.map((step, index) =>
+                step.completed ? (
+                  <li
+                    key={step.id}
+                    className="flex items-start gap-3 rounded-md border border-[#e7e1d3] bg-[#fbfaf7] px-3 py-3"
+                  >
+                    <CheckCircle2
+                      size={18}
+                      aria-hidden="true"
+                      className="mt-0.5 shrink-0 text-[#2a6f58]"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-[#6d6658] line-through">
+                        {step.title}
+                      </p>
+                      <p className="mt-0.5 text-xs leading-5 text-[#8a8170]">
+                        {step.description}
+                      </p>
+                    </div>
+                  </li>
+                ) : (
+                  <li key={step.id}>
+                    <Link
+                      href={step.href}
+                      className="flex items-start gap-3 rounded-md border border-[#e7e1d3] px-3 py-3 transition-colors hover:border-[#123c69]/40 hover:bg-[#fbfaf7]"
+                    >
+                      <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-[#e4eef6] text-xs font-semibold text-[#123c69]">
+                        {index + 1}
+                      </span>
+                      <span className="flex-1">
+                        <span className="block text-sm font-semibold">
+                          {step.title}
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-5 text-[#6d6658]">
+                          {step.description}
+                        </span>
+                      </span>
+                      <ChevronRight
+                        size={16}
+                        aria-hidden="true"
+                        className="mt-1 shrink-0 text-[#8a8170]"
+                      />
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ol>
+          </section>
+        ) : null}
         <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-7">
           {dashboardCards.map((card) => (
             <article
@@ -563,6 +671,7 @@ export default async function DashboardPage() {
           </aside>
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

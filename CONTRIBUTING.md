@@ -1,4 +1,4 @@
-# Contributing to Citizen Bill
+# Contributing to MattamUndo
 
 Thanks for helping build open civic infrastructure. This guide covers how to set up the project, propose changes, and keep contributions reviewable.
 
@@ -132,7 +132,7 @@ CI must pass before merge. Maintainers may ask for smaller diffs if a PR mixes u
 
 ## Civic and Legal Content
 
-Citizen Bill hosts civic drafting and discussion. Contributors should:
+MattamUndo hosts civic drafting and discussion. Contributors should:
 
 - Avoid hate speech, harassment, and doxxing in examples or fixtures
 - Minimize personal data in seeds, screenshots, and logs

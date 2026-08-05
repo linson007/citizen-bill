@@ -17,14 +17,30 @@ import {
   sanitizeUploadFileName,
 } from "@/lib/bill-uploads";
 import { sendEmailNotification } from "@/lib/email";
+import { revalidateBillDetailData } from "@/lib/bill-detail";
+import { revalidateHomepageData } from "@/lib/homepage";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
+
+function redirectToBillLogin(formData: FormData): never {
+  const slug = formData.get("slug")?.toString();
+  redirect(
+    slug
+      ? `/login?callbackUrl=${encodeURIComponent(`/bills/${slug}`)}`
+      : "/login",
+  );
+}
+
+function revalidateBillDetailPath(slug: string) {
+  revalidateBillDetailData();
+  revalidatePath(`/bills/${slug}`);
+}
 
 export async function publishBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -88,7 +104,8 @@ export async function publishBillAction(formData: FormData) {
   });
 
   revalidatePath("/bills");
-  revalidatePath(`/bills/${slug}`);
+  revalidateHomepageData();
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -119,7 +136,7 @@ async function notifyUser({
 
   await sendEmailNotification({
     to: notification.user.email,
-    subject: "Citizen Bill notification",
+    subject: "MattamUndo notification",
     text: notification.bill
       ? `${message}\n\nBill: ${notification.bill.title}`
       : message,
@@ -168,7 +185,7 @@ export async function toggleVoteAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -214,30 +231,11 @@ export async function toggleVoteAction(formData: FormData) {
       },
     });
   } else {
-    await prisma.$transaction(async (tx) => {
-      await tx.vote.create({
-        data: {
-          billId: bill.id,
-          userId: session.user.id,
-        },
-      });
-
-      const voteCount = await tx.vote.count({
-        where: {
-          billId: bill.id,
-        },
-      });
-
-      if (voteCount >= 25 && bill.status !== "READY_FOR_REVIEW") {
-        await tx.bill.update({
-          where: {
-            id: bill.id,
-          },
-          data: {
-            status: "READY_FOR_REVIEW",
-          },
-        });
-      }
+    await prisma.vote.create({
+      data: {
+        billId: bill.id,
+        userId: session.user.id,
+      },
     });
 
     if (bill.authorId !== session.user.id) {
@@ -251,7 +249,8 @@ export async function toggleVoteAction(formData: FormData) {
   }
 
   revalidatePath("/bills");
-  revalidatePath(`/bills/${slug}`);
+  revalidateHomepageData();
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -260,7 +259,7 @@ export async function toggleSavedBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -308,7 +307,7 @@ export async function toggleSavedBillAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -317,7 +316,7 @@ export async function toggleFollowBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -365,7 +364,7 @@ export async function toggleFollowBillAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
 }
@@ -374,7 +373,7 @@ export async function createCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -402,27 +401,13 @@ export async function createCommentAction(formData: FormData) {
     redirect(`/bills/${slug}`);
   }
 
-  await prisma.$transaction([
-    prisma.comment.create({
-      data: {
-        billId: bill.id,
-        userId: session.user.id,
-        body: body.slice(0, 2000),
-      },
-    }),
-    ...(bill.status === "PUBLISHED"
-      ? [
-          prisma.bill.update({
-            where: {
-              id: bill.id,
-            },
-            data: {
-              status: "UNDER_DISCUSSION" as const,
-            },
-          }),
-        ]
-      : []),
-  ]);
+  await prisma.comment.create({
+    data: {
+      billId: bill.id,
+      userId: session.user.id,
+      body: body.slice(0, 2000),
+    },
+  });
 
   if (bill.authorId !== session.user.id) {
     await notifyUser({
@@ -442,7 +427,8 @@ export async function createCommentAction(formData: FormData) {
   });
 
   revalidatePath("/bills");
-  revalidatePath(`/bills/${slug}`);
+  revalidateHomepageData();
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#comments`);
 }
@@ -451,7 +437,7 @@ export async function updateBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -554,7 +540,8 @@ export async function updateBillAction(formData: FormData) {
   ]);
 
   revalidatePath("/bills");
-  revalidatePath(`/bills/${slug}`);
+  revalidateHomepageData();
+  revalidateBillDetailPath(slug);
   revalidatePath(`/bills/${slug}/edit`);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}`);
@@ -564,7 +551,7 @@ export async function uploadBillFileAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -624,7 +611,7 @@ export async function uploadBillFileAction(formData: FormData) {
     },
   });
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   redirect(`/bills/${slug}?upload=ok`);
 }
 
@@ -632,7 +619,7 @@ export async function reportBillAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -701,7 +688,7 @@ export async function reportCommentAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -750,7 +737,7 @@ export async function createSuggestionAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -779,28 +766,14 @@ export async function createSuggestionAction(formData: FormData) {
     redirect(`/bills/${slug}`);
   }
 
-  await prisma.$transaction([
-    prisma.amendmentSuggestion.create({
-      data: {
-        billId: bill.id,
-        userId: session.user.id,
-        section: section || null,
-        body: body.slice(0, 3000),
-      },
-    }),
-    ...(bill.status === "PUBLISHED"
-      ? [
-          prisma.bill.update({
-            where: {
-              id: bill.id,
-            },
-            data: {
-              status: "UNDER_DISCUSSION" as const,
-            },
-          }),
-        ]
-      : []),
-  ]);
+  await prisma.amendmentSuggestion.create({
+    data: {
+      billId: bill.id,
+      userId: session.user.id,
+      section: section || null,
+      body: body.slice(0, 3000),
+    },
+  });
 
   if (bill.authorId !== session.user.id) {
     await notifyUser({
@@ -819,7 +792,7 @@ export async function createSuggestionAction(formData: FormData) {
     message: `New amendment suggestion on a bill you follow: "${bill.title}".`,
   });
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#suggestions`);
 }
@@ -828,7 +801,7 @@ export async function reviewSuggestionAction(formData: FormData) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirectToBillLogin(formData);
   }
 
   const slug = formData.get("slug")?.toString();
@@ -922,7 +895,7 @@ export async function reviewSuggestionAction(formData: FormData) {
     });
   }
 
-  revalidatePath(`/bills/${slug}`);
+  revalidateBillDetailPath(slug);
   revalidatePath("/dashboard");
   redirect(`/bills/${slug}#suggestions`);
 }

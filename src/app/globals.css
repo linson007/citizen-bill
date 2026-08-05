@@ -1,21 +1,78 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f6f2;
-  --foreground: #161616;
+  --background: #f0eee6;
+  --foreground: #141414;
+  --surface: #f7f5ef;
+  --surface-raised: #ffffff;
+  --ink-muted: #5f584c;
+  --ink-soft: #3f3a32;
+  --border: #d2cbb8;
+  --border-strong: #bdb59f;
+  --accent: #0f355c;
+  --accent-soft: #dce8f2;
+  --success: #2a6f58;
+  --success-soft: #e2efe8;
+  --warning-bg: #f7f0e0;
+  --warning-ink: #5c4718;
+  --hero-ink: #0a2440;
+  --hero-mist: #d9e4ef;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #f0eee6;
+  --color-foreground: #141414;
+  --color-surface: #f7f5ef;
+  --color-surface-raised: #ffffff;
+  --color-ink-muted: #5f584c;
+  --color-ink-soft: #3f3a32;
+  --color-border: #d2cbb8;
+  --color-border-strong: #bdb59f;
+  --color-accent: #0f355c;
+  --color-accent-soft: #dce8f2;
+  --color-success: #2a6f58;
+  --color-success-soft: #e2efe8;
+  --color-warning-bg: #f7f0e0;
+  --color-warning-ink: #5c4718;
+  --color-hero-ink: #0a2440;
+  --color-hero-mist: #d9e4ef;
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-fraunces);
+  --font-malayalam: var(--font-manjari);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  text-size-adjust: 100%;
+  font-family:
+    var(--font-source-sans),
+    var(--font-manjari),
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--hero-ink);
+}
+
+.font-display {
+  font-family:
+    var(--font-fraunces),
+    var(--font-manjari),
+    Georgia,
+    serif;
+}
+
+.font-malayalam {
+  font-family:
+    var(--font-manjari),
+    var(--font-source-sans),
+    sans-serif;
 }
 
 button,
@@ -24,4 +81,63 @@ input,
 textarea,
 select {
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  outline-offset: 2px;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-drift {
+  from {
+    transform: translate3d(0, 8px, 0) scale(1.02);
+    opacity: 0.55;
+  }
+  to {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
+.animate-hero-drift {
+  animation: hero-drift 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-up,
+  .animate-fade-up-delay,
+  .animate-fade-up-delay-2,
+  .animate-hero-drift {
+    animation: none;
+  }
 }

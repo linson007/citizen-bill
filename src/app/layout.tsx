@@ -1,39 +1,62 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { getServerSession } from "next-auth";
+import { Fraunces, Manjari, Source_Sans_3 } from "next/font/google";
 
-import { AuthProvider } from "@/components/auth-provider";
-import { authOptions } from "@/lib/auth";
+import { getAppUrl } from "@/lib/app-url";
+import { localeHtmlLang } from "@/lib/locale";
+import { getRequestLocale } from "@/lib/request-locale";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
+
+const manjari = Manjari({
+  variable: "--font-manjari",
+  subsets: ["malayalam"],
+  weight: ["400", "700"],
+});
+
+const siteDescription =
+  "മാറ്റം ഉണ്ടോ? Draft, discuss, and support public bill proposals for Kerala with AI assistance.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
-  title: "Citizen Bill",
-  description:
-    "Create, publish, discuss, and support public bills with AI assistance.",
+  metadataBase: new URL(getAppUrl()),
+  title: {
+    default: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    template: "%s | MattamUndo",
+  },
+  description: siteDescription,
+  applicationName: "MattamUndo",
+  keywords: [
+    "MattamUndo",
+    "Kerala",
+    "private member bill",
+    "civic tech",
+    "public participation",
+    "legislation",
+  ],
   openGraph: {
-    title: "Citizen Bill",
-    description:
-      "Create, publish, discuss, and support public bills with AI assistance.",
-    siteName: "Citizen Bill",
+    title: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    description: siteDescription,
+    siteName: "MattamUndo",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
-    card: "summary",
-    title: "Citizen Bill",
-    description:
-      "Create, publish, discuss, and support public bills with AI assistance.",
+    card: "summary_large_image",
+    title: "MattamUndo — മാറ്റം ഉണ്ടോ?",
+    description: siteDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -42,15 +65,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
+  const locale = await getRequestLocale();
 
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={localeHtmlLang(locale)}
+      className={`${sourceSans.variable} ${fraunces.variable} ${manjari.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <AuthProvider session={session}>{children}</AuthProvider>
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-accent px-4 py-3 text-sm font-semibold text-white focus:not-sr-only"
+        >
+          Skip to main content
+        </a>
+        {children}
       </body>
     </html>
   );

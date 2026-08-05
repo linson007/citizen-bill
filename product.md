@@ -1,20 +1,25 @@
-# Citizen Bill - Product Plan
+# MattamUndo - Product Plan
+
+Public brand: **MattamUndo** (മാറ്റം ഉണ്ടോ?) · [mattamundo.com](https://mattamundo.com)  
+Repository: still hosted at `linson007/citizen-bill` until renamed.
+
+Last reviewed against the codebase: August 2026 (`v0.1.0` / unreleased open-source polish).
 
 ## 1. Product Objective
 
-Citizen Bill is an open-source civic technology platform where people can draft, attach supporting files, discuss, improve, vote on, and share proposed legislative bills with help from an AI chatbot.
+MattamUndo is an open-source civic technology platform where people can draft, attach supporting files, discuss, improve, vote on, and share proposed legislative bills with help from an AI chatbot.
 
-The platform is focused first on Kerala, where MLAs can introduce private member bills, but the success rate and public participation around such bills are low. Citizen Bill aims to give people a structured way to turn public problems into draft bills that can be reviewed, supported, and potentially taken forward by elected representatives, civic groups, policy researchers, journalists, and the public.
+The platform is focused first on Kerala, where MLAs can introduce private member bills, but the success rate and public participation around such bills are low. MattamUndo aims to give people a structured way to turn public problems into draft bills that can be reviewed, supported, and potentially taken forward by elected representatives, civic groups, policy researchers, journalists, and the public.
 
 ## 2. Background
 
 In Kerala, Members of the Legislative Assembly can introduce private member bills. However, these bills rarely succeed, and the public has limited practical channels to help shape legislative ideas into usable legal drafts.
 
-Citizen Bill will become a public participation layer for legislative drafting:
+MattamUndo is a public participation layer for legislative drafting:
 
 - Anyone can draft a new bill with AI assistance or a structured editor.
 - Authors can attach supporting bill documents after creating a bill.
-- The community can vote, comment, and improve proposals.
+- The community can vote, comment, suggest amendments, and improve proposals.
 - Popular and well-drafted bills can be shared publicly and surfaced to representatives.
 
 ## 3. Target Users
@@ -28,247 +33,275 @@ Citizen Bill will become a public participation layer for legislative drafting:
 ## 4. Core User Journey
 
 1. A user signs in with Google.
-2. The user creates a bill proposal with the structured editor and optional AI chatbot support.
-3. The user adds a title, short description, category, tags, summary, and supporting notes.
-4. The user may attach supporting PDF or DOCX files after the bill record exists.
+2. The user creates a bill proposal with the structured editor and optional AI helper.
+3. The user adds a title, short description, Kerala department-style category, tags, problem, solution, impact, body, and references.
+4. The user may attach supporting PDF or DOCX files after the bill record exists (Vercel Blob).
 5. The AI assistant helps improve structure, language, legal clarity, and public readability.
-6. The bill is published to the public feed after validation and moderation checks.
-7. Other users can read, save/bookmark, follow activity updates, vote, comment, suggest improvements, and share the bill.
-8. The dashboard highlights trending bills, most supported bills, saved bills, followed bills, recent activity, and draft status.
+6. The bill is published to the public feed after field validation; public bills can later be reported and reviewed by moderators.
+7. Other users can read, save/bookmark, follow for activity updates, vote, comment, suggest amendments, report content, and share the bill.
+8. The dashboard and profile highlight drafts, published bills, saves, follows, votes, comments, reputation, notifications, trending bills, and discovery filters.
 
-## 5. MVP Features
+## 5. Implementation Status
+
+### Done in the current app
+
+| Area | What ships today |
+| --- | --- |
+| Auth | Google sign-in via Auth.js / NextAuth, Prisma adapter, roles `USER` / `MODERATOR` / `ADMIN` |
+| Profiles | Display name, avatar from Google, reputation score/level, AI session history |
+| Bill drafting | Structured form (title, description, category, tags, problem, solution, impact, body, references), draft save, publish validation |
+| Categories | Kerala department-style category list plus free-text “Other” |
+| AI drafting | Chat + outline helpers, modes (draft, legal structure, simplify, Malayalam, summarize, arguments), streaming, insert into form, optional session save, daily per-user limits, safety event logging, local fallbacks without `OPENAI_API_KEY` |
+| Uploads | PDF/DOCX after bill creation via Vercel Blob, MIME/size/signature checks |
+| Public bills | Detail pages with metadata, Open Graph / Twitter previews, analytics counts |
+| Engagement | One vote per user, save/unsave, follow/unfollow, flat comments, amendment suggestions with author accept / reject / merge |
+| Notifications | In-app notifications for votes, comments, suggestions, and followed-bill activity; mark-as-read |
+| Discovery | `/bills` search (Postgres full-text), category filter, sort (trending, newest, most supported, most discussed) |
+| Bill lifecycle | `DRAFT` → `PUBLISHED`; votes, comments, and amendment suggestions leave the published status unchanged |
+| Versions | Version snapshots on publish/update, version detail pages, side-by-side compare |
+| Export | Public bill PDF and DOCX export |
+| Sharing | WhatsApp, X, Facebook, LinkedIn, Telegram, copy link, share event tracking |
+| Dashboard | Drafts, published, vote/comment/save/follow counts, saved and followed lists, recent comments on my bills, trending / most supported / recently published |
+| Moderation | Report bill/comment, moderator queue (dismiss, resolve, remove bill), AI usage overview and reset |
+| Legal | Terms, privacy, AI-not-legal-advice disclaimer |
+| Open source | MIT license, README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT, CHANGELOG, `.env.example`, CI, issue/PR templates |
+
+### Gaps and incomplete work
+
+Living checklist: [`GAP.md`](GAP.md) (reconfirmed August 2, 2026). Compared with this product plan and the schema, these items are still missing or only partial:
+
+| Gap | Status | Notes |
+| --- | --- | --- |
+| Threaded comment replies | Schema has `parentId` | UI posts and lists flat comments only |
+| Tag filters / `Bill.region` | Partial | Tags stored on bills; browse filters by query, category, status, and sort — not by tag. `region` is schema-only — expose or remove |
+| Malayalam product UI | Partial | Nav, home, and bill discovery are localized; dashboard, notifications, profile, and much bill-detail copy remain English-first. Discovery FTS is English `tsvector`; PDF export is Helvetica / Latin-focused |
+| Dedicated “bills I voted on” list | Partial | Dashboard shows vote **count**; profile lists up to 10 recent votes |
+| Attachment management | Partial | Authors can upload PDF/DOCX; cannot remove/replace or delete the Vercel Blob object |
+| Accepted suggestions in version history | Partial | Accept/merge updates the live bill; history does not label “from accepted suggestion” |
+| Public author profiles | Not built | `/profile` is private to the signed-in user |
+| Notifications UX | Partial | Mark-all-read exists; page caps at 50; no pagination, per-item read, or preferences |
+| Content quality / abuse beyond reports | Partial | Report + moderator queue exist; richer spam/abuse controls, rate limits, and quality signals do not |
+| Admin user management | Not built | Roles exist; no user admin UI beyond moderation tools |
+| Email delivery | Stub | `EMAIL_FROM` logs queued events; no provider (Resend/SES/etc.) |
+| Analytics / error tracking | Not wired | No Vercel Analytics, Sentry, or PostHog |
+| Discovery scale | Partial | Unfiltered discovery loads all public bills; search results cap at 100 |
+| Test coverage beyond helpers | Partial | CI runs helper-focused unit tests; no DB-backed action/API or e2e journey tests |
+| shadcn/ui | Intentional non-gap | Not adopted; retain custom Tailwind unless the team chooses a migration |
+
+## 6. MVP Feature Detail
 
 ### Authentication
 
 - Sign in with Google.
 - Basic user profile with name, email, avatar, and public display name.
-- Role support for future moderation and admin tools.
+- Role support for moderation and admin tools (`USER`, `MODERATOR`, `ADMIN`).
+- Reputation score derived from published bills, votes received, comments, and amendment suggestions.
 
 ### Bill Creation
 
 - Create bill manually using a structured editor.
-- Attach bill files after creation, initially supporting PDF and DOCX.
-- Add metadata:
+- Attach bill files after creation, supporting PDF and DOCX.
+- Metadata:
   - Title
   - Short description
-  - Category
+  - Category (Kerala department list + Other)
   - Tags
   - Problem statement
   - Proposed solution
   - Expected public impact
+  - Full draft body
   - References or supporting links
 
 ### AI Drafting Assistant
 
-- Chatbot to help users draft bills from plain language.
-- Assistant should help with:
-  - Converting a problem statement into a draft bill outline.
-  - Improving clarity and structure.
-  - Creating summaries for the public.
-  - Suggesting missing sections.
-  - Rewriting in simpler language.
-  - Translating or preparing bilingual drafts in a later phase.
-- AI output must be treated as a draft, not legal advice.
+- Chat and one-shot draft helpers inside the bill editor.
+- Modes for drafting, legal structure, simplifying language, summarizing, arguments, and early Malayalam drafting.
+- Login-required AI access with per-user daily usage limits (`AI_DAILY_LIMIT`, default 20).
+- AI safety event logging for blocked prompts.
+- Optional conversation save; sessions visible on the profile.
+- AI output is treated as a draft, not legal advice.
 
 ### Bill Pages
 
-- Public page for each bill.
-- Display:
-  - Title
-  - Summary
-  - Full bill draft
-  - References and supporting links
-  - Author
-  - Status
-  - Votes
-  - Comments
-  - Share buttons
-  - Created and updated dates
-- Export bills as PDF or DOCX for offline review and sharing.
+- Public page for each bill (drafts visible to author only).
+- Display title, summary/description, full draft, references, author, status, votes, saves, followers, comments, suggestions, shares, created/updated dates.
+- Export as PDF or DOCX.
 - Compare bill versions to show what changed over time.
 
 ### Voting
 
-- Users can upvote bills.
+- Authenticated users can upvote public bills (authors cannot vote on their own).
 - One vote per authenticated user per bill.
 - Vote count visible publicly.
-- Future support for reactions or priority scoring can be added later.
+- Future: reactions or priority scoring.
 
 ### Saved Bills
 
-- Authenticated users can save or unsave public bills from the bill page.
-- Each user can save a bill only once.
-- Bill pages show how many people saved the proposal.
-- The dashboard includes saved-bill counts and a personal saved bills list for later reading and follow-up.
+- Authenticated users can save or unsave public bills.
+- One save per user per bill; save counts shown on bill pages.
+- Dashboard includes saved-bill counts and a personal saved list.
 
 ### Followed Bills and Activity Notifications
 
-- Authenticated users can follow or unfollow public bills from the bill page.
-- Followers receive notifications when new comments or amendment suggestions are added by other users.
-- Bill pages show follower counts as part of public analytics.
-- The dashboard includes followed-bill counts and a personal followed bills list.
+- Authenticated users can follow or unfollow public bills.
+- Followers get in-app notifications for new comments and amendment suggestions from others.
+- Authors get notifications for votes, comments, and suggestions.
+- Bill pages show follower counts; dashboard lists followed bills.
+- Email hooks are prepared but not delivered yet.
 
-### Comments
+### Comments and Amendments
 
-- Authenticated users can comment on bills.
-- Threaded replies can be added after MVP.
-- Basic moderation support should be planned from the start.
-- Authors can accept, reject, or merge public amendment suggestions.
+- Authenticated users can comment on public bills.
+- Threaded replies are planned next (schema ready).
+- Amendment suggestions with section label; authors can accept, reject, or merge.
+- Report bill and report comment actions feed the moderation queue.
 
 ### Sharing
 
-- Share bill links to social media.
-- Generate metadata previews for platforms like WhatsApp, X, Facebook, LinkedIn, and Telegram.
-- Copy link action.
+- Share bill links to WhatsApp, X, Facebook, LinkedIn, and Telegram.
+- Open Graph / Twitter metadata for previews.
+- Copy link action and share event recording (`BillShare`).
 
-### Dashboard
+### Dashboard and Discovery
 
-The dashboard should help both creators and readers understand what is happening.
+Authenticated dashboard sections that exist today:
 
-MVP dashboard sections:
-
-- My drafts
-- My published bills
-- Bills I voted on
-- Saved bills
-- Followed bills
+- My drafts and my published bills
+- Vote / comment / save / follow counts
+- Saved bills and followed bills lists
 - Recent comments on my bills
-- Trending bills
-- Most supported bills
-- Recently published bills
+- Trending, most supported, and recently published bills
+
+Public discovery (`/bills` and home highlights):
+
+- Search (PostgreSQL full-text)
 - Category filters
-- Search
-- Kerala-wide discovery for public bills by topic, support, and recency.
+- Public status filters
+- Sort by trending, newest, most supported, most discussed
 
-Admin or moderator dashboard, later phase:
+Moderator tools (`/moderation`):
 
-- Reported bills and comments
-- Pending moderation queue
+- Reported bills and comments queue
+- Resolve / dismiss / remove reported bill
+- AI usage and safety event visibility
+
+Still later for admin:
+
 - User management
-- Content quality flags
-- Abuse reports
+- Richer content quality flags
 
-## 6. Recommended Tech Stack
+## 7. Tech Stack (as implemented)
 
-The project is planned for Vercel deployment and should remain open-source friendly.
+Planned for Vercel-friendly open-source deployment.
 
 ### Frontend and Backend
 
-- Framework: Next.js with App Router
+- Framework: Next.js App Router (currently Next 16) + React 19
 - Language: TypeScript
-- Styling: Tailwind CSS
-- UI components: shadcn/ui
+- Styling: Tailwind CSS (custom components; shadcn/ui not required)
 - Icons: lucide-react
 - Forms: React Hook Form
 - Validation: Zod
+- Tests: Vitest for `src/lib` helpers
 
 ### Authentication
 
-- Auth.js / NextAuth.js with Google provider
+- Auth.js / NextAuth.js with Google provider and Prisma adapter
 
 ### Database
 
-- PostgreSQL
-- Recommended hosted options:
-  - Neon
-  - Supabase
-  - Vercel Postgres, if preferred
-- ORM: Prisma
+- PostgreSQL (local via Docker Compose; hosted Neon / Supabase / Vercel Postgres compatible)
+- ORM: Prisma 7 (`src/generated/prisma`)
 
 ### File Uploads
 
-- Vercel Blob for MVP
-- Alternative: UploadThing or Supabase Storage
+- Vercel Blob (`BLOB_READ_WRITE_TOKEN`)
 
 ### AI
 
-- OpenAI API for chat-based drafting assistance
-- Use streaming responses for a better chat experience
-- Store AI conversations only when useful for drafts and with clear user consent
+- OpenAI API for chat and draft assistance (optional in development)
+- Streaming responses where supported
+- Deterministic local fallbacks when no API key is set
+- Conversations stored only when the user opts to save history
 
 ### Search
 
-- MVP: PostgreSQL full-text search
+- MVP: PostgreSQL full-text search (`websearch_to_tsquery` / `ts_rank_cd`)
 - Later: Meilisearch, Typesense, or Algolia if search becomes central
 
 ### Deployment
 
-- Hosting: Vercel
-- Database: Neon or Supabase PostgreSQL
-- File storage: Vercel Blob or Supabase Storage
-- Environment variables managed through Vercel project settings
+- Hosting: Vercel-friendly
+- Database: Neon or Supabase PostgreSQL (or local Docker)
+- File storage: Vercel Blob
+- Environment variables via `.env` / Vercel project settings
 
-### Analytics and Observability
+### Analytics and Observability (not yet)
 
-- Vercel Analytics
-- Sentry for error tracking
-- Optional: PostHog for product analytics if privacy policy supports it
+- Planned: Vercel Analytics, Sentry, optional PostHog if the privacy policy supports it
 
-## 7. Suggested Data Model
+## 8. Data Model
 
-Core entities:
+Core entities in `prisma/schema.prisma`:
 
-- User
+- User (with `UserRole`)
+- Account / Session / VerificationToken (Auth.js)
 - Bill
-- BillDraft
 - BillVersion
 - Vote
 - SavedBill
 - BillFollow
-- Comment
-- Tag
-- Category
+- BillSignature *(schema ready; product UI pending)*
+- BillShare
+- Comment *(supports `parentId` for future threading)*
+- Tag / BillTag / Category
 - UploadedFile
-- AiConversation
+- AiConversation / AiSafetyEvent / AiUsageEvent
+- AmendmentSuggestion
 - Report
+- Notification
+
+There is no separate `BillDraft` table; drafts are `Bill` rows with status `DRAFT`.
 
 Important relationships:
 
 - A user can create many bills.
-- A bill can have many versions.
-- A bill can have many votes and comments.
-- A user can vote once per bill.
-- A user can save each public bill once for later reading.
-- A user can follow each public bill once to receive activity notifications.
-- A bill can have multiple uploaded files.
-- A bill can have AI conversation history attached to drafting sessions.
+- A bill can have many versions, votes, comments, saves, follows, shares, files, suggestions, and AI sessions.
+- A user can vote, save, follow, or sign each bill at most once (unique constraints).
+- Reports can target a bill or a comment.
 
-## 8. Bill Status Flow
+## 9. Bill Status Flow
 
-Recommended statuses:
+Current statuses in the enum:
 
 - Draft
-- Ready for Review
 - Published
-- Under Discussion
 - Archived
 - Reported
 - Removed
+- Submitted to MLA *(enum reserved; no author workflow yet)*
+- Introduced as Private Bill *(enum reserved)*
+- Rejected *(enum reserved)*
+- Passed *(enum reserved)*
 
-Future statuses:
+The public lifecycle is intentionally limited to `DRAFT` → `PUBLISHED`. Votes, comments, and amendment suggestions do not alter the status. Existing `UNDER_DISCUSSION` and `READY_FOR_REVIEW` records are migrated to `PUBLISHED`.
 
-- Submitted to MLA
-- Accepted for Review
-- Introduced as Private Bill
-- Rejected
-- Passed
+Legislative outreach statuses remain reserved database values and are not part of the product workflow.
 
-## 9. Moderation and Safety
+## 10. Moderation and Safety
 
-Since this is a civic platform, moderation must be included early.
-
-MVP requirements:
+Included early and largely implemented:
 
 - Report bill
 - Report comment
-- Basic admin review page
+- Basic moderator review page
 - Terms of use
 - Privacy policy
 - Clear disclaimer that AI-generated drafts are not legal advice
 - Login-required AI access with per-user daily usage limits
 - AI safety event logging for blocked prompts
 
-Content risks to handle:
+Content risks still to keep hardening against:
 
 - Defamation
 - Hate speech
@@ -278,125 +311,94 @@ Content risks to handle:
 - AI hallucinations
 - Impersonation
 
-## 10. Open Source Standards
+## 11. Open Source Standards
 
-The repository should be easy for contributors to understand and run locally.
-
-Recommended files:
+Present in the repository:
 
 - `README.md`
 - `CONTRIBUTING.md`
 - `CODE_OF_CONDUCT.md`
-- `LICENSE`
+- `LICENSE` (MIT)
 - `.env.example`
 - `SECURITY.md`
+- `SUPPORT.md`
+- `CHANGELOG.md`
 - `product.md`
+- `docs/OPEN_SOURCE_CHECKLIST.md`
+- GitHub issue forms, PR template, CI workflow
 
-Recommended practices:
+Practices in use:
 
-- Use TypeScript throughout.
-- Keep formatting automated with Prettier.
-- Use ESLint.
-- Add meaningful issue templates.
-- Add pull request template.
-- Document local setup clearly.
-- Avoid committing secrets.
-- Use conventional commits if possible.
-- Keep feature work in small pull requests.
+- TypeScript throughout
+- Prettier and ESLint
+- Small focused pull requests preferred
+- Secrets kept out of git (`.env` gitignored)
 
-Recommended license:
+## 12. Development Plan Progress
 
-- MIT License for maximum adoption, or
-- AGPL-3.0 if the goal is to ensure hosted modifications remain open-source.
+### Phase 1 - Foundation — done
 
-## 11. MVP Development Plan
+- Next.js + TypeScript, Tailwind, ESLint, Prettier, Prisma, PostgreSQL, `.env.example`, open-source docs, CI.
 
-### Phase 1 - Foundation
+### Phase 2 - Authentication and Profiles — done
 
-- Create Next.js app with TypeScript.
-- Configure Tailwind CSS and shadcn/ui.
-- Add ESLint, Prettier, and basic project scripts.
-- Set up Prisma and PostgreSQL.
-- Add `.env.example`.
-- Add open-source repository documents.
+- Google login, user records, profile page, protected dashboard, roles, reputation.
 
-### Phase 2 - Authentication and Profiles
+### Phase 3 - Bill Creation — done
 
-- Add Google login using Auth.js.
-- Create user records in the database.
-- Build basic account/profile page.
-- Protect dashboard routes.
+- Creation form, draft save, metadata, detail page, published listing.
 
-### Phase 3 - Bill Creation
+### Phase 4 - Uploads — done
 
-- Build bill creation form.
-- Add draft save support.
-- Add bill metadata fields.
-- Add bill detail page.
-- Add published bill listing page.
+- PDF/DOCX via Vercel Blob, validation, attachment to bill records.
 
-### Phase 4 - Uploads
+### Phase 5 - AI Drafting Chatbot — done (MVP)
 
-- Add PDF and DOCX uploads for existing bill records.
-- Store files in Vercel Blob or Supabase Storage.
-- Attach uploaded files to bill records.
-- Add file validation and size limits.
+- Editor AI helper, prompt modes, streaming, insert into draft, usage limits, safety logging, optional history.
 
-### Phase 5 - AI Drafting Chatbot
+### Phase 6 - Public Participation — mostly done
 
-- Add AI chat interface inside the bill editor.
-- Support prompt templates for:
-  - Drafting a bill from a problem statement
-  - Summarizing a bill
-  - Improving structure
-  - Simplifying language
-- Add streaming responses.
-- Let users insert AI output into their draft.
+- Voting, comments, amendment review, sharing, category filters, search, discovery sorts.
+- Remaining: threaded replies and tag filters.
 
-### Phase 6 - Public Participation
+### Phase 7 - Dashboard — mostly done
 
-- Add voting.
-- Add comments.
-- Add public amendment suggestion review workflow.
-- Add social sharing.
-- Add category and tag filters.
-- Add search.
-- Add improved Kerala-wide discovery and category navigation.
+- Authenticated dashboard for drafts, engagement, saves, follows, trending and support rankings.
+- Remaining: richer “bills I voted on” list on the dashboard itself.
 
-### Phase 7 - Dashboard
+### Phase 8 - Moderation and Launch Readiness — mostly done
 
-- Build authenticated user dashboard.
-- Show draft bills, published bills, votes, comments, and activity.
-- Build public dashboard for trending and most supported bills.
+- Reports, moderation page, legal pages, notification hooks.
+- Remaining: real email provider, analytics, Sentry, user management.
 
-### Phase 8 - Moderation and Launch Readiness
+### Phase 9 - Document and Version Tools — done (MVP)
 
-- Add report actions.
-- Add basic admin moderation dashboard.
-- Add legal disclaimer, privacy policy, and terms pages.
-- Add email notification hooks for important user activity.
-- Add analytics and error tracking.
-- Prepare Vercel deployment.
+- PDF/DOCX export, version pages, compare view.
+- Remaining: explicitly surface accepted amendments in version history labels.
 
-### Phase 9 - Document and Version Tools
+## 13. Near-Term Product Backlog
 
-- Export public bills as PDF and DOCX.
-- Compare previous bill versions.
-- Surface accepted amendment suggestions in version history.
+Priority gaps to close next (see [`GAP.md`](GAP.md) for the full checklist):
 
-## 12. Future Enhancements
+1. Threaded comment replies using existing `parentId`.
+2. Tag filter on public discovery; decide whether to expose or remove `Bill.region`.
+3. Malayalam completeness for dashboard, notifications, profile, and bill detail; Malayalam-aware search and Unicode PDF export.
+4. Dedicated “bills I voted on” list (dashboard and/or paginated profile).
+5. Attachment remove/replace with Vercel Blob delete.
+6. Email provider for notification delivery.
+7. Discovery pagination / cursor loading.
+8. Analytics and error tracking.
 
-- Malayalam interface.
-- Malayalam and English bilingual bill drafting.
+## 14. Future Enhancements
+
+- Full Malayalam interface and bilingual bill drafting UX beyond the localized nav/home/discovery chrome.
 - Legislative format templates.
-- Public petitions attached to bills.
-- MLA outreach workflow.
 - Organization accounts for NGOs and civic groups.
 - Verified expert review badges.
 - API for public civic data access.
 - Integration with public datasets and government references.
 
-## 13. Success Metrics
+## 15. Success Metrics
 
 MVP success can be measured through:
 
@@ -404,13 +406,13 @@ MVP success can be measured through:
 - Number of bill drafts created.
 - Number of published bills.
 - Number of votes per bill.
-- Number of comments and discussions.
-- Number of social shares.
+- Number of comments, suggestions, and discussions.
+- Number of social shares and saves/follows.
 - Percentage of drafts improved with AI assistance.
-- Number of bills submitted to MLAs or civic organizations.
+- Number of bills moved toward MLA or civic organization follow-up.
 - Contributor activity in the open-source repository.
 
-## 14. Key Product Principles
+## 16. Key Product Principles
 
 - Public-first: Bills should be easy for ordinary people to understand.
 - Drafts, not legal advice: AI should assist, not claim authority.
