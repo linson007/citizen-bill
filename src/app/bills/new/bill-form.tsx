@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import {
   FileText,
   History,
+  CheckCircle2,
   Lightbulb,
   Loader2,
   Send,
@@ -105,6 +106,9 @@ function BillFormEditor({
     useState<AiTitleCategorySuggestion | null>(null);
   const [suggestionError, setSuggestionError] = useState("");
   const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<"saved" | "saving">(
+    "saved",
+  );
   const lastSavedSnapshotRef = useRef(JSON.stringify(fields));
   const submittedRef = useRef(false);
 
@@ -119,6 +123,7 @@ function BillFormEditor({
       return;
     }
 
+    setDraftStatus("saving");
     const timer = setTimeout(() => {
       if (submittedRef.current) {
         return;
@@ -126,6 +131,7 @@ function BillFormEditor({
 
       lastSavedSnapshotRef.current = snapshot;
       saveBillDraft(fields);
+      setDraftStatus("saved");
     }, AUTOSAVE_DELAY_MS);
 
     return () => clearTimeout(timer);
@@ -151,6 +157,7 @@ function BillFormEditor({
     setFields({ ...EMPTY_BILL_DRAFT_FIELDS });
     setBannerDismissed(true);
     lastSavedSnapshotRef.current = JSON.stringify(EMPTY_BILL_DRAFT_FIELDS);
+    setDraftStatus("saved");
   }
 
   function updateField(name: keyof typeof fields, value: string) {
@@ -210,8 +217,20 @@ function BillFormEditor({
     }
   }
 
+  const completedFields = [
+    fields.title,
+    fields.description,
+    fields.category,
+    fields.problem,
+    fields.proposedSolution,
+    fields.expectedImpact,
+    fields.body,
+    fields.references,
+  ].filter((value) => value.trim().length > 0).length;
+  const completionPercent = Math.round((completedFields / 8) * 100);
+
   return (
-    <form action={formAction} onSubmit={handleSubmit} className="space-y-10">
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-8">
       {restoredDraft && !bannerDismissed ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#c8c0ae] bg-[#fbfaf7] px-4 py-3">
           <p className="flex items-center gap-2 text-sm text-[#3f3a32]">
@@ -238,6 +257,47 @@ function BillFormEditor({
           </button>
         </div>
       ) : null}
+
+      <section
+        aria-label={ml ? "ഡ്രാഫ്റ്റ് പുരോഗതി" : "Draft progress"}
+        className="rounded-lg border border-border bg-surface-raised p-4 shadow-sm"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-ink-soft">
+              {ml ? "നിങ്ങളുടെ ബിൽ ഡ്രാഫ്റ്റ്" : "Your bill draft"}
+            </p>
+            <p className="mt-0.5 text-sm text-ink-muted">
+              {ml
+                ? `${completedFields} / 8 പ്രധാന വിവരങ്ങൾ ചേർത്തു`
+                : `${completedFields} of 8 key details added`}
+            </p>
+          </div>
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted" aria-live="polite">
+            {draftStatus === "saving" ? (
+              <Loader2 className="animate-spin text-accent" size={15} aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="text-success" size={15} aria-hidden="true" />
+            )}
+            {draftStatus === "saving"
+              ? ml ? "സംരക്ഷിക്കുന്നു…" : "Saving…"
+              : ml ? "ഈ ഉപകരണത്തിൽ സംരക്ഷിച്ചു" : "Saved on this device"}
+          </p>
+        </div>
+        <div
+          className="mt-3 h-2 overflow-hidden rounded-full bg-surface"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={8}
+          aria-valuenow={completedFields}
+          aria-label={ml ? "ഡ്രാഫ്റ്റ് പൂർത്തീകരണം" : "Draft completion"}
+        >
+          <div
+            className="h-full rounded-full bg-accent transition-[width] duration-300"
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
+      </section>
 
       <section aria-label={ml ? "ഘട്ടം 1: AI ഉപയോഗിച്ച് ഡ്രാഫ്റ്റ്" : "Step 1: Draft with AI"}>
         <StepHeading
@@ -430,7 +490,7 @@ function BillFormEditor({
             </FormSection>
           </div>
 
-          <aside className="space-y-4">
+          <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-lg border border-[#d8d2c4] bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-md bg-[#e4eef6] text-[#123c69]">
@@ -636,9 +696,11 @@ function TextArea({
       : [];
 
   return (
-    <label className="block">
+    <div className="block">
       <span className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold text-[#3f3a32]">{label}</span>
+        <label htmlFor={name} className="text-sm font-semibold text-[#3f3a32]">
+          {label}
+        </label>
         {snippets.length > 0 ? (
           <span className="flex gap-1">
             {snippets.map((snippet) => (
@@ -655,6 +717,7 @@ function TextArea({
         ) : null}
       </span>
       <textarea
+        id={name}
         name={name}
         rows={rows}
         placeholder={placeholder}
@@ -663,7 +726,7 @@ function TextArea({
         className="mt-2 w-full resize-y rounded-md border border-[#c8c0ae] bg-white px-3 py-3 text-sm leading-6 outline-none focus:border-[#123c69] focus:ring-2 focus:ring-[#123c69]/15"
       />
       {error ? <ErrorText>{error}</ErrorText> : null}
-    </label>
+    </div>
   );
 }
 
