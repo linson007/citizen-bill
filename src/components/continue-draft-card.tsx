@@ -54,7 +54,7 @@ export function ContinueDraftCard() {
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-accent text-white">
+          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-accent-solid text-white">
             <PenLine size={20} aria-hidden="true" />
           </span>
           <div>
@@ -81,7 +81,7 @@ export function ContinueDraftCard() {
           </button>
           <Link
             href="/bills/new"
-            className="flex h-10 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+            className="flex h-10 items-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
           >
             <PenLine size={16} aria-hidden="true" />
             Continue drafting

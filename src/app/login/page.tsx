@@ -28,7 +28,7 @@ export default async function LoginPage({
         <div className="mb-6 flex items-center gap-3">
           <Link
             href="/"
-            className="grid size-11 place-items-center rounded-lg bg-accent text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            className="grid size-11 place-items-center rounded-lg bg-accent-solid text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             aria-label={t.login.home}
           >
             <Scale size={23} aria-hidden="true" />

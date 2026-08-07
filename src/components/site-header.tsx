@@ -35,7 +35,7 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-surface-raised/95 shadow-sm shadow-hero-ink/5 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-8 sm:py-4">
         <Link href="/" className="flex min-w-0 items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent text-white">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-solid text-white">
             <Scale size={22} aria-hidden="true" />
           </span>
           <span className="min-w-0">
@@ -97,7 +97,7 @@ export async function SiteHeader() {
             >
               <Bell size={18} aria-hidden="true" />
               {unreadNotificationCount > 0 ? (
-                <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] font-bold leading-5 text-white">
+                <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-accent-solid px-1 text-[11px] font-bold leading-5 text-white">
                   {unreadNotificationCount > 99
                     ? "99+"
                     : unreadNotificationCount}
@@ -119,7 +119,7 @@ export async function SiteHeader() {
           <Link
             href="/bills/new"
             aria-label={t.nav.newBill}
-            className="flex h-11 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 sm:px-4"
+            className="flex h-11 items-center gap-2 rounded-md bg-accent-solid px-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 sm:px-4"
           >
             <Plus size={16} aria-hidden="true" />
             <span className="hidden sm:inline">{t.nav.newBill}</span>

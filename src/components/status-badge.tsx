@@ -10,7 +10,7 @@ const STATUS_STYLES: Record<string, StatusStyle> = {
   },
   PUBLISHED: {
     badge: "bg-accent-soft text-accent",
-    dot: "bg-accent",
+    dot: "bg-accent-solid",
   },
   ARCHIVED: {
     badge: "border border-border bg-surface text-ink-muted",
@@ -42,7 +42,7 @@ const STATUS_STYLES: Record<string, StatusStyle> = {
   },
   OPEN: {
     badge: "bg-accent-soft text-accent",
-    dot: "bg-accent",
+    dot: "bg-accent-solid",
   },
   ACCEPTED: {
     badge: "bg-success-soft text-success",
@@ -52,7 +52,7 @@ const STATUS_STYLES: Record<string, StatusStyle> = {
 
 const DEFAULT_STYLE: StatusStyle = {
   badge: "bg-accent-soft text-accent",
-  dot: "bg-accent",
+  dot: "bg-accent-solid",
 };
 
 export function StatusBadge({

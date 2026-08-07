@@ -11,7 +11,7 @@ export async function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-10 sm:px-8 md:flex-row md:items-start md:justify-between">
         <div className="max-w-md">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-lg bg-accent text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-accent-solid text-white">
               <Scale size={18} aria-hidden="true" />
             </span>
             <div>

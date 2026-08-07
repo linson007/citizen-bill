@@ -137,7 +137,7 @@ export default async function ModerationPage() {
 
                     <form action={resetAiUsageAction}>
                       <input type="hidden" name="userId" value={row.userId} />
-                      <button className="h-10 rounded-md bg-accent px-3 text-sm font-semibold text-white">
+                      <button className="h-10 rounded-md bg-accent-solid px-3 text-sm font-semibold text-white">
                         Reset today
                       </button>
                     </form>

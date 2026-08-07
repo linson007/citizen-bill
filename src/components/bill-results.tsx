@@ -247,7 +247,7 @@ function LayoutToggleButton({
       title={label}
       className={`grid size-9 place-items-center transition-colors ${
         active
-          ? "bg-accent text-white"
+          ? "bg-accent-solid text-white"
           : "bg-surface-raised text-ink-muted hover:text-foreground"
       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2`}
     >
@@ -423,7 +423,7 @@ function Metric({
   return (
     <div
       className={`flex h-10 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold ${
-        primary ? "bg-accent text-white" : "border border-border text-ink-soft"
+        primary ? "bg-accent-solid text-white" : "border border-border text-ink-soft"
       }`}
     >
       <Icon size={16} aria-hidden="true" />

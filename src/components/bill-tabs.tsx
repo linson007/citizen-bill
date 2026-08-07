@@ -83,7 +83,7 @@ export function BillTabs({
               onClick={() => setActive(tab.id)}
               className={`flex h-10 items-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
                 isActive
-                  ? "bg-accent text-white"
+                  ? "bg-accent-solid text-white"
                   : "border border-border-strong bg-surface-raised text-ink-soft hover:border-accent hover:text-accent"
               }`}
             >

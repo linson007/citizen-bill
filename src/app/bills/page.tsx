@@ -108,7 +108,7 @@ export default async function BillsPage({
             </div>
             <Link
               href="/bills/new"
-              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink"
+              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
             >
               <FileText size={17} aria-hidden="true" />
               {t.bills.create}
@@ -174,7 +174,7 @@ export default async function BillsPage({
 
           <button
             type="submit"
-            className="h-11 rounded-md bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-hero-ink sm:col-span-2 lg:col-auto"
+            className="h-11 rounded-md bg-accent-solid px-5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover sm:col-span-2 lg:col-auto"
           >
             {t.bills.search}
           </button>
@@ -244,7 +244,7 @@ export default async function BillsPage({
             </p>
             <Link
               href="/bills/new"
-              className="mt-5 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              className="mt-5 inline-flex h-11 items-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             >
               <FileText size={16} aria-hidden="true" />
               {t.bills.create}
