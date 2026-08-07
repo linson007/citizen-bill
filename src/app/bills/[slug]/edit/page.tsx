@@ -148,7 +148,7 @@ export default async function EditBillPage({
 
           <button
             type="submit"
-            className="flex h-11 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+            className="flex h-11 items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
           >
             <Save size={17} aria-hidden="true" />
             Save changes

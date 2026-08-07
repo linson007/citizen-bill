@@ -327,7 +327,7 @@ export function AiDraftHelper({
           type="button"
           onClick={sendChatMessage}
           disabled={loading || prompt.trim().length < 5}
-          className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
+        className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} aria-hidden="true" />
@@ -361,7 +361,7 @@ export function AiDraftHelper({
               <button
                 type="button"
                 onClick={() => onInsert(fields)}
-                className="flex h-8 items-center gap-1.5 rounded-md bg-accent px-2.5 text-xs font-semibold text-white"
+                className="flex h-8 items-center gap-1.5 rounded-md bg-accent-solid px-2.5 text-xs font-semibold text-white"
               >
                 {fields.proposedSolution || fields.expectedImpact ? (
                   <Wand2 size={14} aria-hidden="true" />

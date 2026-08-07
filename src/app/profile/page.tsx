@@ -178,7 +178,7 @@ export default async function ProfilePage() {
               </label>
               <SubmitStatusButton
                 pending={ml ? "സേവ് ചെയ്യുന്നു…" : "Saving…"}
-                className="h-10 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                className="h-10 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Save size={16} aria-hidden="true" />
                 {ml ? "പ്രൊഫൈൽ സേവ് ചെയ്യുക" : "Save profile"}

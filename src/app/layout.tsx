@@ -89,7 +89,7 @@ export default async function RootLayout({
         />
         <a
           href="#main-content"
-          className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-accent px-4 py-3 text-sm font-semibold text-white focus:not-sr-only"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-accent-solid px-4 py-3 text-sm font-semibold text-white focus:not-sr-only"
         >
           Skip to main content
         </a>

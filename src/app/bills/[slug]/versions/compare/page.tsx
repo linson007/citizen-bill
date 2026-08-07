@@ -123,7 +123,7 @@ export default async function VersionComparePage({
           </select>
           <button
             type="submit"
-            className="h-10 rounded-md bg-accent px-4 text-sm font-semibold text-white"
+            className="h-10 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white"
           >
             Compare
           </button>

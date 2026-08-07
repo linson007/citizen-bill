@@ -63,7 +63,7 @@ export default async function Home() {
             <div className="animate-fade-up-delay-2 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/bills/new"
-                className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+                className="flex h-12 items-center justify-center gap-2 rounded-md bg-accent-solid px-6 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
               >
                 <PenLine size={18} aria-hidden="true" />
                 {t.home.ctaPrimary}
@@ -148,7 +148,7 @@ export default async function Home() {
             </ol>
             <Link
               href="/bills/new"
-              className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-hero-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
             >
               {t.home.howCta}
               <ArrowRight size={16} aria-hidden="true" />

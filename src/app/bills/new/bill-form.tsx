@@ -302,7 +302,7 @@ function BillFormEditor({
           aria-label={ml ? "ഡ്രാഫ്റ്റ് പൂർത്തീകരണം" : "Draft completion"}
         >
           <div
-            className="h-full rounded-full bg-accent transition-[width] duration-300"
+            className="h-full rounded-full bg-accent-solid transition-[width] duration-300"
             style={{ width: `${completionPercent}%` }}
           />
         </div>
@@ -345,7 +345,7 @@ function BillFormEditor({
                     type="button"
                     onClick={suggestTitleAndCategory}
                     disabled={suggestionLoading}
-                    className="flex h-9 items-center gap-1.5 rounded-md bg-accent px-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                    className="flex h-9 items-center gap-1.5 rounded-md bg-accent-solid px-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {suggestionLoading ? (
                       <Loader2
@@ -545,7 +545,7 @@ function StepHeading({
 }) {
   return (
     <div className="mb-4 flex items-start gap-3">
-      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-white">
+      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-solid text-sm font-semibold text-white">
         {number}
       </span>
       <div>
@@ -569,7 +569,7 @@ function SubmitButton({ intent, locale }: { intent: "draft" | "publish"; locale:
       value={intent}
       className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-70 ${
         isPublish
-          ? "bg-accent text-white"
+          ? "bg-accent-solid text-white"
           : "border border-border-strong bg-surface-raised text-ink-soft"
       }`}
       disabled={pending}

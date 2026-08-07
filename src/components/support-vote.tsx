@@ -40,7 +40,7 @@ export function SupportVote({
         className={`flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition-colors ${
           active
             ? "border border-accent bg-accent-soft text-accent"
-            : "bg-accent text-white"
+            : "bg-accent-solid text-white"
         }`}
       >
         <ThumbsUp size={16} aria-hidden="true" />
@@ -57,7 +57,7 @@ export function SupportVote({
       className={`flex h-11 items-center gap-2 rounded-md px-5 text-sm font-semibold shadow-sm transition-colors ${
         active
           ? "border border-accent bg-accent-soft text-accent"
-          : "bg-accent text-white hover:bg-hero-ink"
+          : "bg-accent-solid text-white hover:bg-accent-hover"
       }`}
     >
       <ThumbsUp size={17} aria-hidden="true" />

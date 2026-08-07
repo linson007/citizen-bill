@@ -20,7 +20,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/bills"
-            className="flex h-11 items-center justify-center rounded-md bg-accent px-5 text-sm font-semibold text-white shadow-sm"
+            className="flex h-11 items-center justify-center rounded-md bg-accent-solid px-5 text-sm font-semibold text-white shadow-sm"
           >
             Browse bills
           </Link>

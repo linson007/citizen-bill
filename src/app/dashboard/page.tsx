@@ -351,7 +351,7 @@ export default async function DashboardPage() {
             </div>
             <Link
               href="/bills/new"
-              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+              className="flex h-11 w-fit items-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
             >
               <Plus size={17} aria-hidden="true" />
               New bill
@@ -369,7 +369,7 @@ export default async function DashboardPage() {
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-md bg-accent text-white">
+                <span className="grid size-10 place-items-center rounded-md bg-accent-solid text-white">
                   <Rocket size={20} aria-hidden="true" />
                 </span>
                 <div>
@@ -390,7 +390,7 @@ export default async function DashboardPage() {
               className="mt-4 h-2 overflow-hidden rounded-full bg-border"
             >
               <div
-                className="h-full rounded-full bg-accent transition-all"
+                className="h-full rounded-full bg-accent-solid transition-all"
                 style={{ width: `${onboardingProgress}%` }}
               />
             </div>
@@ -657,7 +657,7 @@ export default async function DashboardPage() {
                 </select>
                 <button
                   type="submit"
-                  className="flex h-10 w-full items-center justify-center rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                  className="flex h-10 w-full items-center justify-center rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
                 >
                   Search bills
                 </button>

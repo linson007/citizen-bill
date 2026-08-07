@@ -59,7 +59,7 @@ export default async function AiSessionPage({
             {aiSession.bill ? (
               <Link
                 href={`/bills/${aiSession.bill.slug}/edit`}
-                className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white"
+                className="flex h-10 items-center gap-2 rounded-md bg-accent-solid px-3 text-sm font-semibold text-white"
               >
                 <FileText size={16} aria-hidden="true" />
                 Continue on bill
@@ -67,7 +67,7 @@ export default async function AiSessionPage({
             ) : (
               <Link
                 href="/bills/new"
-                className="flex h-10 items-center gap-2 rounded-md bg-accent px-3 text-sm font-semibold text-white"
+                className="flex h-10 items-center gap-2 rounded-md bg-accent-solid px-3 text-sm font-semibold text-white"
               >
                 <FileText size={16} aria-hidden="true" />
                 Start new bill

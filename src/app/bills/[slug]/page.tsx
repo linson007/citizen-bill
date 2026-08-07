@@ -283,7 +283,7 @@ export default async function BillDetailPage({
             {isAuthor ? (
               <Link
                 href={`/bills/${bill.slug}/edit`}
-                className="flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-hero-ink"
+                className="flex h-11 items-center gap-2 rounded-md bg-accent-solid px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover"
               >
                 <Pencil size={17} aria-hidden="true" />
                 Edit bill
@@ -402,7 +402,7 @@ export default async function BillDetailPage({
                       </label>
                       <button
                         type="submit"
-                        className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                        className="mt-3 flex h-10 items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
                       >
                         <SendHorizontal size={16} aria-hidden="true" />
                         Post comment
@@ -523,7 +523,7 @@ export default async function BillDetailPage({
                       </label>
                       <button
                         type="submit"
-                        className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                        className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
                       >
                         <SendHorizontal size={16} aria-hidden="true" />
                         Suggest amendment
@@ -615,7 +615,7 @@ export default async function BillDetailPage({
                       {versions.length >= 2 ? (
                         <Link
                           href={`/bills/${bill.slug}/versions/compare?from=${versions[1].id}&to=${versions[0].id}`}
-                          className="block rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white"
+                          className="block rounded-md bg-accent-solid px-3 py-2 text-sm font-semibold text-white"
                         >
                           Compare latest versions
                         </Link>
@@ -790,7 +790,7 @@ export default async function BillDetailPage({
               </p>
               <button
                 type="submit"
-                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Send size={17} aria-hidden="true" />
                 Publish bill
@@ -937,7 +937,7 @@ export default async function BillDetailPage({
             ) : (
               <Link
                 href={`/bills/${bill.slug}/edit`}
-                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Pencil size={16} aria-hidden="true" />
                 Edit bill
@@ -1009,7 +1009,7 @@ function SuggestionButton({
         className={`h-8 rounded-md border px-2.5 text-xs font-semibold ${
           intent === "reject"
             ? "border-border-strong text-danger"
-            : "border-accent bg-accent text-white"
+            : "border-accent bg-accent-solid text-white"
         }`}
       >
         {children}
@@ -1165,7 +1165,7 @@ function BillEngagementPrompt({
       </p>
       <Link
         href={href}
-        className="mt-4 inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+        className="mt-4 inline-flex h-11 items-center rounded-md bg-accent-solid px-4 text-sm font-semibold text-white shadow-sm"
       >
         Join the discussion
       </Link>
@@ -1265,7 +1265,7 @@ function StatusWorkflow({ status }: { status: string }) {
           <div key={step.label} className="flex items-center gap-3">
             <span
               className={`size-3 rounded-full ${
-                step.active || step.done ? "bg-accent" : "bg-border"
+                step.active || step.done ? "bg-accent-solid" : "bg-border"
               }`}
             />
             <span

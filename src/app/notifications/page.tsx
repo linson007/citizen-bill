@@ -91,7 +91,7 @@ export default async function NotificationsPage({
               aria-current={selectedFilter === tab.value ? "page" : undefined}
               className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${
                 selectedFilter === tab.value
-                  ? "border-accent bg-accent text-white"
+                  ? "border-accent bg-accent-solid text-white"
                   : "border-border-strong bg-surface-raised text-ink-soft hover:border-accent"
               }`}
             >
