@@ -48,6 +48,7 @@ export function SharePanel({
   embedded?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function recordShare(platform: string) {
     await fetch(`/api/bills/${slug}/share`, {
@@ -60,10 +61,15 @@ export function SharePanel({
   }
 
   async function copyLink() {
-    await navigator.clipboard.writeText(url);
-    await recordShare("copy");
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    try {
+      await navigator.clipboard.writeText(url);
+      await recordShare("copy");
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setFailed(true);
+      window.setTimeout(() => setFailed(false), 1800);
+    }
   }
 
   return (
@@ -94,6 +100,7 @@ export function SharePanel({
         <button
           type="button"
           onClick={copyLink}
+          aria-pressed={copied}
           className="flex h-10 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-raised px-3 text-sm font-semibold text-ink-soft shadow-sm"
         >
           {copied ? (
@@ -102,6 +109,13 @@ export function SharePanel({
             <Copy size={16} aria-hidden="true" />
           )}
           {copied ? "Copied" : "Copy link"}
+          <span aria-live="polite" className="sr-only">
+            {copied
+              ? "Link copied to clipboard"
+              : failed
+                ? "Could not copy link"
+                : ""}
+          </span>
         </button>
       </div>
     </div>
