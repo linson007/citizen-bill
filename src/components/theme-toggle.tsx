@@ -31,6 +31,7 @@ export function ThemeToggle({ label }: { label: string }) {
       type="button"
       onClick={toggleTheme}
       aria-label={label}
+      aria-pressed={theme === "dark"}
       title={label}
       className="grid size-11 place-items-center rounded-md border border-border-strong bg-surface-raised text-ink-soft transition-colors hover:bg-surface hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
     >
