@@ -17,6 +17,7 @@ import {
 } from "@/app/profile/actions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SubmitStatusButton } from "@/components/submit-status-button";
 import { authOptions } from "@/lib/auth";
 import { PUBLIC_BILL_STATUSES } from "@/lib/bill-visibility";
 import { prisma } from "@/lib/prisma";
@@ -175,13 +176,13 @@ export default async function ProfilePage() {
                   className="mt-2 h-10 w-full rounded-md border border-border-strong bg-surface-raised px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
                 />
               </label>
-              <button
-                type="submit"
-                className="flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
+              <SubmitStatusButton
+                pending={ml ? "സേവ് ചെയ്യുന്നു…" : "Saving…"}
+                className="h-10 rounded-md bg-accent px-4 text-sm font-semibold text-white shadow-sm"
               >
                 <Save size={16} aria-hidden="true" />
                 {ml ? "പ്രൊഫൈൽ സേവ് ചെയ്യുക" : "Save profile"}
-              </button>
+              </SubmitStatusButton>
             </form>
           </div>
 
